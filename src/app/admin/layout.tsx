@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { supabaseAdminClient } from "@/lib/supabaseAdminClient";
 import { adminFetch } from "@/lib/adminApi";
-import { LayoutDashboard, Users, LogOut, ShieldCheck, Loader2 } from "lucide-react";
+import { LayoutDashboard, Users, LogOut, ShieldCheck, Loader2, Bell } from "lucide-react";
 import "@/styles/portal.css";
 
 export default function AdminLayout({
@@ -99,6 +99,12 @@ export default function AdminLayout({
             className={`admin-nav-item ${pathname.startsWith("/admin/drivers") ? "active" : ""}`}
           >
             <Users /> Drivers
+          </Link>
+          <Link
+            href="/admin/push"
+            className={`admin-nav-item ${pathname.startsWith("/admin/push") ? "active" : ""}`}
+          >
+            <Bell /> Push Notifications
           </Link>
           {/* Phase 2:
           <Link href="/admin/rides" className="admin-nav-item"><Route /> Rides</Link>
