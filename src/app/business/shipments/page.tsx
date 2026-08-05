@@ -7,13 +7,60 @@ import { portalFetch } from "@/lib/portalFetch";
 export default function ShipmentsPage() {
   const [shipments, setShipments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
 
-  useEffect(() => {
+  const fetchShipments = () => {
+    setLoading(true);
     portalFetch("/business/portal/shipments")
       .then((res) => setShipments(res.shipments || []))
       .catch(console.error)
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchShipments();
   }, []);
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      try {
+        const text = event.target?.result as string;
+        // Simple CSV parser for POC
+        const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+        const dataLines = lines.slice(1); // skip header
+        
+        const bulkShipments = dataLines.map(line => {
+          // Splitting by comma (ignores commas inside quotes for a robust parser, but simple split for POC)
+          const [origin, dest, vehicle, weight] = line.split(',').map(s => s.trim());
+          return {
+            origin_address: origin,
+            dest_address: dest,
+            vehicle_type: vehicle || "mini_truck",
+            cargo_weight_kg: weight || "100",
+          };
+        });
+
+        await portalFetch("/business/portal/shipments/bulk", {
+          method: "POST",
+          body: JSON.stringify({ shipments: bulkShipments })
+        });
+        
+        fetchShipments();
+      } catch (err) {
+        console.error("Upload failed", err);
+        alert("Upload failed");
+      } finally {
+        setUploading(false);
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = ''; // reset input
+  };
 
   return (
     <div>
@@ -23,10 +70,11 @@ export default function ShipmentsPage() {
           <p className="text-gray-500">Manage, track, and bulk-upload your fleet logistics.</p>
         </div>
         <div className="flex gap-3">
-          <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors">
+          <label className={`flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors cursor-pointer ${uploading ? 'opacity-50' : ''}`}>
             <Upload size={18} />
-            Bulk CSV Upload
-          </button>
+            {uploading ? 'Uploading...' : 'Bulk CSV Upload'}
+            <input type="file" accept=".csv" className="hidden" onChange={handleFileUpload} disabled={uploading} />
+          </label>
           <button className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium transition-colors">
             <Plus size={18} />
             New Shipment
