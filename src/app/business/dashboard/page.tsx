@@ -21,55 +21,55 @@ export default function BusinessDashboard() {
 
   return (
     <div>
-      <h1 className="text-3xl font-display font-bold text-gray-900 mb-2">Overview</h1>
-      <p className="text-gray-500 mb-8">Welcome back. Here's what's happening with your fleet today.</p>
+      <h1 className="admin-page-title">Overview</h1>
+      <p className="admin-page-subtitle mb-8">Welcome back. Here's what's happening with your fleet today.</p>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-gray-500 mb-1">Active Shipments</p>
-            <h3 className="text-2xl font-bold text-gray-900">{stats.active}</h3>
+      <div className="admin-stats-grid">
+        <div className="admin-stat-card">
+          <div className="admin-stat-head">
+            <span className="admin-stat-title">Active Shipments</span>
+            <span className="admin-stat-icon cyan">
+              <TruckIcon />
+            </span>
           </div>
-          <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center">
-            <TruckIcon />
-          </div>
+          <div className="admin-stat-value">{stats.active}</div>
         </div>
 
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-gray-500 mb-1">Completed (Month)</p>
-            <h3 className="text-2xl font-bold text-gray-900">{stats.completed}</h3>
+        <div className="admin-stat-card">
+          <div className="admin-stat-head">
+            <span className="admin-stat-title">Completed (Month)</span>
+            <span className="admin-stat-icon green">
+              <CheckCircle size={20} />
+            </span>
           </div>
-          <div className="w-12 h-12 bg-green-50 text-green-600 rounded-full flex items-center justify-center">
-            <CheckCircle size={24} />
-          </div>
+          <div className="admin-stat-value">{stats.completed}</div>
         </div>
 
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-gray-500 mb-1">Scheduled Jobs</p>
-            <h3 className="text-2xl font-bold text-gray-900">{stats.scheduled}</h3>
+        <div className="admin-stat-card">
+          <div className="admin-stat-head">
+            <span className="admin-stat-title">Scheduled Jobs</span>
+            <span className="admin-stat-icon amber">
+              <Clock size={20} />
+            </span>
           </div>
-          <div className="w-12 h-12 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center">
-            <Clock size={24} />
-          </div>
+          <div className="admin-stat-value">{stats.scheduled}</div>
         </div>
 
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-gray-500 mb-1">Logistics Spend</p>
-            <h3 className="text-2xl font-bold text-gray-900">₹{(stats.spend / 1000).toFixed(1)}k</h3>
+        <div className="admin-stat-card">
+          <div className="admin-stat-head">
+            <span className="admin-stat-title">Logistics Spend</span>
+            <span className="admin-stat-icon">
+              <TrendingUp size={20} />
+            </span>
           </div>
-          <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center">
-            <TrendingUp size={24} />
-          </div>
+          <div className="admin-stat-value">₹{(stats.spend / 1000).toFixed(1)}k</div>
         </div>
       </div>
 
       {/* Recent Activity */}
-      <h2 className="text-xl font-semibold text-gray-900 mb-4">Live Tracking Map</h2>
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-2 h-[420px] flex flex-col items-center justify-center text-center">
+      <h2 className="admin-page-title mt-8 mb-4" style={{ fontSize: '18px' }}>Live Tracking Map</h2>
+      <div style={{ height: 420, borderRadius: 12, overflow: 'hidden', border: '1px solid var(--admin-border)' }}>
         <LiveTrackingMap />
       </div>
     </div>

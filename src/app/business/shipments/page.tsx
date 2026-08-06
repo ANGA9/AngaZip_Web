@@ -64,88 +64,93 @@ export default function ShipmentsPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 32 }}>
         <div>
-          <h1 className="text-3xl font-display font-bold text-gray-900 mb-2">Shipments</h1>
-          <p className="text-gray-500">Manage, track, and bulk-upload your fleet logistics.</p>
+          <h1 className="admin-page-title">Shipments</h1>
+          <p className="admin-page-subtitle">Manage, track, and bulk-upload your fleet logistics.</p>
         </div>
-        <div className="flex gap-3">
-          <label className={`flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors cursor-pointer ${uploading ? 'opacity-50' : ''}`}>
-            <Upload size={18} />
+        <div style={{ display: "flex", gap: 12 }}>
+          <label className={`btn-white ${uploading ? 'disabled' : ''}`} style={{ cursor: uploading ? 'default' : 'pointer', opacity: uploading ? 0.7 : 1 }}>
+            <Upload size={16} style={{ marginRight: 8 }} />
             {uploading ? 'Uploading...' : 'Bulk CSV Upload'}
-            <input type="file" accept=".csv" className="hidden" onChange={handleFileUpload} disabled={uploading} />
+            <input type="file" accept=".csv" style={{ display: 'none' }} onChange={handleFileUpload} disabled={uploading} />
           </label>
-          <button className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium transition-colors">
-            <Plus size={18} />
+          <button className="btn-primary">
+            <Plus size={16} style={{ marginRight: 8 }} />
             New Shipment
           </button>
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="admin-table-container">
         {/* Toolbar */}
-        <div className="p-4 border-b border-gray-200 flex items-center justify-between bg-gray-50">
-          <div className="relative w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+        <div className="admin-table-toolbar">
+          <div style={{ position: "relative", width: 256 }}>
+            <Search style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "var(--admin-muted-soft)" }} size={16} />
             <input 
               type="text" 
               placeholder="Search by ID or destination..." 
-              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              style={{ width: "100%", padding: "8px 12px 8px 36px", border: "1px solid var(--admin-border-strong)", borderRadius: 8, fontSize: 14, outline: "none" }}
             />
           </div>
-          <button className="flex items-center gap-2 px-3 py-1.5 text-gray-600 hover:bg-gray-100 rounded-md text-sm font-medium transition-colors">
-            <Filter size={16} />
+          <button className="btn-white">
+            <Filter size={16} style={{ marginRight: 6 }} />
             Filter
           </button>
         </div>
 
         {/* Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-white border-b border-gray-200 text-gray-500">
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>Tracking ID</th>
+              <th>Origin</th>
+              <th>Destination</th>
+              <th>Vehicle</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loading ? (
+              [...Array(3)].map((_, i) => (
+                <tr key={i}>
+                  <td colSpan={6}>
+                    <div className="admin-skel" style={{ height: 20, width: "100%" }} />
+                  </td>
+                </tr>
+              ))
+            ) : shipments.length === 0 ? (
               <tr>
-                <th className="px-6 py-4 font-medium">Tracking ID</th>
-                <th className="px-6 py-4 font-medium">Origin</th>
-                <th className="px-6 py-4 font-medium">Destination</th>
-                <th className="px-6 py-4 font-medium">Vehicle</th>
-                <th className="px-6 py-4 font-medium">Status</th>
-                <th className="px-6 py-4 font-medium text-right">Actions</th>
+                <td colSpan={6}>
+                  <div className="admin-empty">
+                    <div className="admin-empty-title">No shipments found.</div>
+                    <div className="admin-empty-sub">Get started by uploading a CSV or creating one manually.</div>
+                  </div>
+                </td>
               </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {loading ? (
-                <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-gray-500">Loading shipments...</td>
+            ) : (
+              shipments.map((ship) => (
+                <tr key={ship.id}>
+                  <td className="admin-cell-mono">#{ship.id.substring(0, 8)}</td>
+                  <td>{ship.origin_address}</td>
+                  <td>{ship.dest_address}</td>
+                  <td style={{ textTransform: "capitalize" }}>{ship.vehicle_type?.replace('_', ' ')}</td>
+                  <td>
+                    <span className={`admin-badge badge-${ship.status}`}>
+                      {ship.status}
+                    </span>
+                  </td>
+                  <td>
+                    <button className="admin-stat-link" style={{ background: "none", border: "none", color: "var(--admin-accent)", cursor: "pointer", fontSize: 13, fontWeight: 500 }}>
+                      View
+                    </button>
+                  </td>
                 </tr>
-              ) : shipments.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-gray-500">No shipments found.</td>
-                </tr>
-              ) : (
-                shipments.map((s) => (
-                  <tr key={s.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 font-medium text-gray-900">{s.id.split("-")[0].toUpperCase()}</td>
-                    <td className="px-6 py-4 text-gray-600 truncate max-w-[200px]">{s.origin_address}</td>
-                    <td className="px-6 py-4 text-gray-600 truncate max-w-[200px]">{s.dest_address}</td>
-                    <td className="px-6 py-4 text-gray-600 capitalize">{s.vehicle_type?.replace("_", " ")}</td>
-                    <td className="px-6 py-4">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        s.status === "completed" ? "bg-green-100 text-green-800" :
-                        s.status === "requested" ? "bg-yellow-100 text-yellow-800" :
-                        "bg-blue-100 text-blue-800"
-                      }`}>
-                        {s.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <button className="text-indigo-600 hover:text-indigo-900 font-medium">Track</button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+              ))
+            )}
+          </tbody>
+        </table>
       </div>
     </div>
   );
