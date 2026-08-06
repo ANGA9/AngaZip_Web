@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { adminFetch } from "@/lib/adminApi";
 import Link from "next/link";
-import { ArrowLeft, User, Car, ShieldCheck, BarChart3, Check, X, Ban, Star, Loader2 } from "lucide-react";
+import { ArrowLeft, User, Car, ShieldCheck, BarChart3, Check, X, Ban, Star, Loader2, FileText, Image as ImageIcon } from "lucide-react";
 
 export default function DriverDetail() {
   const params = useParams();
@@ -14,6 +14,17 @@ export default function DriverDetail() {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [error, setError] = useState("");
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+
+  // The `documents` bucket is private, so a /object/public/ URL returns 400 and
+  // the anon key cannot sign for another user's files. The backend attaches a
+  // short-lived `signed_url` to each row instead (see common/document-urls.ts).
+  const getDocUrl = (doc: { signed_url?: string | null; storage_path?: string }) => {
+    if (doc.signed_url) return doc.signed_url;
+    // Legacy rows stored an absolute URL directly.
+    if (doc.storage_path?.startsWith("http")) return doc.storage_path;
+    return "";
+  };
 
   const fetchDriver = async () => {
     setLoading(true);
@@ -117,6 +128,39 @@ export default function DriverDetail() {
               <p style={{ color: "var(--color-text-muted)" }}>No vehicles registered.</p>
             )}
           </div>
+          
+          <div className="admin-card">
+            <h2><FileText /> Uploaded Documents</h2>
+            {driver.driver_documents && driver.driver_documents.length > 0 ? (
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: "16px", marginTop: "16px" }}>
+                {driver.driver_documents.map((doc: any, i: number) => {
+                  const url = getDocUrl(doc);
+                  return (
+                  <div key={i} style={{ display: "flex", flexDirection: "column", gap: "8px", border: "1px solid #E5E7EB", padding: "10px", borderRadius: "8px", alignItems: "center" }}>
+                    <div
+                      style={{ width: "100%", height: "100px", backgroundColor: "#F3F4F6", borderRadius: "4px", overflow: "hidden", cursor: url ? "pointer" : "default", display: "flex", alignItems: "center", justifyContent: "center" }}
+                      onClick={() => url && setPreviewImage(url)}
+                    >
+                      {url ? (
+                        <img src={url} alt={doc.doc_type} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      ) : (
+                        <ImageIcon color="#9CA3AF" />
+                      )}
+                    </div>
+                    <span style={{ fontSize: "12px", fontWeight: 600, textTransform: "capitalize", color: "#374151" }}>
+                      {doc.doc_type.replace(/_/g, " ")}
+                    </span>
+                    <span style={{ fontSize: "11px", color: doc.status === "approved" ? "#10B981" : doc.status === "rejected" ? "#EF4444" : "#F59E0B" }}>
+                      {doc.status}
+                    </span>
+                  </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <p style={{ color: "var(--color-text-muted)", marginTop: "16px" }}>No documents uploaded yet.</p>
+            )}
+          </div>
         </div>
 
         {/* Right Column: Actions */}
@@ -192,6 +236,29 @@ export default function DriverDetail() {
           </div>
         </div>
       </div>
+
+      {/* Image Preview Modal */}
+      {previewImage && (
+        <div style={{
+          position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: "rgba(0,0,0,0.8)", zIndex: 9999,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          padding: "40px"
+        }} onClick={() => setPreviewImage(null)}>
+          <button 
+            style={{ position: "absolute", top: "20px", right: "20px", background: "white", border: "none", borderRadius: "50%", width: "40px", height: "40px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
+            onClick={(e) => { e.stopPropagation(); setPreviewImage(null); }}
+          >
+            <X size={24} color="#000" />
+          </button>
+          <img 
+            src={previewImage} 
+            alt="Document Preview" 
+            style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", borderRadius: "8px" }} 
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
     </div>
   );
 }
