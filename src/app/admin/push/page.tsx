@@ -105,8 +105,8 @@ export default function PushNotificationsPage() {
                 style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--admin-border)' }}
               >
                 <option value="all_users">All Users</option>
-                <option value="riders">Riders Only (Future)</option>
-                <option value="drivers">Drivers Only (Future)</option>
+                <option value="riders">Riders Only</option>
+                <option value="drivers">Drivers Only</option>
               </select>
             </div>
 
