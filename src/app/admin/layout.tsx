@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { supabaseAdminClient } from "@/lib/supabaseAdminClient";
 import { adminFetch } from "@/lib/adminApi";
-import { LayoutDashboard, Users, LogOut, ShieldCheck, Loader2, Bell } from "lucide-react";
+import { LayoutDashboard, Users, LogOut, ShieldCheck, Loader2, Bell, UserMinus } from "lucide-react";
 import "@/styles/portal.css";
 
 export default function AdminLayout({
@@ -96,9 +96,15 @@ export default function AdminLayout({
           <div className="admin-nav-section-label">Operations</div>
           <Link
             href="/admin/drivers"
-            className={`admin-nav-item ${pathname.startsWith("/admin/drivers") ? "active" : ""}`}
+            className={`admin-nav-item ${pathname === "/admin/drivers" ? "active" : ""}`}
           >
             <Users /> Drivers
+          </Link>
+          <Link
+            href="/admin/incomplete"
+            className={`admin-nav-item ${pathname.startsWith("/admin/incomplete") ? "active" : ""}`}
+          >
+            <UserMinus /> Possible Drivers
           </Link>
           <Link
             href="/admin/push"
