@@ -127,10 +127,14 @@ function DriversListContent() {
                   </td>
                   <td className="admin-cell-mono">{driver.phone}</td>
                   <td>
-                    {driver.vehicles?.[0] ? (
+                    {driver.vehicles ? (
                       <div>
-                        <span style={{ textTransform: "capitalize", fontWeight: 500 }}>{driver.vehicles[0].type}</span>
-                        <div className="admin-cell-sub">{driver.vehicles[0].plate}</div>
+                        <span style={{ textTransform: "capitalize", fontWeight: 500 }}>
+                          {(Array.isArray(driver.vehicles) ? driver.vehicles[0] : driver.vehicles).type}
+                        </span>
+                        <div className="admin-cell-sub">
+                          {(Array.isArray(driver.vehicles) ? driver.vehicles[0] : driver.vehicles).plate}
+                        </div>
                       </div>
                     ) : (
                       "—"

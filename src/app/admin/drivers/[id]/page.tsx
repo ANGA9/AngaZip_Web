@@ -107,16 +107,16 @@ export default function DriverDetail() {
 
           <div className="admin-card">
             <h2><Car /> Vehicle Information</h2>
-            {driver.vehicles && driver.vehicles.length > 0 ? (
-              driver.vehicles.map((v: any, i: number) => (
-                <div key={i} style={{ marginBottom: i < driver.vehicles.length - 1 ? "20px" : "0", borderBottom: i < driver.vehicles.length - 1 ? "1px solid #F4F5F7" : "none", paddingBottom: i < driver.vehicles.length - 1 ? "20px" : "0" }}>
+            {driver.vehicles ? (
+              [...(Array.isArray(driver.vehicles) ? driver.vehicles : [driver.vehicles])].map((v: any, i: number) => (
+                <div key={i} className="admin-info-grid" style={{ marginBottom: i > 0 ? "16px" : 0 }}>
                   <div className="admin-info-row">
                     <span className="admin-info-label">Type</span>
                     <span className="admin-info-value" style={{ textTransform: "capitalize" }}>{v.type}</span>
                   </div>
                   <div className="admin-info-row">
-                    <span className="admin-info-label">Plate Number</span>
-                    <span className="admin-info-value" style={{ fontFamily: "monospace", fontSize: "16px" }}>{v.plate}</span>
+                    <span className="admin-info-label">Plate</span>
+                    <span className="admin-info-value">{v.plate}</span>
                   </div>
                   <div className="admin-info-row">
                     <span className="admin-info-label">Model</span>
