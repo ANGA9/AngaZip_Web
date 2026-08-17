@@ -7,9 +7,9 @@ This document tracks the end-to-end design, responsiveness, typography, and UX p
 ## 📊 Overall Progress Summary
 
 - **Total Active Pages / Endpoints:** 26
-- **Completed & Verified (Satisfied):** 12
-- **Pending Review & Perfection:** 14
-- **Progress:** 46.2%
+- **Completed & Verified (Satisfied):** 13
+- **Pending Review & Perfection:** 13
+- **Progress:** 50.0%
 
 ---
 
@@ -27,7 +27,7 @@ This document tracks the end-to-end design, responsiveness, typography, and UX p
 | Status | Endpoint | Page Name | Description & Key Components |
 | :---: | :--- | :--- | :--- |
 | [x] | `/` | **Home / Landing** | Hero booking widget, vehicle tiers, live reviews, app CTA, light modern branding. |
-| [ ] | `/city-rides` | **City Rides** | Daily urban commute (Auto, Bike Taxi, Mini & Sedan Cabs), transparent rates. |
+| [x] | `/city-rides` | **City Rides** | Minimalist photo hero banner, interactive 4-tier vehicle showcase (Auto, Bike Taxi, Mini & Prime Sedan) with upfront rates, custom purple/cyan blob artwork, 4 impact metrics, clean FAQ accordion, AppDownloadCTA, Footer. |
 | [ ] | `/city-to-city` | **City-to-City** | Intercity outstation cabs, one-way/roundtrip bookings, luggage guidelines. |
 | [ ] | `/ride-a-bike-taxi` | **Ride a Bike Taxi** | Two-wheeler mobility, helmet rules, instant pickup & congestion bypass. |
 | [ ] | `/live-tracking` | **Live Trip Tracking** | Real-time passenger telemetry, emergency safety sharing & driver status. |
