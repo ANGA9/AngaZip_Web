@@ -6,8 +6,8 @@ const footerColumns = [
     links: [
       { label: "City rides", href: "/city-rides" },
       { label: "City to City", href: "/city-to-city" },
-      { label: "Delivery", href: "/delivery" },
-      { label: "Cities", href: "/cities" },
+      { label: "Darkstore", href: "/darkstore" },
+      { label: "Business", href: "/business" },
     ],
   },
   {
@@ -25,7 +25,7 @@ const footerColumns = [
       { label: "About Us", href: "/about-us" },
       { label: "Careers", href: "/careers" },
       { label: "Safety Hub", href: "/safety" },
-      { label: "Impact", href: "/impact" },
+      { label: "Blog & News", href: "/blog" },
     ],
   },
   {

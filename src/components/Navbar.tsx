@@ -30,8 +30,8 @@ const megaMenuData = [
     links: [
       { label: "City rides", desc: "Everyday rides at fair prices.", icon: icons.car, href: "/city-rides" },
       { label: "City to City", desc: "Travel comfortably between cities.", icon: icons.map, href: "/city-to-city" },
-      { label: "Delivery", desc: "Fast and reliable door-to-door delivery.", icon: icons.box, href: "/delivery" },
-      { label: "Cities", desc: "Find out where we operate.", icon: icons.globe, href: "/cities" },
+      { label: "Darkstore", desc: "Instant fulfillment logistics.", icon: icons.box, href: "/darkstore" },
+      { label: "Business", desc: "Corporate fleet & billing solutions.", icon: icons.briefcase, href: "/business" },
     ]
   },
   {
@@ -41,7 +41,7 @@ const megaMenuData = [
       { label: "Drive a Cab", desc: "Provide rides in your local city.", icon: icons.car, href: "/drive-a-cab" },
       { label: "Bike Taxi", desc: "Flexible bike taxi rides.", icon: icons.bike, href: "/ride-a-bike-taxi" },
       { label: "Courier delivery", desc: "Deliver small packages quickly.", icon: icons.box, href: "/deliver-as-courier" },
-      { label: "Join a Fleet", desc: "Move heavy cargo and goods.", icon: icons.truck, href: "/join-a-fleet" },
+      { label: "Join a Fleet", desc: "Manage commercial fleets.", icon: icons.truck, href: "/join-a-fleet" },
     ]
   },
   {
@@ -51,7 +51,7 @@ const megaMenuData = [
       { label: "About us", desc: "Learn about our mission and vision.", icon: icons.building, href: "/about-us" },
       { label: "Careers", desc: "Join our team and build the future.", icon: icons.briefcase, href: "/careers" },
       { label: "Safety Hub", desc: "Our commitment to keeping everyone safe.", icon: icons.shield, href: "/safety" },
-      { label: "Impact", desc: "See how we're changing communities.", icon: icons.leaf, href: "/impact" },
+      { label: "Blog & News", desc: "Stories, updates and announcements.", icon: icons.news, href: "/blog" },
     ]
   },
   {
