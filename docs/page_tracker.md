@@ -7,9 +7,9 @@ This document tracks the end-to-end design, responsiveness, typography, and UX p
 ## 📊 Overall Progress Summary
 
 - **Total Active Pages / Endpoints:** 26
-- **Completed & Verified (Satisfied):** 4
-- **Pending Review & Perfection:** 22
-- **Progress:** 15.4%
+- **Completed & Verified (Satisfied):** 6
+- **Pending Review & Perfection:** 20
+- **Progress:** 23.1%
 
 ---
 
@@ -65,8 +65,8 @@ This document tracks the end-to-end design, responsiveness, typography, and UX p
 ### 5. Support & Customer Care
 | Status | Endpoint | Page Name | Description & Key Components |
 | :---: | :--- | :--- | :--- |
-| [ ] | `/support` | **Help & Support** | Categorized FAQ knowledge base, ride dispute ticket submission desk. |
-| [ ] | `/contact` | **Contact Us** | Corporate office address, customer support emails, dedicated helpline numbers. |
+| [x] | `/support` | **Help & Support** | Searchable knowledge library, category filters, custom purple blob editorial illustration, ticket submission desk, AppDownloadCTA, Footer. |
+| [x] | `/contact` | **Contact Us** | Direct channel cards, interactive contact form, custom blue blob editorial illustration, official registered office desk, AppDownloadCTA, Footer. |
 
 ---
 
@@ -95,25 +95,21 @@ This document tracks the end-to-end design, responsiveness, typography, and UX p
 
 ## 🛠️ Perfection Criteria for Every Page
 
-When auditing each page, ensure the following checklist is completed:
-
 1. **Light, Clean & Aesthetic Theme**:
    - Pure crisp background (`#FFFFFF`), curated slate text (`#0F172A`, `#334155`), Riksho brand indigo (`#4338CA`) and cyan (`#00C2FF`) accents.
    - Zero dark navy backgrounds or muddy containers.
 
-2. **Zero Vector/Cartoon Placeholders**:
-   - Replace any generic vector graphics with real, high-resolution photographs or clean typography/card layouts.
+2. **Official Editorial Blob Art Style**:
+   - Flat vector cartoon illustration in bold, minimal editorial style with thick black outlines, flat solid color fill, and irregular abstract color blobs (`#4338CA` / `#00C2FF`).
 
 3. **100% Mobile Responsiveness (320px to 4K)**:
-   - Full support for mobile viewports without horizontal scroll or squished content.
+   - Zero horizontal scroll, adaptive typography (`clamp()`), and clean touch targets.
    - Proper padding (`100px+` top padding to clear fixed 80px Navbar).
-   - Adaptive typography (`clamp()`) and touch-friendly controls.
 
 4. **Correct Corporate Information**:
    - Registered address: `G744+2PV, Jalkal, Maheshtala, West Bengal 700141`.
    - Officer Name: `Sumit Shaw` (Chief Nodal & Grievance Redressal Officer).
-   - No placeholder GST numbers or false CIN codes.
+   - Real contact channels (`support@riksho.in`, `partnercare@riksho.in`, `grievance@riksho.in`).
 
-5. **SEO Best Practices**:
-   - Descriptive `<title>` and `<meta name="description">`.
-   - Semantic HTML5 heading hierarchy (`h1`, `h2`, `h3`).
+5. **Home Page Consistency**:
+   - Standardized `<AppDownloadCTA />` banner section and `<Footer />` across all pages.
