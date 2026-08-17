@@ -64,7 +64,7 @@ export const webPrivacyCustomerTranslations: LegalDocument = {
   entityName: "Riksho Technologies Pvt. Ltd.",
   intro: [
     "Your privacy matters to Riksho Technologies Pvt. Ltd. (the \"Company\", \"we\", \"Riksho\", \"us\" or \"our\").",
-    "This Privacy Policy (\"Policy\") describes our policies and procedures on the collection, use, processing, storage, retrieval, disclosure, transfer, and protection of your information, including personal information and sensitive personal data or information (\"Information\"), that Riksho may receive through your online access, interaction, or use of the Riksho mobile applications (\"Riksho App\"), our website located at https://riksho.in (the website and Riksho App are collectively referred to as the \"Riksho Platform\"), or through your offline interactions with us including via telephone, emails, in-person support desks, or while availing our on-demand mobility and delivery Services.",
+    "This Privacy Policy (\"Policy\") describes our policies and procedures on the collection, use, processing, storage, retrieval, disclosure, transfer, and protection of your information, including personal information and sensitive personal data or information (\"Information\"), that Riksho may receive through your online access, interaction, or use of the Riksho mobile applications (\"Riksho App\"), our website located at https://riksho.com (the website and Riksho App are collectively referred to as the \"Riksho Platform\"), or through your offline interactions with us including via telephone, emails, in-person support desks, or while availing our on-demand mobility and delivery Services.",
     "The terms \"you\" and \"your\" refer to a Customer / Rider, a Captain / Driver Partner, a Delivery Partner, or any other user accessing the Riksho Platform or availing the Services.",
     "Please read this Policy carefully before using the Riksho Platform or submitting any Information to Riksho. This Policy is incorporated into and is to be read alongside the Customer Terms of Service and applicable Partner Agreements available on the Riksho Platform."
   ],
@@ -583,7 +583,7 @@ export const webCookiePolicyCustomerTranslations: LegalDocument = {
   effectiveDate: "August 1, 2026",
   entityName: "Riksho Technologies Pvt. Ltd.",
   intro: [
-    "This Cookie & Tracking Technologies Policy (\"Cookie Policy\") explains how Riksho Technologies Pvt. Ltd. (\"Riksho\", \"we\", \"us\", or \"our\") uses cookies, local browser storage, pixel tags, software development kits (SDKs), and similar telemetry identifiers when you visit our website https://riksho.in or access our web portals.",
+    "This Cookie & Tracking Technologies Policy (\"Cookie Policy\") explains how Riksho Technologies Pvt. Ltd. (\"Riksho\", \"we\", \"us\", or \"our\") uses cookies, local browser storage, pixel tags, software development kits (SDKs), and similar telemetry identifiers when you visit our website https://riksho.com or access our web portals.",
     "This Cookie Policy is to be read in conjunction with our Customer Privacy Policy and Terms of Service. By continuing to navigate or interact with the Riksho website, you acknowledge and consent to our use of cookies and tracking technologies as described herein."
   ],
   sections: [
