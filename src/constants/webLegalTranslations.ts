@@ -27,6 +27,8 @@ export interface LegalDocument {
 export const legalUiTranslations = {
   customerTab: "Customer / Rider",
   partnerTab: "Driver / Partner",
+  allUsersTab: "Web Platform & All Users",
+  partnerPortalTab: "Partner Web Portal",
   tableOfContents: "Document Outline",
   searchPlaceholder: "Search legal clauses, keywords, terms...",
   noResults: "No matching legal clauses found",
@@ -41,7 +43,7 @@ export const legalUiTranslations = {
   faqSubtitle: "Quick answers to common legal, payment, data privacy, and compliance queries.",
   grievanceTitle: "Nodal Grievance Redressal & Statutory Compliance",
   grievanceDesc: "Pursuant to the Information Technology (Intermediary Guidelines and Digital Media Ethics Code) Rules, 2021, the Consumer Protection (E-Commerce) Rules, 2020, and the Digital Personal Data Protection (DPDP) Act, 2023, please find below the designated statutory Grievance Officer details:",
-  officerName: "Rajesh Kumar Sharma",
+  officerName: "Sumit Shaw",
   officerRole: "Chief Nodal & Grievance Redressal Officer",
   officerEntity: "Riksho Technologies Pvt. Ltd.",
   officerEmail: "grievance@riksho.in",
@@ -244,7 +246,7 @@ export const webPrivacyCustomerTranslations: LegalDocument = {
       title: "Nodal Grievance Redressal Officer & Policy Amendments",
       paragraphs: [
         "If you have any questions, concerns, feedback, or legal grievances regarding the processing of your Information, please reach out to our designated Nodal Grievance Officer:",
-        "Name: Rajesh Kumar Sharma | Designation: Chief Nodal & Grievance Redressal Officer | Email: grievance@riksho.in | Address: G744+2PV, Jalkal, Maheshtala, West Bengal 700141, India.",
+        "Name: Sumit Shaw | Designation: Chief Nodal & Grievance Redressal Officer | Email: grievance@riksho.in | Address: G744+2PV, Jalkal, Maheshtala, West Bengal 700141, India.",
         "Amendments: Riksho reserves the right to modify this Policy periodically. We will notify you of material changes via in-app banner notifications or email prior to the revised Policy taking effect."
       ]
     }
@@ -568,4 +570,133 @@ export const webTermsPartnerTranslations: LegalDocument = {
       answer: "You need a Commercial Driving License (DL), Vehicle Registration Certificate (RC), Commercial Insurance, Pollution Certificate (PUC), PAN Card, and Aadhaar."
     }
   ]
+};
+
+// ==========================================
+// 5. COOKIE & TRACKING POLICY (WEB PLATFORM)
+// ==========================================
+export const webCookiePolicyCustomerTranslations: LegalDocument = {
+  title: "Cookie & Tracking Technologies Policy",
+  subtitle: "Comprehensive Disclosure Regarding the Utilization of Cookies, Local Storage, Session Identifiers, Web Beacons, and Telemetry Controls Across the Riksho Web Platform under the DPDP Act, 2023 and IT Act, 2000.",
+  version: "Version 4.1.0 (Cookie Governance)",
+  lastUpdated: "July 21, 2026",
+  effectiveDate: "August 1, 2026",
+  entityName: "Riksho Technologies Pvt. Ltd.",
+  intro: [
+    "This Cookie & Tracking Technologies Policy (\"Cookie Policy\") explains how Riksho Technologies Pvt. Ltd. (\"Riksho\", \"we\", \"us\", or \"our\") uses cookies, local browser storage, pixel tags, software development kits (SDKs), and similar telemetry identifiers when you visit our website https://riksho.in or access our web portals.",
+    "This Cookie Policy is to be read in conjunction with our Customer Privacy Policy and Terms of Service. By continuing to navigate or interact with the Riksho website, you acknowledge and consent to our use of cookies and tracking technologies as described herein."
+  ],
+  sections: [
+    {
+      id: "what-are-cookies",
+      number: "1",
+      title: "What Are Cookies and Tracking Technologies?",
+      paragraphs: [
+        "Cookies are small text files placed on your computer, tablet, or mobile browser by websites that you visit. They are widely used to make websites function securely and efficiently, remember user preferences, and provide analytical telemetry to site operators.",
+        "In addition to traditional HTTP cookies, Riksho may utilize modern client-side storage technologies such as HTML5 LocalStorage, SessionStorage, and security tokens to maintain encrypted authentication states and improve page rendering speeds."
+      ]
+    },
+    {
+      id: "categories-of-cookies",
+      number: "2",
+      title: "Categories of Cookies We Deploy",
+      paragraphs: [
+        "We categorize cookies and tracking technologies deployed on our website into four distinct functional tiers:"
+      ],
+      bullets: [
+        "Strictly Necessary & Authentication Cookies: Essential for basic website operation, security, CSRF protection, and user session persistence. Without these cookies, services like booking ride estimates and account logins cannot function.",
+        "Performance & Analytical Telemetry Cookies: Gather aggregated, anonymous telemetry regarding page visit counts, bounce rates, error logs, and navigation paths to help us optimize server responsiveness and platform usability.",
+        "Functional & Preference Cookies: Remember your chosen settings such as language selection, dark/light theme preferences, and recently searched pickup locations.",
+        "Security & Anti-Fraud Tokens: Identify suspicious browser behavior, prevent automated bot attacks, detect GPS spoofing attempts, and protect digital payment transactions."
+      ],
+      callout: "Essential Cookies: Strictly necessary cookies cannot be switched off in our systems as they are required for security and core platform functions."
+    },
+    {
+      id: "third-party-cookies",
+      number: "3",
+      title: "Third-Party Cookies & Integrated Technology Partners",
+      paragraphs: [
+        "Some cookies on our web platform are set by trusted third-party technology providers contracted by Riksho to power specialized functions:",
+        "Key third-party integrations include:"
+      ],
+      bullets: [
+        "Mapping & Geocoding Services (Google Maps / Mapbox): Deliver interactive route visualizers, live road congestion maps, and accurate distance calculation.",
+        "Payment Aggregators (Razorpay / Cashfree): Ensure encrypted tokenization and fraud monitoring during UPI and card checkout flows.",
+        "Content Delivery & Security (Cloudflare / AWS CloudFront): Deliver low-latency page loads and defend against Distributed Denial of Service (DDoS) attacks."
+      ]
+    },
+    {
+      id: "cookie-retention-lifespan",
+      number: "4",
+      title: "Lifespan & Data Retention of Cookies",
+      paragraphs: [
+        "Cookies deployed on the Riksho platform have varying durations depending on their specific technical purpose:"
+      ],
+      bullets: [
+        "Session Cookies: Temporary cookies that expire and are automatically deleted from your device memory when you close your web browser.",
+        "Persistent Cookies: Remain on your device storage for a specified period (ranging from 24 hours to 180 days) or until manually cleared via browser settings. These ensure you remain logged in across browser restarts."
+      ]
+    },
+    {
+      id: "managing-cookie-preferences",
+      number: "5",
+      title: "How to Control, Manage & Disable Cookies",
+      paragraphs: [
+        "You have complete autonomy to accept, configure, or reject non-essential cookies. You can manage your preferences through your web browser controls:",
+        "Most browsers allow you to view stored cookies, delete existing cookies individually or collectively, block third-party cookies, or configure alerts whenever a cookie is transmitted.",
+        "Please note that disabling strictly necessary cookies may prevent certain critical features (such as live booking dispatches and account login) from functioning correctly."
+      ],
+      bullets: [
+        "Google Chrome: Settings > Privacy and Security > Third-party cookies.",
+        "Apple Safari: Settings > Safari > Advanced > Block All Cookies.",
+        "Mozilla Firefox: Settings > Privacy & Security > Enhanced Tracking Protection.",
+        "Microsoft Edge: Settings > Cookies and site permissions > Manage and delete cookies."
+      ]
+    },
+    {
+      id: "do-not-track",
+      number: "6",
+      title: "Do Not Track (DNT) & Global Privacy Control Signals",
+      paragraphs: [
+        "Some web browsers transmit 'Do Not Track' (DNT) or Global Privacy Control (GPC) headers. Riksho respects user privacy choices and does not track users across unrelated third-party websites for commercial advertising purposes."
+      ]
+    },
+    {
+      id: "policy-updates",
+      number: "7",
+      title: "Updates to this Cookie Policy",
+      paragraphs: [
+        "Riksho may update this Cookie Policy periodically to reflect technological advancements, new platform features, or evolving regulatory mandates under Indian law. Any modifications will take effect immediately upon publication on this page with an updated Effective Date."
+      ]
+    },
+    {
+      id: "contact-officer",
+      number: "8",
+      title: "Questions & Statutory Compliance Desk",
+      paragraphs: [
+        "If you have questions regarding our cookie practices, please contact our designated Statutory Grievance & Compliance Desk:",
+        "Name: Sumit Shaw | Role: Chief Nodal & Grievance Redressal Officer | Email: grievance@riksho.in | Address: G744+2PV, Jalkal, Maheshtala, West Bengal 700141, India."
+      ]
+    }
+  ],
+  faqs: [
+    {
+      question: "What happens if I disable cookies on the Riksho website?",
+      answer: "If you disable all cookies, you can still view public information pages, but interactive features such as account login, real-time fare estimates, and saved pickup favorites will not function properly."
+    },
+    {
+      question: "Does Riksho use cookies to sell my browsing data?",
+      answer: "No. Riksho never sells, trades, or rents your web browsing data or cookie identifiers to third-party data brokers or marketing networks."
+    },
+    {
+      question: "How long do authentication session tokens stay active?",
+      answer: "Web session tokens typically expire after 30 days of inactivity, requiring re-authentication via SMS OTP for security."
+    }
+  ]
+};
+
+export const webCookiePolicyPartnerTranslations: LegalDocument = {
+  ...webCookiePolicyCustomerTranslations,
+  title: "Partner Portal Cookie & Telemetry Policy",
+  subtitle: "Technical Protocol Governing Session State, Partner Dashboard Telemetry, Map Rendering Tokens, and Secure Banking Gateway Session Handshakes for Driver & Delivery Partners."
 };

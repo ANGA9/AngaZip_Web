@@ -1475,3 +1475,236 @@ ul {
     justify-content: space-between;
   }
 }
+
+/* ==========================================================================
+   Responsive Legal Layout Styles (Terms, Privacy, Cookies)
+   ========================================================================== */
+
+.legal-hero {
+  background-color: #FFFFFF;
+  border-bottom: 1px solid #E2E8F0;
+  padding-top: 100px;
+  padding-bottom: 28px;
+  position: relative;
+}
+
+@media (min-width: 768px) {
+  .legal-hero {
+    padding-top: 112px;
+    padding-bottom: 36px;
+  }
+}
+
+.legal-meta-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 16px;
+  padding-top: 20px;
+  border-top: 1px solid #F1F5F9;
+}
+
+@media (min-width: 768px) {
+  .legal-meta-bar {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 24px;
+  }
+}
+
+.legal-audience-switcher {
+  display: flex;
+  width: 100%;
+  background-color: #F1F5F9;
+  padding: 4px;
+  border-radius: 12px;
+  border: 1px solid #E2E8F0;
+}
+
+@media (min-width: 768px) {
+  .legal-audience-switcher {
+    display: inline-flex;
+    width: auto;
+  }
+}
+
+.legal-audience-btn {
+  flex: 1;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+@media (min-width: 768px) {
+  .legal-audience-btn {
+    flex: initial;
+    padding: 8px 20px;
+    font-size: 0.875rem;
+  }
+}
+
+.legal-actions-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .legal-actions-group {
+    width: auto;
+    justify-content: flex-end;
+    gap: 14px;
+  }
+}
+
+.legal-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .legal-grid {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 36px;
+    align-items: start;
+  }
+}
+
+.legal-sidebar-desktop {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .legal-sidebar-desktop {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: sticky;
+    top: 96px;
+    max-height: calc(100vh - 120px);
+  }
+}
+
+.legal-sidebar-mobile {
+  display: block;
+  margin-bottom: 8px;
+}
+
+@media (min-width: 1024px) {
+  .legal-sidebar-mobile {
+    display: none;
+  }
+}
+
+.legal-article {
+  background-color: #FFFFFF;
+  border-radius: 16px;
+  border: 1px solid #E2E8F0;
+  padding: 24px 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.03);
+  width: 100%;
+  overflow-x: hidden;
+}
+
+@media (min-width: 640px) {
+  .legal-article {
+    padding: 36px 28px;
+    border-radius: 20px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .legal-article {
+    padding: 48px 40px;
+    border-radius: 24px;
+  }
+}
+
+.legal-clause-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #F1F5F9;
+}
+
+.legal-clause-badge {
+  font-size: 0.8125rem;
+  font-weight: 800;
+  color: var(--color-indigo);
+  background-color: var(--color-indigo-tint);
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-family: var(--font-display);
+  border: 1px solid rgba(67, 56, 202, 0.15);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.legal-clause-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.15rem, 3.8vw, 1.45rem);
+  font-weight: 700;
+  color: #0F172A;
+  margin: 0;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.legal-sub-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  background-color: #F8FAFC;
+  border-radius: 10px;
+  border: 1px solid #F1F5F9;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: #334155;
+  word-break: break-word;
+}
+
+@media (min-width: 640px) {
+  .legal-sub-item {
+    padding: 12px 16px;
+    gap: 12px;
+    font-size: 0.96rem;
+  }
+}
+
+.legal-grievance-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  padding: 16px;
+  background-color: #FFFFFF;
+  border-radius: 12px;
+  border: 1px solid #E2E8F0;
+}
+
+@media (min-width: 640px) {
+  .legal-grievance-grid {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+    padding: 18px;
+  }
+}
+
