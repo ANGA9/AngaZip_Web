@@ -7,9 +7,9 @@ This document tracks the end-to-end design, responsiveness, typography, and UX p
 ## 📊 Overall Progress Summary
 
 - **Total Active Pages / Endpoints:** 26
-- **Completed & Verified (Satisfied):** 10
-- **Pending Review & Perfection:** 16
-- **Progress:** 38.5%
+- **Completed & Verified (Satisfied):** 11
+- **Pending Review & Perfection:** 15
+- **Progress:** 42.3%
 
 ---
 
@@ -57,7 +57,7 @@ This document tracks the end-to-end design, responsiveness, typography, and UX p
 | :---: | :--- | :--- | :--- |
 | [x] | `/about-us` | **About Us** | Real people photo hero banner, custom purple blob (`#4338CA`) & cyan blob (`#00C2FF`) editorial illustrations, impact metrics, spacious points hierarchy, clean FAQ accordion, AppDownloadCTA, Footer. |
 | [ ] | `/careers` | **Careers** | Open job listings, engineering culture, employee benefits & hiring process. |
-| [ ] | `/blog` | **Blog & News** | Company news, engineering updates, press releases & transit tips. |
+| [x] | `/blog` | **Blog & News** | Minimalist photo hero banner, featured editorial spotlight card (`#4338CA`), interactive category filter pills, curated articles grid, clean FAQ accordion, AppDownloadCTA, Footer. |
 | [x] | `/safety` | **Safety First** | Minimalist photo hero banner, custom purple blob (`#4338CA`) passenger safety & cyan blob (`#00C2FF`) partner welfare illustrations, impact metrics, spacious points hierarchy, clean FAQ accordion, AppDownloadCTA, Footer. |
 
 ---
