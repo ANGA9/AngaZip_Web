@@ -415,7 +415,7 @@ export default function SupportPage() {
                   justifyContent: "center"
                 }}>
                   <Image
-                    src="/images/ill_support_hub.png"
+                    src="/images/ill_support_desk_v2.png"
                     alt="Riksho 24/7 Support Illustration"
                     fill
                     style={{ objectFit: "contain", padding: "16px" }}
