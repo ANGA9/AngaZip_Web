@@ -69,11 +69,11 @@ export default function SafetyHubPage() {
               style={{ objectFit: "cover", objectPosition: "center 35%" }}
               priority
             />
-            {/* Cinematic Gradient Overlay */}
+            {/* Minimal Ambient Gradient Overlay */}
             <div style={{
               position: "absolute",
               inset: 0,
-              background: "linear-gradient(90deg, rgba(15, 23, 42, 0.92) 0%, rgba(15, 23, 42, 0.65) 55%, rgba(15, 23, 42, 0.3) 100%)"
+              background: "linear-gradient(90deg, rgba(15, 23, 42, 0.62) 0%, rgba(15, 23, 42, 0.32) 45%, rgba(15, 23, 42, 0.02) 100%)"
             }} />
           </div>
 
@@ -86,7 +86,8 @@ export default function SafetyHubPage() {
                 letterSpacing: "-0.03em",
                 lineHeight: 1.1,
                 marginBottom: "18px",
-                color: "#FFFFFF"
+                color: "#FFFFFF",
+                textShadow: "0 2px 14px rgba(0, 0, 0, 0.55)"
               }}>
                 Safety in every motion.<br />
                 <span style={{ color: "#00C2FF" }}>Protected at every turn.</span>
@@ -95,9 +96,10 @@ export default function SafetyHubPage() {
               <p style={{
                 fontSize: "clamp(1.05rem, 1.8vw, 1.25rem)",
                 lineHeight: 1.6,
-                color: "rgba(255, 255, 255, 0.92)",
+                color: "#FFFFFF",
                 maxWidth: "620px",
-                margin: 0
+                margin: 0,
+                textShadow: "0 1px 8px rgba(0, 0, 0, 0.55)"
               }}>
                 Real-time safety telemetry, verified captains, and proactive trip monitoring designed to keep every rider and driver secure across India.
               </p>

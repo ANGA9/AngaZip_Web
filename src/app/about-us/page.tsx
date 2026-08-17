@@ -72,11 +72,11 @@ export default function AboutUsPage() {
               style={{ objectFit: "cover", objectPosition: "center 30%" }}
               priority
             />
-            {/* Cinematic Directional Gradient Overlay */}
+            {/* Minimal Ambient Gradient Overlay */}
             <div style={{
               position: "absolute",
               inset: 0,
-              background: "linear-gradient(90deg, rgba(15, 23, 42, 0.9) 0%, rgba(15, 23, 42, 0.65) 55%, rgba(15, 23, 42, 0.3) 100%)"
+              background: "linear-gradient(90deg, rgba(15, 23, 42, 0.62) 0%, rgba(15, 23, 42, 0.32) 45%, rgba(15, 23, 42, 0.02) 100%)"
             }} />
           </div>
 
@@ -89,7 +89,8 @@ export default function AboutUsPage() {
                 letterSpacing: "-0.03em",
                 lineHeight: 1.1,
                 marginBottom: "18px",
-                color: "#FFFFFF"
+                color: "#FFFFFF",
+                textShadow: "0 2px 14px rgba(0, 0, 0, 0.55)"
               }}>
                 Moving India forward.<br />
                 <span style={{ color: "#00C2FF" }}>Empowering everyday journeys.</span>
@@ -98,9 +99,10 @@ export default function AboutUsPage() {
               <p style={{
                 fontSize: "clamp(1.05rem, 1.8vw, 1.25rem)",
                 lineHeight: 1.6,
-                color: "rgba(255, 255, 255, 0.92)",
+                color: "#FFFFFF",
                 maxWidth: "620px",
-                margin: 0
+                margin: 0,
+                textShadow: "0 1px 8px rgba(0, 0, 0, 0.55)"
               }}>
                 We build transparent mobility technology that brings dignity to driver partners and reliable, safe transit to millions across Indian cities.
               </p>
