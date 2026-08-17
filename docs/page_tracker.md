@@ -7,9 +7,9 @@ This document tracks the end-to-end design, responsiveness, typography, and UX p
 ## 📊 Overall Progress Summary
 
 - **Total Active Pages / Endpoints:** 26
-- **Completed & Verified (Satisfied):** 8
-- **Pending Review & Perfection:** 18
-- **Progress:** 30.8%
+- **Completed & Verified (Satisfied):** 10
+- **Pending Review & Perfection:** 16
+- **Progress:** 38.5%
 
 ---
 
@@ -55,10 +55,10 @@ This document tracks the end-to-end design, responsiveness, typography, and UX p
 ### 4. Company, Vision & Culture
 | Status | Endpoint | Page Name | Description & Key Components |
 | :---: | :--- | :--- | :--- |
-| [ ] | `/about-us` | **About Us** | Company mission, leadership principles, founding milestones & roadmap. |
+| [x] | `/about-us` | **About Us** | Real people photo hero banner, custom purple blob (`#4338CA`) & cyan blob (`#00C2FF`) editorial illustrations, impact metrics, spacious points hierarchy, clean FAQ accordion, AppDownloadCTA, Footer. |
 | [ ] | `/careers` | **Careers** | Open job listings, engineering culture, employee benefits & hiring process. |
 | [ ] | `/blog` | **Blog & News** | Company news, engineering updates, press releases & transit tips. |
-| [ ] | `/safety` | **Safety First** | 24/7 Safety Command Center, Police SOS (112) integration, ride insurance. |
+| [x] | `/safety` | **Safety First** | Minimalist photo hero banner, custom purple blob (`#4338CA`) passenger safety & cyan blob (`#00C2FF`) partner welfare illustrations, impact metrics, spacious points hierarchy, clean FAQ accordion, AppDownloadCTA, Footer. |
 
 ---
 
