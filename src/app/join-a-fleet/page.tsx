@@ -56,26 +56,6 @@ export default function JoinAFleetPage() {
         "Automated splitting of driver commission and owner share",
         "Full GST-compliant electronic invoices and statements"
       ]
-    },
-    {
-      icon: <Zap size={24} color="#0F172A" strokeWidth={2.2} />,
-      title: "Corporate Priority Dispatch",
-      tagline: "High-ticket enterprise & intercity trips",
-      points: [
-        "Fleet vehicles receive priority dispatch on corporate routes",
-        "Access to scheduled outstation and airport transfer bookings",
-        "Guaranteed higher average kilometer fare yields"
-      ]
-    },
-    {
-      icon: <Users2 size={24} color="#0F172A" strokeWidth={2.2} />,
-      title: "Dedicated Account Manager",
-      tagline: "Priority local operations support",
-      points: [
-        "Dedicated Relationship Manager for driver onboarding",
-        "Fast-track bulk document renewals and compliance audits",
-        "24/7 priority emergency escalation telephone desk"
-      ]
     }
   ];
 
@@ -192,7 +172,7 @@ export default function JoinAFleetPage() {
           </div>
         </section>
 
-        {/* Section: Fleet Pillars Grid (5 Cards: 3 in Top Row, 2 Centered in Bottom Row) */}
+        {/* Section: Fleet Pillars Grid (3 Cards) */}
         <section style={{ padding: "64px 0 32px 0", backgroundColor: "#FFFFFF" }}>
           <div className="container">
             <div style={{ textAlign: "center", marginBottom: "40px" }}>
@@ -207,11 +187,10 @@ export default function JoinAFleetPage() {
               </p>
             </div>
 
-            {/* 5 Pillars: 3 on Top, 2 Centered Below */}
+            {/* 3 Pillars Grid */}
             <div style={{
-              display: "flex",
-              flexWrap: "wrap",
-              justifyContent: "center",
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
               gap: "24px"
             }}>
               {fleetPillars.map((pillar, idx) => (
@@ -219,9 +198,6 @@ export default function JoinAFleetPage() {
                   key={idx}
                   className="pillar-card"
                   style={{
-                    flex: "1 1 320px",
-                    maxWidth: "370px",
-                    minWidth: "280px",
                     backgroundColor: "#FFFFFF",
                     border: "1.5px solid #E2E8F0",
                     borderRadius: "20px",

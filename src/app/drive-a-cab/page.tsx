@@ -55,26 +55,6 @@ export default function DriveCabPage() {
         "Log in and log off whenever you choose",
         "Set custom destination rides on your way home"
       ]
-    },
-    {
-      icon: <ShieldCheck size={24} color="#0F172A" strokeWidth={2.2} />,
-      title: "₹5 Lakh Accidental Protection",
-      tagline: "Comprehensive driver welfare & safety",
-      points: [
-        "Free commercial accidental & medical insurance coverage",
-        "24/7 dedicated emergency driver helpline",
-        "In-app direct SOS button linked to police dispatch"
-      ]
-    },
-    {
-      icon: <PhoneCall size={24} color="#0F172A" strokeWidth={2.2} />,
-      title: "Privacy & Masked Calling",
-      tagline: "Zero spam, zero harassment",
-      points: [
-        "Passenger calls routed through secure proxy numbers",
-        "Your private phone number is never exposed",
-        "Strict passenger zero-tolerance safety policies"
-      ]
     }
   ];
 
@@ -191,7 +171,7 @@ export default function DriveCabPage() {
           </div>
         </section>
 
-        {/* Section: Driver Partner Pillars Grid (5 Cards: 3 in Top Row, 2 Centered in Bottom Row) */}
+        {/* Section: Driver Partner Pillars Grid (3 Cards) */}
         <section style={{ padding: "64px 0 32px 0", backgroundColor: "#FFFFFF" }}>
           <div className="container">
             <div style={{ textAlign: "center", marginBottom: "40px" }}>
@@ -206,11 +186,10 @@ export default function DriveCabPage() {
               </p>
             </div>
 
-            {/* 5 Pillars: 3 on Top, 2 Centered Below */}
+            {/* 3 Pillars Grid */}
             <div style={{
-              display: "flex",
-              flexWrap: "wrap",
-              justifyContent: "center",
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
               gap: "24px"
             }}>
               {driverPillars.map((pillar, idx) => (
@@ -218,9 +197,6 @@ export default function DriveCabPage() {
                   key={idx}
                   className="pillar-card"
                   style={{
-                    flex: "1 1 320px",
-                    maxWidth: "370px",
-                    minWidth: "280px",
                     backgroundColor: "#FFFFFF",
                     border: "1.5px solid #E2E8F0",
                     borderRadius: "20px",

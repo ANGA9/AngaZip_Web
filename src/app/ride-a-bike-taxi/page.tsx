@@ -54,32 +54,12 @@ export default function RideBikeTaxiPage() {
         "Zero withdrawal holding fee or lock-in period",
         "Keep 100% of passenger cash and in-app tips"
       ]
-    },
-    {
-      icon: <HardHat size={24} color="#0F172A" strokeWidth={2.2} />,
-      title: "Free ISI Safety Kit Provided",
-      tagline: "Dual helmets & high-visibility gear",
-      points: [
-        "Free ISI-certified captain & passenger safety helmets",
-        "Sanitized helmet caps and high-vis reflective rain jacket",
-        "₹5 Lakh free accidental medical insurance coverage"
-      ]
-    },
-    {
-      icon: <Clock size={24} color="#0F172A" strokeWidth={2.2} />,
-      title: "Flexible Part-Time Hours",
-      tagline: "Earn on your schedule in 2–4 hours",
-      points: [
-        "Perfect for college students and working professionals",
-        "Log in during commute to college or office and earn on the way",
-        "Zero minimum login targets or penalty lockouts"
-      ]
     }
   ];
 
   const bikeMetrics = [
     { value: "₹1,800+", label: "Daily Earning Potential", icon: <Banknote size={20} color="#0F172A" strokeWidth={2.2} /> },
-    { value: "2 Helmets", label: "Free ISI Certified Safety Kit", icon: <HardHat size={20} color="#0F172A" strokeWidth={2.2} /> },
+    { value: "25+", label: "Daily Ride Opportunities", icon: <Bike size={20} color="#0F172A" strokeWidth={2.2} /> },
     { value: "10 Mins", label: "Instant Paperless Onboarding", icon: <FileCheck2 size={20} color="#0F172A" strokeWidth={2.2} /> },
     { value: "Daily", label: "Instant Bank UPI Transfers", icon: <Wallet size={20} color="#0F172A" strokeWidth={2.2} /> }
   ];
@@ -91,7 +71,7 @@ export default function RideBikeTaxiPage() {
     },
     {
       question: "What safety equipment is required for bike taxi rides?",
-      answer: "Safety is strictly enforced. Every bike captain must wear an ISI-certified helmet and provide an ISI helmet to the passenger. Riksho provides your official captain safety kit upon verification."
+      answer: "Safety is strictly enforced. Every bike captain must carry ISI-certified helmets for both the captain and passenger in accordance with state transport guidelines."
     },
     {
       question: "Can I work flexible hours as a part-time student or freelancer?",
@@ -190,7 +170,7 @@ export default function RideBikeTaxiPage() {
           </div>
         </section>
 
-        {/* Section: Bike Captain Pillars Grid (5 Cards: 3 in Top Row, 2 Centered in Bottom Row) */}
+        {/* Section: Bike Captain Pillars Grid (3 Cards) */}
         <section style={{ padding: "64px 0 32px 0", backgroundColor: "#FFFFFF" }}>
           <div className="container">
             <div style={{ textAlign: "center", marginBottom: "40px" }}>
@@ -205,11 +185,10 @@ export default function RideBikeTaxiPage() {
               </p>
             </div>
 
-            {/* 5 Pillars: 3 on Top, 2 Centered Below */}
+            {/* 3 Pillars Grid */}
             <div style={{
-              display: "flex",
-              flexWrap: "wrap",
-              justifyContent: "center",
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
               gap: "24px"
             }}>
               {bikePillars.map((pillar, idx) => (
@@ -217,9 +196,6 @@ export default function RideBikeTaxiPage() {
                   key={idx}
                   className="pillar-card"
                   style={{
-                    flex: "1 1 320px",
-                    maxWidth: "370px",
-                    minWidth: "280px",
                     backgroundColor: "#FFFFFF",
                     border: "1.5px solid #E2E8F0",
                     borderRadius: "20px",
@@ -329,14 +305,14 @@ export default function RideBikeTaxiPage() {
 
                   <div style={{ display: "flex", alignItems: "flex-start", gap: "16px" }}>
                     <div style={{ width: "42px", height: "42px", borderRadius: "12px", backgroundColor: "var(--color-indigo-tint)", color: "#0F172A", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: "2px" }}>
-                      <HardHat size={20} color="#0F172A" strokeWidth={2.2} />
+                      <CheckCircle2 size={20} color="#0F172A" strokeWidth={2.2} />
                     </div>
                     <div>
                       <h4 style={{ fontSize: "1.05rem", fontWeight: 700, color: "#0F172A", margin: "0 0 6px 0" }}>
-                        2. Collect Your ISI Safety Kit
+                        2. Fast Digital Verification
                       </h4>
                       <p style={{ fontSize: "0.95rem", lineHeight: 1.6, color: "#64748B", margin: 0 }}>
-                        Receive your dual ISI certified helmets and reflective safety jacket delivered to your doorstep or local hub.
+                        Our automated compliance system verifies your profile within 10 minutes so you can start riding immediately.
                       </p>
                     </div>
                   </div>
@@ -378,7 +354,7 @@ export default function RideBikeTaxiPage() {
                   Protected on Every Single Ride
                 </h2>
                 <p style={{ fontSize: "1.05rem", lineHeight: 1.7, color: "#475569", marginBottom: "28px" }}>
-                  Your safety and financial well-being on two wheels are our topmost priority with comprehensive medical coverage and masked passenger calling.
+                  Your safety and financial peace of mind on two wheels are our priority with real-time GPS telemetry and masked passenger calling.
                 </p>
 
                 {/* 3 Spacious Safety Points */}
@@ -389,10 +365,10 @@ export default function RideBikeTaxiPage() {
                     </div>
                     <div>
                       <h4 style={{ fontSize: "1.05rem", fontWeight: 700, color: "#0F172A", margin: "0 0 6px 0" }}>
-                        ₹5 Lakh Free Accidental &amp; Medical Cover
+                        Masked Passenger Calling
                       </h4>
                       <p style={{ fontSize: "0.95rem", lineHeight: 1.6, color: "#64748B", margin: 0 }}>
-                        Automatic cashless accidental insurance protection active from the moment you accept a booking until passenger drop.
+                        Your personal phone number is never shared with passengers, keeping your personal contact details 100% private.
                       </p>
                     </div>
                   </div>

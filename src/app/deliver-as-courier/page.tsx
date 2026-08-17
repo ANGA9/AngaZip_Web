@@ -55,26 +55,6 @@ export default function DeliverAsCourierPage() {
         "4-digit customer OTP verification prevents delivery disputes",
         "Pre-paid orders eliminate cash collection friction"
       ]
-    },
-    {
-      icon: <Bike size={24} color="#0F172A" strokeWidth={2.2} />,
-      title: "Multi-Vehicle Delivery",
-      tagline: "EV, motorcycle, scooter, or bicycle",
-      points: [
-        "Deliver on an electric scooter, motorcycle, or cargo bike",
-        "Subsidized EV battery swapping network partner discounts",
-        "Zero high vehicle maintenance overheads"
-      ]
-    },
-    {
-      icon: <Wallet size={24} color="#0F172A" strokeWidth={2.2} />,
-      title: "Instant Daily UPI Cashout",
-      tagline: "Direct to Google Pay, PhonePe, or bank",
-      points: [
-        "Cash out your daily delivery earnings anytime",
-        "Zero withdrawal holding fee or lock-in period",
-        "Transparent trip-by-trip earnings breakdown in app"
-      ]
     }
   ];
 
@@ -191,7 +171,7 @@ export default function DeliverAsCourierPage() {
           </div>
         </section>
 
-        {/* Section: Courier Pillars Grid (5 Cards: 3 in Top Row, 2 Centered in Bottom Row) */}
+        {/* Section: Courier Pillars Grid (3 Cards) */}
         <section style={{ padding: "64px 0 32px 0", backgroundColor: "#FFFFFF" }}>
           <div className="container">
             <div style={{ textAlign: "center", marginBottom: "40px" }}>
@@ -206,11 +186,10 @@ export default function DeliverAsCourierPage() {
               </p>
             </div>
 
-            {/* 5 Pillars: 3 on Top, 2 Centered Below */}
+            {/* 3 Pillars Grid */}
             <div style={{
-              display: "flex",
-              flexWrap: "wrap",
-              justifyContent: "center",
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
               gap: "24px"
             }}>
               {courierPillars.map((pillar, idx) => (
@@ -218,9 +197,6 @@ export default function DeliverAsCourierPage() {
                   key={idx}
                   className="pillar-card"
                   style={{
-                    flex: "1 1 320px",
-                    maxWidth: "370px",
-                    minWidth: "280px",
                     backgroundColor: "#FFFFFF",
                     border: "1.5px solid #E2E8F0",
                     borderRadius: "20px",
@@ -361,7 +337,7 @@ export default function DeliverAsCourierPage() {
           </div>
         </section>
 
-        {/* Section 2: Courier Welfare & Protection (With Cyan Blob Artwork #00C2FF) */}
+        {/* Section 2: Courier Care & Transparent Earnings (With Cyan Blob Artwork #00C2FF) */}
         <section style={{ padding: "64px 0", backgroundColor: "#FFFFFF" }}>
           <div className="container">
             <div style={{
@@ -379,7 +355,7 @@ export default function DeliverAsCourierPage() {
                   Safe Shifts and Transparent Earnings
                 </h2>
                 <p style={{ fontSize: "1.05rem", lineHeight: 1.7, color: "#475569", marginBottom: "28px" }}>
-                  Deliver with peace of mind. We provide full accidental insurance, insulated waterproof carrier bags, and automated OTP delivery confirmation.
+                  Deliver with peace of mind. We provide insulated carrier bags, real-time GPS telemetry, and automated OTP delivery confirmation.
                 </p>
 
                 {/* 3 Spacious Welfare Feature Points */}
@@ -390,10 +366,10 @@ export default function DeliverAsCourierPage() {
                     </div>
                     <div>
                       <h4 style={{ fontSize: "1.05rem", fontWeight: 700, color: "#0F172A", margin: "0 0 6px 0" }}>
-                        ₹5 Lakh Medical &amp; Accidental Protection
+                        Digital Proof of Delivery
                       </h4>
                       <p style={{ fontSize: "0.95rem", lineHeight: 1.6, color: "#64748B", margin: 0 }}>
-                        Complete medical hospitalization and accidental coverage automatically active during all ongoing delivery shifts.
+                        Automatic timestamp and geolocation tagging on every parcel drop ensures accurate trip logs and zero dispute penalties.
                       </p>
                     </div>
                   </div>
