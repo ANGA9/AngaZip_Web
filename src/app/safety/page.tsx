@@ -12,7 +12,6 @@ import {
   HeartHandshake, 
   Lock, 
   Activity, 
-  HelpCircle,
   Users
 } from "lucide-react";
 
@@ -20,10 +19,10 @@ export default function SafetyHubPage() {
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
 
   const stats = [
-    { value: "100%", label: "Background Verified Captains", icon: <ShieldCheck size={20} color="var(--color-indigo)" /> },
-    { value: "24/7", label: "Active Incident Command Desk", icon: <Activity size={20} color="var(--color-indigo)" /> },
-    { value: "99.98%", label: "Incident-Free Completed Trips", icon: <Lock size={20} color="var(--color-indigo)" /> },
-    { value: "4-Digit", label: "Mandatory Secure Ride OTP", icon: <PhoneCall size={20} color="var(--color-indigo)" /> }
+    { value: "100%", label: "Background Verified Captains", icon: <ShieldCheck size={20} color="#0F172A" /> },
+    { value: "24/7", label: "Active Incident Command Desk", icon: <Activity size={20} color="#0F172A" /> },
+    { value: "99.98%", label: "Incident-Free Completed Trips", icon: <Lock size={20} color="#0F172A" /> },
+    { value: "4-Digit", label: "Mandatory Secure Ride OTP", icon: <PhoneCall size={20} color="#0F172A" /> }
   ];
 
   const safetyFaqs = [
@@ -100,7 +99,7 @@ export default function SafetyHubPage() {
                 maxWidth: "620px",
                 margin: 0
               }}>
-                From background-verified captains to 24/7 live telemetry and direct Police SOS (112) integration, your security is our non-negotiable foundation.
+                Real-time safety telemetry, verified captains, and proactive trip monitoring designed to keep every rider and driver secure across India.
               </p>
             </div>
           </div>
@@ -127,11 +126,11 @@ export default function SafetyHubPage() {
                   Whether commuting late at night, travelling intercity, or booking for a loved one, every Riksho ride is safeguarded by strict identity audits and active telemetry.
                 </p>
 
-                {/* 3 Spacious Passenger Points */}
+                {/* 3 Spacious Passenger Points (Tinted Badges with Black Icons) */}
                 <div style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
                   <div style={{ display: "flex", alignItems: "flex-start", gap: "16px" }}>
-                    <div style={{ width: "42px", height: "42px", borderRadius: "12px", backgroundColor: "var(--color-indigo-tint)", color: "var(--color-indigo)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: "2px" }}>
-                      <PhoneCall size={20} />
+                    <div style={{ width: "42px", height: "42px", borderRadius: "12px", backgroundColor: "var(--color-indigo-tint)", color: "#0F172A", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: "2px" }}>
+                      <PhoneCall size={20} color="#0F172A" strokeWidth={2.2} />
                     </div>
                     <div>
                       <h4 style={{ fontSize: "1.05rem", fontWeight: 700, color: "#0F172A", margin: "0 0 6px 0" }}>
@@ -144,8 +143,8 @@ export default function SafetyHubPage() {
                   </div>
 
                   <div style={{ display: "flex", alignItems: "flex-start", gap: "16px" }}>
-                    <div style={{ width: "42px", height: "42px", borderRadius: "12px", backgroundColor: "var(--color-indigo-tint)", color: "var(--color-indigo)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: "2px" }}>
-                      <Lock size={20} />
+                    <div style={{ width: "42px", height: "42px", borderRadius: "12px", backgroundColor: "var(--color-indigo-tint)", color: "#0F172A", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: "2px" }}>
+                      <Lock size={20} color="#0F172A" strokeWidth={2.2} />
                     </div>
                     <div>
                       <h4 style={{ fontSize: "1.05rem", fontWeight: 700, color: "#0F172A", margin: "0 0 6px 0" }}>
@@ -158,8 +157,8 @@ export default function SafetyHubPage() {
                   </div>
 
                   <div style={{ display: "flex", alignItems: "flex-start", gap: "16px" }}>
-                    <div style={{ width: "42px", height: "42px", borderRadius: "12px", backgroundColor: "var(--color-indigo-tint)", color: "var(--color-indigo)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: "2px" }}>
-                      <MapPin size={20} />
+                    <div style={{ width: "42px", height: "42px", borderRadius: "12px", backgroundColor: "var(--color-indigo-tint)", color: "#0F172A", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: "2px" }}>
+                      <MapPin size={20} color="#0F172A" strokeWidth={2.2} />
                     </div>
                     <div>
                       <h4 style={{ fontSize: "1.05rem", fontWeight: 700, color: "#0F172A", margin: "0 0 6px 0" }}>
@@ -291,25 +290,25 @@ export default function SafetyHubPage() {
                   Safety is a two-way commitment. We actively safeguard our driver and courier partners with automated telematics, collision checks, and 24/7 dedicated partner assistance.
                 </p>
 
-                {/* 3 Spacious Partner Points */}
+                {/* 3 Spacious Partner Points (Tinted Badges with Black Icons) */}
                 <div style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
                   <div style={{ display: "flex", alignItems: "flex-start", gap: "16px" }}>
-                    <div style={{ width: "42px", height: "42px", borderRadius: "12px", backgroundColor: "rgba(0, 194, 255, 0.12)", color: "#0284C7", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: "2px" }}>
-                      <HeartHandshake size={20} />
+                    <div style={{ width: "42px", height: "42px", borderRadius: "12px", backgroundColor: "rgba(0, 194, 255, 0.12)", color: "#0F172A", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: "2px" }}>
+                      <HeartHandshake size={20} color="#0F172A" strokeWidth={2.2} />
                     </div>
                     <div>
                       <h4 style={{ fontSize: "1.05rem", fontWeight: 700, color: "#0F172A", margin: "0 0 6px 0" }}>
-                        Accidental Insurance Cover
+                        Comprehensive In-Transit Cover
                       </h4>
                       <p style={{ fontSize: "0.95rem", lineHeight: 1.6, color: "#64748B", margin: 0 }}>
-                        Every active partner is covered up to ₹5 Lakh for medical emergencies and accidental hospitalizations during on-duty hours.
+                        24/7 emergency medical protection and financial security for every active captain and rider on duty.
                       </p>
                     </div>
                   </div>
 
                   <div style={{ display: "flex", alignItems: "flex-start", gap: "16px" }}>
-                    <div style={{ width: "42px", height: "42px", borderRadius: "12px", backgroundColor: "rgba(0, 194, 255, 0.12)", color: "#0284C7", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: "2px" }}>
-                      <Activity size={20} />
+                    <div style={{ width: "42px", height: "42px", borderRadius: "12px", backgroundColor: "rgba(0, 194, 255, 0.12)", color: "#0F172A", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: "2px" }}>
+                      <Activity size={20} color="#0F172A" strokeWidth={2.2} />
                     </div>
                     <div>
                       <h4 style={{ fontSize: "1.05rem", fontWeight: 700, color: "#0F172A", margin: "0 0 6px 0" }}>
@@ -322,8 +321,8 @@ export default function SafetyHubPage() {
                   </div>
 
                   <div style={{ display: "flex", alignItems: "flex-start", gap: "16px" }}>
-                    <div style={{ width: "42px", height: "42px", borderRadius: "12px", backgroundColor: "rgba(0, 194, 255, 0.12)", color: "#0284C7", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: "2px" }}>
-                      <Users size={20} />
+                    <div style={{ width: "42px", height: "42px", borderRadius: "12px", backgroundColor: "rgba(0, 194, 255, 0.12)", color: "#0F172A", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: "2px" }}>
+                      <Users size={20} color="#0F172A" strokeWidth={2.2} />
                     </div>
                     <div>
                       <h4 style={{ fontSize: "1.05rem", fontWeight: 700, color: "#0F172A", margin: "0 0 6px 0" }}>

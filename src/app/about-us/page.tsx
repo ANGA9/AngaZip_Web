@@ -22,10 +22,10 @@ export default function AboutUsPage() {
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
 
   const stats = [
-    { value: "100K+", label: "Verified Driver Partners", icon: <Users size={20} color="var(--color-indigo)" /> },
-    { value: "5M+", label: "Safe Trips Completed", icon: <Car size={20} color="var(--color-indigo)" /> },
-    { value: "50+", label: "Cities & Urban Clusters", icon: <MapPin size={20} color="var(--color-indigo)" /> },
-    { value: "₹0", label: "Hidden Surge Surcharges", icon: <TrendingUp size={20} color="var(--color-indigo)" /> }
+    { value: "100K+", label: "Verified Driver Partners", icon: <Users size={20} color="#0F172A" strokeWidth={2.2} /> },
+    { value: "5M+", label: "Safe Trips Completed", icon: <Car size={20} color="#0F172A" strokeWidth={2.2} /> },
+    { value: "50+", label: "Cities & Urban Clusters", icon: <MapPin size={20} color="#0F172A" strokeWidth={2.2} /> },
+    { value: "₹0", label: "Hidden Surge Surcharges", icon: <TrendingUp size={20} color="#0F172A" strokeWidth={2.2} /> }
   ];
 
   const faqs = [
@@ -132,8 +132,8 @@ export default function AboutUsPage() {
                 {/* 3 Core Mission Points (Spacious & Breathable) */}
                 <div style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
                   <div style={{ display: "flex", alignItems: "flex-start", gap: "16px" }}>
-                    <div style={{ width: "42px", height: "42px", borderRadius: "12px", backgroundColor: "var(--color-indigo-tint)", color: "var(--color-indigo)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: "2px" }}>
-                      <HeartHandshake size={20} />
+                    <div style={{ width: "42px", height: "42px", borderRadius: "12px", backgroundColor: "var(--color-indigo-tint)", color: "#0F172A", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: "2px" }}>
+                      <HeartHandshake size={20} color="#0F172A" strokeWidth={2.2} />
                     </div>
                     <div>
                       <h4 style={{ fontSize: "1.05rem", fontWeight: 700, color: "#0F172A", margin: "0 0 6px 0" }}>
@@ -146,8 +146,8 @@ export default function AboutUsPage() {
                   </div>
 
                   <div style={{ display: "flex", alignItems: "flex-start", gap: "16px" }}>
-                    <div style={{ width: "42px", height: "42px", borderRadius: "12px", backgroundColor: "var(--color-indigo-tint)", color: "var(--color-indigo)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: "2px" }}>
-                      <Zap size={20} />
+                    <div style={{ width: "42px", height: "42px", borderRadius: "12px", backgroundColor: "var(--color-indigo-tint)", color: "#0F172A", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: "2px" }}>
+                      <Zap size={20} color="#0F172A" strokeWidth={2.2} />
                     </div>
                     <div>
                       <h4 style={{ fontSize: "1.05rem", fontWeight: 700, color: "#0F172A", margin: "0 0 6px 0" }}>
@@ -160,8 +160,8 @@ export default function AboutUsPage() {
                   </div>
 
                   <div style={{ display: "flex", alignItems: "flex-start", gap: "16px" }}>
-                    <div style={{ width: "42px", height: "42px", borderRadius: "12px", backgroundColor: "var(--color-indigo-tint)", color: "var(--color-indigo)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: "2px" }}>
-                      <ShieldCheck size={20} />
+                    <div style={{ width: "42px", height: "42px", borderRadius: "12px", backgroundColor: "var(--color-indigo-tint)", color: "#0F172A", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: "2px" }}>
+                      <ShieldCheck size={20} color="#0F172A" strokeWidth={2.2} />
                     </div>
                     <div>
                       <h4 style={{ fontSize: "1.05rem", fontWeight: 700, color: "#0F172A", margin: "0 0 6px 0" }}>
@@ -296,8 +296,8 @@ export default function AboutUsPage() {
                 {/* 3 Engineering & Safety Pillars (Matching Mission Section Design & Spacing) */}
                 <div style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
                   <div style={{ display: "flex", alignItems: "flex-start", gap: "16px" }}>
-                    <div style={{ width: "42px", height: "42px", borderRadius: "12px", backgroundColor: "rgba(0, 194, 255, 0.12)", color: "#0284C7", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: "2px" }}>
-                      <ShieldCheck size={20} />
+                    <div style={{ width: "42px", height: "42px", borderRadius: "12px", backgroundColor: "rgba(0, 194, 255, 0.12)", color: "#0F172A", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: "2px" }}>
+                      <ShieldCheck size={20} color="#0F172A" strokeWidth={2.2} />
                     </div>
                     <div>
                       <h4 style={{ fontSize: "1.05rem", fontWeight: 700, color: "#0F172A", margin: "0 0 6px 0" }}>
@@ -310,8 +310,8 @@ export default function AboutUsPage() {
                   </div>
 
                   <div style={{ display: "flex", alignItems: "flex-start", gap: "16px" }}>
-                    <div style={{ width: "42px", height: "42px", borderRadius: "12px", backgroundColor: "rgba(0, 194, 255, 0.12)", color: "#0284C7", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: "2px" }}>
-                      <Zap size={20} />
+                    <div style={{ width: "42px", height: "42px", borderRadius: "12px", backgroundColor: "rgba(0, 194, 255, 0.12)", color: "#0F172A", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: "2px" }}>
+                      <Zap size={20} color="#0F172A" strokeWidth={2.2} />
                     </div>
                     <div>
                       <h4 style={{ fontSize: "1.05rem", fontWeight: 700, color: "#0F172A", margin: "0 0 6px 0" }}>
@@ -324,8 +324,8 @@ export default function AboutUsPage() {
                   </div>
 
                   <div style={{ display: "flex", alignItems: "flex-start", gap: "16px" }}>
-                    <div style={{ width: "42px", height: "42px", borderRadius: "12px", backgroundColor: "rgba(0, 194, 255, 0.12)", color: "#0284C7", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: "2px" }}>
-                      <Car size={20} />
+                    <div style={{ width: "42px", height: "42px", borderRadius: "12px", backgroundColor: "rgba(0, 194, 255, 0.12)", color: "#0F172A", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: "2px" }}>
+                      <Car size={20} color="#0F172A" strokeWidth={2.2} />
                     </div>
                     <div>
                       <h4 style={{ fontSize: "1.05rem", fontWeight: 700, color: "#0F172A", margin: "0 0 6px 0" }}>
