@@ -164,8 +164,8 @@ export default function LegalLayout({ type }: LegalLayoutProps) {
                 </span>
               </div>
 
-              {/* Version & Entity Badge */}
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+              {/* Version & Entity Badge (Desktop Only) */}
+              <div className="legal-badges-desktop">
                 <span style={{ 
                   display: "inline-flex", 
                   alignItems: "center", 
