@@ -7,9 +7,9 @@ This document tracks the end-to-end design, responsiveness, typography, and UX p
 ## 📊 Overall Progress Summary
 
 - **Total Active Pages / Endpoints:** 26
-- **Completed & Verified (Satisfied):** 6
-- **Pending Review & Perfection:** 20
-- **Progress:** 23.1%
+- **Completed & Verified (Satisfied):** 8
+- **Pending Review & Perfection:** 18
+- **Progress:** 30.8%
 
 ---
 
@@ -65,8 +65,8 @@ This document tracks the end-to-end design, responsiveness, typography, and UX p
 ### 5. Support & Customer Care
 | Status | Endpoint | Page Name | Description & Key Components |
 | :---: | :--- | :--- | :--- |
-| [x] | `/support` | **Help & Support** | Searchable knowledge library, category filters, custom purple blob editorial illustration, ticket submission desk, AppDownloadCTA, Footer. |
-| [x] | `/contact` | **Contact Us** | Direct channel cards, interactive contact form, custom blue blob editorial illustration, official registered office desk, AppDownloadCTA, Footer. |
+| [x] | `/support` | **Help & Support** | 3 minimalist category cards, direct brand indigo channels, custom purple blob scooty illustration (`#4338CA`), clean FAQ accordion, "Still Need Help?" banner, AppDownloadCTA, Footer. |
+| [x] | `/contact` | **Contact Us** | 3 unified brand indigo contact cards, interactive contact form with right-side blue blob illustration (`#00C2FF`), mobile responsive stack, clean FAQ accordion, AppDownloadCTA, Footer. |
 
 ---
 
