@@ -487,12 +487,8 @@ export default function BlogPage() {
               </div>
             </div>
 
-            {/* Articles Grid (Clean Responsive Layout with Hover Animation) */}
-            <div style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-              gap: "24px"
-            }}>
+            {/* Articles Grid (Strictly 3 Columns on Desktop, 2 on Tablet, 1 on Mobile) */}
+            <div className="articles-grid">
               {filteredArticles.map((article) => (
                 <div
                   key={article.id}
@@ -597,7 +593,7 @@ export default function BlogPage() {
           </div>
         </section>
 
-        {/* Full Article Interactive Modal / Dialogue Box */}
+        {/* Full Article Interactive Modal / Dialogue Box (Clean Text Focused) */}
         {activeArticle && (
           <div
             style={{
@@ -624,7 +620,7 @@ export default function BlogPage() {
                 maxHeight: "90vh",
                 overflowY: "auto",
                 position: "relative",
-                padding: "clamp(20px, 4vw, 40px)",
+                padding: "clamp(24px, 5vw, 44px)",
                 boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
                 display: "flex",
                 flexDirection: "column",
@@ -657,7 +653,7 @@ export default function BlogPage() {
               </button>
 
               {/* Article Header Meta */}
-              <div>
+              <div style={{ borderBottom: "1px solid #F1F5F9", paddingBottom: "18px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
                   <span style={{
                     backgroundColor: "var(--color-indigo-tint)",
@@ -692,28 +688,7 @@ export default function BlogPage() {
                 </div>
               </div>
 
-              {/* Native 1:1 Editorial Illustration (Clean & Centered) */}
-              <div style={{
-                position: "relative",
-                width: "100%",
-                maxWidth: "320px",
-                aspectRatio: "1/1",
-                backgroundColor: "#FFFFFF",
-                margin: "0 auto",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center"
-              }}>
-                <Image
-                  src={activeArticle.image}
-                  alt={activeArticle.title}
-                  fill
-                  style={{ objectFit: "contain" }}
-                  priority
-                />
-              </div>
-
-              {/* Article Body Paragraphs */}
+              {/* Article Body Paragraphs (Clean Direct Text) */}
               <div style={{ display: "flex", flexDirection: "column", gap: "20px", color: "#334155", fontSize: "1rem", lineHeight: 1.75 }}>
                 {activeArticle.paragraphs.map((p, pIdx) => (
                   <div key={pIdx}>
@@ -800,8 +775,23 @@ export default function BlogPage() {
           </div>
         )}
 
-        {/* Global Micro-animation CSS for Card Hover and Read Links */}
+        {/* Global CSS for 3-Column Responsive Grid and Micro-animations */}
         <style jsx global>{`
+          .articles-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+          }
+          @media (max-width: 1024px) {
+            .articles-grid {
+              grid-template-columns: repeat(2, 1fr);
+            }
+          }
+          @media (max-width: 640px) {
+            .articles-grid {
+              grid-template-columns: 1fr;
+            }
+          }
           .article-card {
             transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.22s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.22s ease !important;
           }
@@ -814,12 +804,6 @@ export default function BlogPage() {
             transform: translateX(4px);
           }
           .arrow-icon {
-            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-          }
-          .featured-story-btn:hover .featured-arrow {
-            transform: translate(2px, -2px);
-          }
-          .featured-arrow {
             transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
           }
         `}</style>
