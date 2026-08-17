@@ -19,7 +19,7 @@ export default function BusinessLayout({
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    if (pathname === "/business/login") {
+    if (pathname === "/business" || pathname === "/business/login") {
       setLoading(false);
       return;
     }
@@ -59,8 +59,8 @@ export default function BusinessLayout({
     router.push("/business/login");
   };
 
-  // Login page doesn't get the sidebar shell
-  if (pathname === "/business/login") {
+  // Public landing and login page do not get the admin sidebar shell
+  if (pathname === "/business" || pathname === "/business/login") {
     return <>{children}</>;
   }
 

@@ -7,9 +7,9 @@ This document tracks the end-to-end design, responsiveness, typography, and UX p
 ## 📊 Overall Progress Summary
 
 - **Total Active Pages / Endpoints:** 26
-- **Completed & Verified (Satisfied):** 13
-- **Pending Review & Perfection:** 13
-- **Progress:** 50.0%
+- **Completed & Verified (Satisfied):** 16
+- **Pending Review & Perfection:** 10
+- **Progress:** 61.5%
 
 ---
 
@@ -28,7 +28,7 @@ This document tracks the end-to-end design, responsiveness, typography, and UX p
 | :---: | :--- | :--- | :--- |
 | [x] | `/` | **Home / Landing** | Hero booking widget, vehicle tiers, live reviews, app CTA, light modern branding. |
 | [x] | `/city-rides` | **City Rides** | Minimalist photo hero banner, interactive 4-tier vehicle showcase (Auto, Bike Taxi, Mini & Prime Sedan) with upfront rates, custom purple/cyan blob artwork, 4 impact metrics, clean FAQ accordion, AppDownloadCTA, Footer. |
-| [ ] | `/city-to-city` | **City-to-City** | Intercity outstation cabs, one-way/roundtrip bookings, luggage guidelines. |
+| [x] | `/city-to-city` | **City-to-City** | Minimalist photo hero banner, interactive route showcase with One-Way vs Roundtrip pricing, custom purple/cyan blob artwork, 4 impact metrics, clean FAQ accordion, AppDownloadCTA, Footer. |
 | [ ] | `/ride-a-bike-taxi` | **Ride a Bike Taxi** | Two-wheeler mobility, helmet rules, instant pickup & congestion bypass. |
 | [ ] | `/live-tracking` | **Live Trip Tracking** | Real-time passenger telemetry, emergency safety sharing & driver status. |
 
@@ -37,8 +37,8 @@ This document tracks the end-to-end design, responsiveness, typography, and UX p
 ### 2. Deliveries & B2B Solutions
 | Status | Endpoint | Page Name | Description & Key Components |
 | :---: | :--- | :--- | :--- |
-| [ ] | `/darkstore` | **Darkstore Logistics** | 10–15 min quick-commerce fulfillment solutions & micro-warehousing. |
-| [ ] | `/business` | **Riksho for Business** | Corporate fleet management, employee ride billing, cost-center invoicing. |
+| [x] | `/darkstore` | **Darkstore Logistics** | Public partner landing page, Sub-15 min SLA, Smart Pick & Pack workflow, API sync, dual action buttons (Partner & Ops Portal link), purple/cyan blob artwork, 4 metrics, FAQ, AppDownloadCTA, Footer. |
+| [x] | `/business` | **Riksho for Business** | Public enterprise landing page, employee commute allowances, GST monthly billing, dual action buttons (Partner & Business Portal link), purple/cyan blob artwork, 4 metrics, FAQ, AppDownloadCTA, Footer. |
 
 ---
 

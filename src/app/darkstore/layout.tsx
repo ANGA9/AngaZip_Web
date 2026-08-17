@@ -19,7 +19,7 @@ export default function DarkstoreLayout({
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    if (pathname === "/darkstore/login") {
+    if (pathname === "/darkstore" || pathname === "/darkstore/login") {
       setLoading(false);
       return;
     }
@@ -61,8 +61,8 @@ export default function DarkstoreLayout({
     router.push("/darkstore/login");
   };
 
-  // Login page doesn't get the sidebar shell
-  if (pathname === "/darkstore/login") {
+  // Public landing and login page do not get the admin sidebar shell
+  if (pathname === "/darkstore" || pathname === "/darkstore/login") {
     return <>{children}</>;
   }
 
@@ -89,8 +89,8 @@ export default function DarkstoreLayout({
         <nav className="admin-sidebar-nav">
           <div className="admin-nav-section-label">Operations</div>
           <Link
-            href="/darkstore"
-            className={`admin-nav-item ${pathname === "/darkstore" ? "active" : ""}`}
+            href="/darkstore/queue"
+            className={`admin-nav-item ${pathname === "/darkstore/queue" ? "active" : ""}`}
           >
             <Package /> Fulfilment Queue
           </Link>
