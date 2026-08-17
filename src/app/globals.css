@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Dancing+Script:wght@700&family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
   /* Colors */
@@ -13,6 +13,7 @@
   /* Typography */
   --font-display: 'Space Grotesk', sans-serif;
   --font-body: 'Inter', sans-serif;
+  --font-cursive: 'Caveat', 'Dancing Script', cursive;
 
   /* Spacing scale */
   --space-xs: 8px;
@@ -1470,6 +1471,30 @@ ul {
 
 .footer-legal a:hover {
   color: var(--color-indigo);
+}
+
+.proudly-indian {
+  font-family: var(--font-cursive);
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: #0F172A;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: 0.01em;
+}
+
+.proudly-indian-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  background-color: #FFFFFF;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  margin-top: 16px;
+  margin-bottom: 12px;
 }
 
 @media (min-width: 640px) {
