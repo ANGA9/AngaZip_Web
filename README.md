@@ -91,6 +91,42 @@ When image generation capacity resets, generate the following high-priority asse
 
 ---
 
+### 6. Drive a Cab or Auto (`/drive-a-cab`)
+| Asset Type | Target File Path | Aspect Ratio | Exact Generation Prompt |
+| :--- | :--- | :---: | :--- |
+| **Hero Banner Photo** | `public/images/photo_drive_cab_hero.jpg` | `16:9` | `A high-quality realistic cinematic photograph of a proud, friendly Indian cab driver captain standing beside his clean modern white commercial sedan and an auto-rickshaw in an Indian urban street, warm daylight, smiling confidently with his smartphone showing instant earnings, professional commercial driver photography.` |
+| **Instant Paperless Onboarding Artwork (`#4338CA`)** | `public/images/ill_driver_onboarding.png` | `1:1` | `Flat vector cartoon illustration in a bold, minimal editorial style: A smiling driver captain holding up a smartphone with an approved green verification badge next to a car silhouette and 10-minute stopwatch emblem. Thick black outlines, flat solid color fill, no gradients, no shading, playful proportions. The character and elements are drawn in black outline with white fill, sitting on top of an irregular abstract blob shape in solid color #4338CA behind them. No text. Pure white background.` |
+| **Driver Dignity & Welfare Artwork (`#00C2FF`)** | `public/images/ill_driver_welfare.png` | `1:1` | `Flat vector cartoon illustration in a bold, minimal editorial style: A driver captain receiving a warm handshake at a community support desk with a medical insurance shield and instant UPI rupee coin badge. Thick black outlines, flat solid color fill, no gradients, no shading, playful proportions. The characters and elements are drawn in black outline with white fill, sitting on top of an irregular abstract blob shape in solid color #00C2FF behind them. No text. Pure white background.` |
+
+---
+
+### 7. Ride a Bike Taxi / Captain (`/ride-a-bike-taxi`)
+| Asset Type | Target File Path | Aspect Ratio | Exact Generation Prompt |
+| :--- | :--- | :---: | :--- |
+| **Hero Banner Photo** | `public/images/photo_ride_bike_hero.jpg` | `16:9` | `A high-quality realistic cinematic photograph of a young dynamic Indian motorcycle captain wearing a neat safety jacket and helmet, standing beside his modern sports bike on an open city flyover during early morning golden hour, confident posture, authentic urban mobility photography.` |
+| **Fast-Track Onboarding Artwork (`#4338CA`)** | `public/images/ill_bike_onboarding.png` | `1:1` | `Flat vector cartoon illustration in a bold, minimal editorial style: A bike captain snapping a photo of his driving license on a phone next to dual safety helmets and a two-wheeler outline. Thick black outlines, flat solid color fill, no gradients, no shading, playful proportions. The character and equipment are drawn in black outline with white fill, sitting on top of an irregular abstract blob shape in solid color #4338CA behind them. No text. Pure white background.` |
+| **Captain Safety Protection Artwork (`#00C2FF`)** | `public/images/ill_bike_safety.png` | `1:1` | `Flat vector cartoon illustration in a bold, minimal editorial style: A bike captain wearing an ISI certified helmet next to a protective medical cross shield, emergency SOS beacon, and live GPS map route. Thick black outlines, flat solid color fill, no gradients, no shading, playful proportions. The character and icons are drawn in black outline with white fill, sitting on top of an irregular abstract blob shape in solid color #00C2FF behind them. No text. Pure white background.` |
+
+---
+
+### 8. Deliver as a Courier (`/deliver-as-courier`)
+| Asset Type | Target File Path | Aspect Ratio | Exact Generation Prompt |
+| :--- | :--- | :---: | :--- |
+| **Hero Banner Photo** | `public/images/photo_courier_hero.jpg` | `16:9` | `A high-quality realistic cinematic photograph of an energetic delivery courier partner wearing an insulated thermal backpack, smiling beside his electric delivery scooter outside a bright modern storefront, holding a parcel crate, authentic logistics photography.` |
+| **Darkstore Micro-Hub Artwork (`#4338CA`)** | `public/images/ill_courier_darkstore.png` | `1:1` | `Flat vector cartoon illustration in a bold, minimal editorial style: A delivery courier picking up three sealed grocery bags from a darkstore counter with sequential multi-drop route navigation pins. Thick black outlines, flat solid color fill, no gradients, no shading, playful proportions. The character and packages are drawn in black outline with white fill, sitting on top of an irregular abstract blob shape in solid color #4338CA behind them. No text. Pure white background.` |
+| **OTP Delivery Handover Artwork (`#00C2FF`)** | `public/images/ill_courier_otp.png` | `1:1` | `Flat vector cartoon illustration in a bold, minimal editorial style: A courier partner handing a package box to a happy customer at a doorstep with a digital 4-digit verification checkmark badge in between. Thick black outlines, flat solid color fill, no gradients, no shading, playful proportions. The characters and package are drawn in black outline with white fill, sitting on top of an irregular abstract blob shape in solid color #00C2FF behind them. No text. Pure white background.` |
+
+---
+
+### 9. Join as a Fleet Owner (`/join-a-fleet`)
+| Asset Type | Target File Path | Aspect Ratio | Exact Generation Prompt |
+| :--- | :--- | :---: | :--- |
+| **Hero Banner Photo** | `public/images/photo_fleet_owner_hero.jpg` | `16:9` | `A high-quality realistic cinematic photograph of a confident Indian fleet business owner standing in front of a neat row of commercial white sedans, commercial autos, and delivery bikes in a modern paved lot, holding a digital tablet displaying fleet analytics, corporate mobility photography.` |
+| **Fleet Telemetry Dashboard Artwork (`#4338CA`)** | `public/images/ill_fleet_telemetry.png` | `1:1` | `Flat vector cartoon illustration in a bold, minimal editorial style: A fleet manager reviewing a digital live GPS map dashboard with vehicle pins, speed gauges, and geo-fence perimeter shields. Thick black outlines, flat solid color fill, no gradients, no shading, playful proportions. The character and screen are drawn in black outline with white fill, sitting on top of an irregular abstract blob shape in solid color #4338CA behind them. No text. Pure white background.` |
+| **Automated Financial Splits Artwork (`#00C2FF`)** | `public/images/ill_fleet_settlement.png` | `1:1` | `Flat vector cartoon illustration in a bold, minimal editorial style: An automated bank vault transferring electronic revenue splits into a fleet business account and driver digital wallets with GST tax invoices. Thick black outlines, flat solid color fill, no gradients, no shading, playful proportions. The elements are drawn in black outline with white fill, sitting on top of an irregular abstract blob shape in solid color #00C2FF behind them. No text. Pure white background.` |
+
+---
+
 ## 🚀 Getting Started
 
 First, install dependencies and run the development server:

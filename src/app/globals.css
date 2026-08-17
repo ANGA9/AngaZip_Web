@@ -552,7 +552,8 @@ ul {
   border: 1px solid transparent;
 }
 
-.mega-menu-card:hover {
+.mega-menu-card:hover,
+.mega-menu-card.selected {
   background-color: transparent;
   border-color: #0f172a;
 }
@@ -578,7 +579,8 @@ ul {
   transition: color 0.2s;
 }
 
-.mega-menu-card:hover .mega-card-text h4 {
+.mega-menu-card:hover .mega-card-text h4,
+.mega-menu-card.selected .mega-card-text h4 {
   color: var(--color-indigo);
 }
 
@@ -596,7 +598,11 @@ ul {
   .mega-menu-card {
     padding: 12px;
     gap: 12px;
-    border: 1px solid rgba(15, 23, 42, 0.2);
+    border: 1px solid transparent;
+  }
+  .mega-menu-card:hover,
+  .mega-menu-card.selected {
+    border: 1px solid #0f172a;
   }
   .mega-card-icon {
     width: 40px;

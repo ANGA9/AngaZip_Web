@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const icons = {
   star: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>,
@@ -65,10 +66,30 @@ const megaMenuData = [
 ];
 
 export default function Navbar() {
+  const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [activeTab, setActiveTab] = useState("services");
+
+  const getTabForPath = (path: string) => {
+    const matchingTab = megaMenuData.find(t =>
+      t.links.some(link => link.href === path || (link.href !== "/" && path.startsWith(link.href)))
+    );
+    return matchingTab ? matchingTab.id : "services";
+  };
+
+  const [activeTab, setActiveTab] = useState<string>("services");
+
+  useEffect(() => {
+    setActiveTab(getTabForPath(pathname));
+  }, [pathname]);
+
+  const toggleMenu = () => {
+    if (!mobileMenuOpen) {
+      setActiveTab(getTabForPath(pathname));
+    }
+    setMobileMenuOpen(prev => !prev);
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -174,7 +195,7 @@ export default function Navbar() {
               {/* Desktop Menu Button */}
               <button 
                 className="nav-pill menu-pill hidden-mobile" 
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                onClick={toggleMenu}
               >
                 {mobileMenuOpen ? (
                   <>
@@ -195,7 +216,7 @@ export default function Navbar() {
 
               {/* Mobile Hamburger (Only visible on small screens) */}
               <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                onClick={toggleMenu}
                 className={`hamburger visible-mobile ${mobileMenuOpen ? "open" : ""}`}
                 aria-label="Toggle menu"
               >
@@ -233,15 +254,23 @@ export default function Navbar() {
             <div className="container" style={{ padding: "32px 16px" }}>
               {/* Content Area */}
               <div className="mega-menu-grid">
-                {activeTabData.links.map((link) => (
-                  <Link key={link.label} href={link.href} className="mega-menu-card" onClick={() => setMobileMenuOpen(false)}>
-                    <div className="mega-card-icon">{link.icon}</div>
-                    <div className="mega-card-text">
-                      <h4>{link.label}</h4>
-                      <p>{link.desc}</p>
-                    </div>
-                  </Link>
-                ))}
+                {activeTabData.links.map((link) => {
+                  const isSelected = pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href));
+                  return (
+                    <Link 
+                      key={link.label} 
+                      href={link.href} 
+                      className={`mega-menu-card ${isSelected ? "selected" : ""}`} 
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <div className="mega-card-icon">{link.icon}</div>
+                      <div className="mega-card-text">
+                        <h4>{link.label}</h4>
+                        <p>{link.desc}</p>
+                      </div>
+                    </Link>
+                  );
+                })}
               </div>
 
               {/* Mobile CTA */}

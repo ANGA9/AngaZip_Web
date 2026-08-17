@@ -7,9 +7,9 @@ This document tracks the end-to-end design, responsiveness, typography, and UX p
 ## 📊 Overall Progress Summary
 
 - **Total Active Pages / Endpoints:** 26
-- **Completed & Verified (Satisfied):** 16
-- **Pending Review & Perfection:** 10
-- **Progress:** 61.5%
+- **Completed & Verified (Satisfied):** 20
+- **Pending Review & Perfection:** 6
+- **Progress:** 76.9%
 
 ---
 
@@ -29,7 +29,7 @@ This document tracks the end-to-end design, responsiveness, typography, and UX p
 | [x] | `/` | **Home / Landing** | Hero booking widget, vehicle tiers, live reviews, app CTA, light modern branding. |
 | [x] | `/city-rides` | **City Rides** | Minimalist photo hero banner, interactive 4-tier vehicle showcase (Auto, Bike Taxi, Mini & Prime Sedan) with upfront rates, custom purple/cyan blob artwork, 4 impact metrics, clean FAQ accordion, AppDownloadCTA, Footer. |
 | [x] | `/city-to-city` | **City-to-City** | Minimalist photo hero banner, interactive route showcase with One-Way vs Roundtrip pricing, custom purple/cyan blob artwork, 4 impact metrics, clean FAQ accordion, AppDownloadCTA, Footer. |
-| [ ] | `/ride-a-bike-taxi` | **Ride a Bike Taxi** | Two-wheeler mobility, helmet rules, instant pickup & congestion bypass. |
+| [x] | `/ride-a-bike-taxi` | **Ride a Bike Taxi** | Dynamic photo hero, 5 captain advantage pillars (3+2 centered layout), free ISI safety kit, rush hour multipliers, purple/cyan blob artwork, 4 metrics, FAQ, AppDownloadCTA, Footer. |
 | [ ] | `/live-tracking` | **Live Trip Tracking** | Real-time passenger telemetry, emergency safety sharing & driver status. |
 
 ---
@@ -37,18 +37,18 @@ This document tracks the end-to-end design, responsiveness, typography, and UX p
 ### 2. Deliveries & B2B Solutions
 | Status | Endpoint | Page Name | Description & Key Components |
 | :---: | :--- | :--- | :--- |
-| [x] | `/darkstore` | **Darkstore Logistics** | Public partner landing page, Sub-15 min SLA, Smart Pick & Pack workflow, API sync, dual action buttons (Partner & Ops Portal link), purple/cyan blob artwork, 4 metrics, FAQ, AppDownloadCTA, Footer. |
-| [x] | `/business` | **Riksho for Business** | Public enterprise landing page, employee commute allowances, GST monthly billing, dual action buttons (Partner & Business Portal link), purple/cyan blob artwork, 4 metrics, FAQ, AppDownloadCTA, Footer. |
+| [x] | `/darkstore` | **Darkstore Logistics** | Public partner landing page, Sub-15 min SLA, Smart Pick & Pack workflow, API sync, dual action buttons (Partner & Ops Portal link), purple/cyan blob artwork, 5 pillars (3+2 layout), 4 metrics, FAQ, AppDownloadCTA, Footer. |
+| [x] | `/business` | **Riksho for Business** | Public enterprise landing page, employee commute allowances, GST monthly billing, dual action buttons (Partner & Business Portal link), purple/cyan blob artwork, 5 solutions (3+2 layout), 4 metrics, FAQ, AppDownloadCTA, Footer. |
 
 ---
 
-### 3. Driver & Partner Hub ("Earn with Riksho")
+### 3. Driver & Fleet Partner Ecosystem
 | Status | Endpoint | Page Name | Description & Key Components |
 | :---: | :--- | :--- | :--- |
-| [ ] | `/earn` | **Partner Hub** | Master onboarding portal, daily earnings calculator & incentive schemes. |
-| [ ] | `/drive-a-cab` | **Drive a Cab / Auto** | Commercial driver partner onboarding (Cab & Auto), daily bank payouts. |
-| [ ] | `/deliver-as-courier` | **Deliver as Courier** | Two-wheeler courier partner registration, onboarding kit & flexible shifts. |
-| [ ] | `/join-a-fleet` | **Join as Fleet Owner** | Multi-vehicle fleet operator portal, centralized analytics & vehicle tracking. |
+| [ ] | `/earn` | **Partner / Driver Hub** | Comprehensive partner portal with dynamic earnings calculator & driver tier perks. |
+| [x] | `/drive-a-cab` | **Drive a Cab / Auto** | Dynamic photo hero, 5 driver pillars (3+2 layout), 0% first month commission, daily UPI cashout, purple/cyan blob artwork, 4 metrics, FAQ, AppDownloadCTA, Footer. |
+| [x] | `/deliver-as-courier` | **Deliver as Courier** | Dynamic photo hero, 5 courier pillars (3+2 layout), high-density darkstore orders, contactless OTP, purple/cyan blob artwork, 4 metrics, FAQ, AppDownloadCTA, Footer. |
+| [x] | `/join-a-fleet` | **Join as Fleet Owner** | Dynamic photo hero, 5 fleet pillars (3+2 layout), live GPS telemetry, automated driver revenue splits, purple/cyan blob artwork, 4 metrics, FAQ, AppDownloadCTA, Footer. |
 
 ---
 
