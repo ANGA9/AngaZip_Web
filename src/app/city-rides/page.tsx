@@ -202,15 +202,19 @@ export default function CityRidesPage() {
                     {/* Badge */}
                     <div style={{
                       position: "absolute",
-                      top: "16px",
-                      right: "16px",
+                      top: "14px",
+                      right: "14px",
+                      zIndex: 2,
                       backgroundColor: isSelected ? "var(--color-indigo)" : "var(--color-indigo-tint)",
                       color: isSelected ? "#FFFFFF" : "var(--color-indigo)",
-                      fontSize: "0.75rem",
+                      fontSize: "0.725rem",
                       fontWeight: 800,
                       padding: "4px 10px",
                       borderRadius: "999px",
-                      textTransform: "uppercase"
+                      textTransform: "uppercase",
+                      letterSpacing: "0.03em",
+                      whiteSpace: "nowrap",
+                      boxShadow: "0 2px 6px rgba(0,0,0,0.04)"
                     }}>
                       {tier.badge}
                     </div>
@@ -220,17 +224,23 @@ export default function CityRidesPage() {
                       <div style={{
                         position: "relative",
                         width: "100%",
-                        height: "120px",
-                        marginBottom: "16px",
+                        height: "165px",
+                        marginBottom: "12px",
                         display: "flex",
                         alignItems: "center",
-                        justifyContent: "center"
+                        justifyContent: "center",
+                        overflow: "hidden",
+                        borderRadius: "14px"
                       }}>
                         <Image
                           src={tier.image}
                           alt={tier.name}
                           fill
-                          style={{ objectFit: "contain" }}
+                          style={{
+                            objectFit: "contain",
+                            transform: "scale(1.22)",
+                            transition: "transform 0.25s ease"
+                          }}
                         />
                       </div>
 
