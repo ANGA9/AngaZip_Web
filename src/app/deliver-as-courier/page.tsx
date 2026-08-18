@@ -103,7 +103,7 @@ export default function DeliverAsCourierPage() {
           {/* Background Photo with Minimal Directional Gradient */}
           <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
             <Image
-              src="/images/photo_courier.png"
+              src="/images/photo_courier_hero.jpg"
               alt="Deliver as a Riksho Courier"
               fill
               style={{ objectFit: "cover", objectPosition: "center 30%" }}
@@ -267,7 +267,7 @@ export default function DeliverAsCourierPage() {
                   justifyContent: "center"
                 }}>
                   <Image
-                    src="/images/ill_about_mission.png"
+                    src="/images/ill_courier_darkstore.png"
                     alt="Fast courier pickup from local darkstore micro hubs"
                     fill
                     style={{ objectFit: "contain" }}
@@ -418,7 +418,7 @@ export default function DeliverAsCourierPage() {
                   justifyContent: "center"
                 }}>
                   <Image
-                    src="/images/ill_about_values.png"
+                    src="/images/ill_courier_otp.png"
                     alt="Courier welfare protection and OTP delivery confirmation"
                     fill
                     style={{ objectFit: "contain" }}

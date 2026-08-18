@@ -102,7 +102,7 @@ export default function RideBikeTaxiPage() {
           {/* Background Photo with Minimal Directional Gradient */}
           <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
             <Image
-              src="/images/photo_ride_bike.png"
+              src="/images/photo_ride_bike_hero.jpg"
               alt="Ride a Bike Taxi with Riksho"
               fill
               style={{ objectFit: "cover", objectPosition: "center 30%" }}
@@ -266,7 +266,7 @@ export default function RideBikeTaxiPage() {
                   justifyContent: "center"
                 }}>
                   <Image
-                    src="/images/ill_about_mission.png"
+                    src="/images/ill_bike_onboarding.png"
                     alt="Fast bike captain digital onboarding"
                     fill
                     style={{ objectFit: "contain" }}
@@ -417,7 +417,7 @@ export default function RideBikeTaxiPage() {
                   justifyContent: "center"
                 }}>
                   <Image
-                    src="/images/ill_about_values.png"
+                    src="/images/ill_bike_safety.png"
                     alt="Bike captain safety and welfare protection"
                     fill
                     style={{ objectFit: "contain" }}

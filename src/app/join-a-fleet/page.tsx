@@ -104,7 +104,7 @@ export default function JoinAFleetPage() {
           {/* Background Photo with Minimal Directional Gradient */}
           <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
             <Image
-              src="/images/photo_earn.png"
+              src="/images/photo_fleet_owner_hero.jpg"
               alt="Join Riksho as a Fleet Partner"
               fill
               style={{ objectFit: "cover", objectPosition: "center 30%" }}
@@ -268,7 +268,7 @@ export default function JoinAFleetPage() {
                   justifyContent: "center"
                 }}>
                   <Image
-                    src="/images/ill_about_mission.png"
+                    src="/images/ill_fleet_telemetry.png"
                     alt="Commercial fleet telemetry and vehicle rostering dashboard"
                     fill
                     style={{ objectFit: "contain" }}
@@ -419,7 +419,7 @@ export default function JoinAFleetPage() {
                   justifyContent: "center"
                 }}>
                   <Image
-                    src="/images/ill_about_values.png"
+                    src="/images/ill_fleet_settlement.png"
                     alt="Fleet financial management and driver sourcing"
                     fill
                     style={{ objectFit: "contain" }}

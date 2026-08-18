@@ -122,7 +122,7 @@ export default function DarkstoreLandingPage() {
           {/* Background Photo with Minimal Directional Gradient */}
           <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
             <Image
-              src="/images/photo_delivery.png"
+              src="/images/photo_darkstore_hero.jpg"
               alt="Riksho Darkstore Logistics"
               fill
               style={{ objectFit: "cover", objectPosition: "center 40%" }}
@@ -290,7 +290,7 @@ export default function DarkstoreLandingPage() {
                   justifyContent: "center"
                 }}>
                   <Image
-                    src="/images/ill_about_mission.png"
+                    src="/images/ill_darkstore_picking.png"
                     alt="Darkstore micro-warehouse fulfillment and packing speed"
                     fill
                     style={{ objectFit: "contain" }}
@@ -441,7 +441,7 @@ export default function DarkstoreLandingPage() {
                   justifyContent: "center"
                 }}>
                   <Image
-                    src="/images/ill_about_values.png"
+                    src="/images/ill_darkstore_dispatch.png"
                     alt="Darkstore fleet orchestration and real-time live map tracking"
                     fill
                     style={{ objectFit: "contain" }}

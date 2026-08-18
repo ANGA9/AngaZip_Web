@@ -103,7 +103,7 @@ export default function DriveCabPage() {
           {/* Background Photo with Minimal Directional Gradient */}
           <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
             <Image
-              src="/images/photo_drive_cab.png"
+              src="/images/photo_drive_cab_hero.jpg"
               alt="Drive with Riksho"
               fill
               style={{ objectFit: "cover", objectPosition: "center 30%" }}
@@ -267,7 +267,7 @@ export default function DriveCabPage() {
                   justifyContent: "center"
                 }}>
                   <Image
-                    src="/images/ill_about_mission.png"
+                    src="/images/ill_driver_onboarding.png"
                     alt="Fast driver paperless onboarding"
                     fill
                     style={{ objectFit: "contain" }}
@@ -418,7 +418,7 @@ export default function DriveCabPage() {
                   justifyContent: "center"
                 }}>
                   <Image
-                    src="/images/ill_about_values.png"
+                    src="/images/ill_driver_welfare.png"
                     alt="Driver partner respect and community support"
                     fill
                     style={{ objectFit: "contain" }}
