@@ -295,7 +295,7 @@ export default function CareersPage() {
                   justifyContent: "center"
                 }}>
                   <Image
-                    src="/images/ill_about_values.png"
+                    src="/images/ill_careers_engineering.png"
                     alt="Riksho Engineering and Team Collaboration"
                     fill
                     style={{ objectFit: "contain" }}
