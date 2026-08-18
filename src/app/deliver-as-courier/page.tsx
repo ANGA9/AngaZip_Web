@@ -151,19 +151,19 @@ export default function DeliverAsCourierPage() {
                   style={{
                     display: "inline-flex",
                     alignItems: "center",
-                    gap: "10px",
+                    gap: "8px",
                     backgroundColor: "var(--color-indigo)",
                     color: "#FFFFFF",
-                    fontWeight: 800,
-                    fontSize: "1rem",
-                    padding: "16px 32px",
+                    fontWeight: 700,
+                    fontSize: "clamp(0.9rem, 1.8vw, 1rem)",
+                    padding: "clamp(12px, 2vw, 15px) clamp(22px, 3vw, 30px)",
                     borderRadius: "999px",
                     textDecoration: "none",
-                    boxShadow: "0 6px 20px rgba(67, 56, 202, 0.5)",
+                    boxShadow: "0 6px 20px rgba(67, 56, 202, 0.4)",
                     transition: "transform 0.15s ease"
                   }}
                 >
-                  <span>Join as a Delivery Courier</span>
+                  <span>Register as a Delivery Partner</span>
                   <ArrowRight size={18} strokeWidth={2.5} />
                 </a>
               </div>
