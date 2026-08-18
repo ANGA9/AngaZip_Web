@@ -119,6 +119,7 @@ export default function DarkstoreLandingPage() {
           paddingBottom: "60px",
           overflow: "hidden"
         }}>
+          {/* Background Photo with Soft Directional Vignette Overlay */}
           <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
             <Image
               src="/images/photo_darkstore_hero.jpg"
@@ -127,6 +128,12 @@ export default function DarkstoreLandingPage() {
               style={{ objectFit: "cover", objectPosition: "center 40%" }}
               priority
             />
+            {/* Soft Directional Gradient (Text Legibility on Left, Fully Faded & Clear on Right) */}
+            <div style={{
+              position: "absolute",
+              inset: 0,
+              background: "linear-gradient(90deg, rgba(15, 23, 42, 0.58) 0%, rgba(15, 23, 42, 0.28) 42%, rgba(15, 23, 42, 0) 72%)"
+            }} />
           </div>
 
           <div className="container" style={{ position: "relative", zIndex: 1, color: "#FFFFFF" }}>
