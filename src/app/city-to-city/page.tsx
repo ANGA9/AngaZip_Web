@@ -163,7 +163,7 @@ export default function CityToCityPage() {
           {/* Background Photo with Minimal Directional Gradient */}
           <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
             <Image
-              src="/images/photo_city_to_city.png"
+              src="/images/photo_city_to_city_hero.jpg"
               alt="City to City Intercity Travel by Riksho"
               fill
               style={{ objectFit: "cover", objectPosition: "center 40%" }}
@@ -373,7 +373,7 @@ export default function CityToCityPage() {
                   justifyContent: "center"
                 }}>
                   <Image
-                    src="/images/ill_about_mission.png"
+                    src="/images/ill_intercity_oneway.png"
                     alt="Riksho Intercity highway travel"
                     fill
                     style={{ objectFit: "contain" }}
@@ -524,7 +524,7 @@ export default function CityToCityPage() {
                   justifyContent: "center"
                 }}>
                   <Image
-                    src="/images/ill_about_values.png"
+                    src="/images/ill_intercity_safety.png"
                     alt="Highway safety monitoring and verified vehicle inspections"
                     fill
                     style={{ objectFit: "contain" }}

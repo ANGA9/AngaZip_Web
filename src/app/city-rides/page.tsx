@@ -46,7 +46,7 @@ export default function CityRidesPage() {
       baseFare: "₹20",
       perKm: "₹8/km",
       features: ["Free sanitized helmet", "Zero traffic delays", "Lowest cost"],
-      image: "/images/bike.png",
+      image: "/images/ill_tier_bike.png",
       badge: "Fastest"
     },
     {
@@ -58,7 +58,7 @@ export default function CityRidesPage() {
       baseFare: "₹50",
       perKm: "₹15/km",
       features: ["Full AC comfort", "Compact hatchbacks", "Clean interiors"],
-      image: "/images/mini_car.png",
+      image: "/images/ill_tier_mini.png",
       badge: "Best Value"
     },
     {
@@ -70,7 +70,7 @@ export default function CityRidesPage() {
       baseFare: "₹70",
       perKm: "₹18/km",
       features: ["Extra legroom", "Top-rated captains", "Trunk luggage space"],
-      image: "/images/sedan_car.png",
+      image: "/images/ill_tier_sedan.png",
       badge: "Executive"
     }
   ];
@@ -330,7 +330,7 @@ export default function CityRidesPage() {
                   justifyContent: "center"
                 }}>
                   <Image
-                    src="/images/ill_about_mission.png"
+                    src="/images/ill_city_fair_fare.png"
                     alt="Fair upfront pricing and electric auto transit"
                     fill
                     style={{ objectFit: "contain" }}
@@ -481,7 +481,7 @@ export default function CityRidesPage() {
                   justifyContent: "center"
                 }}>
                   <Image
-                    src="/images/ill_about_values.png"
+                    src="/images/ill_city_safety_otp.png"
                     alt="Safety shields and verified transit captains"
                     fill
                     style={{ objectFit: "contain" }}

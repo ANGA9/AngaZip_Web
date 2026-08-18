@@ -123,7 +123,7 @@ export default function BusinessLandingPage() {
           {/* Background Photo with Minimal Directional Gradient */}
           <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
             <Image
-              src="/images/photo_freight.png"
+              src="/images/photo_business_hero.jpg"
               alt="Riksho for Business"
               fill
               style={{ objectFit: "cover", objectPosition: "center 40%" }}
@@ -291,7 +291,7 @@ export default function BusinessLandingPage() {
                   justifyContent: "center"
                 }}>
                   <Image
-                    src="/images/ill_about_mission.png"
+                    src="/images/ill_business_invoicing.png"
                     alt="Automated corporate billing and GST tax reports"
                     fill
                     style={{ objectFit: "contain" }}
@@ -442,7 +442,7 @@ export default function BusinessLandingPage() {
                   justifyContent: "center"
                 }}>
                   <Image
-                    src="/images/ill_about_values.png"
+                    src="/images/ill_business_api.png"
                     alt="Developer API and multi-location darkstore dispatch"
                     fill
                     style={{ objectFit: "contain" }}
