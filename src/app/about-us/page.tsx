@@ -63,7 +63,6 @@ export default function AboutUsPage() {
           paddingBottom: "60px",
           overflow: "hidden"
         }}>
-          {/* Background Real People Photograph with Cinematic Gradient */}
           <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
             <Image
               src="/images/photo_about_hero.jpg"
@@ -72,12 +71,6 @@ export default function AboutUsPage() {
               style={{ objectFit: "cover", objectPosition: "center 30%" }}
               priority
             />
-            {/* Minimal Ambient Gradient Overlay */}
-            <div style={{
-              position: "absolute",
-              inset: 0,
-              background: "linear-gradient(90deg, rgba(15, 23, 42, 0.62) 0%, rgba(15, 23, 42, 0.32) 45%, rgba(15, 23, 42, 0.02) 100%)"
-            }} />
           </div>
 
           <div className="container" style={{ position: "relative", zIndex: 1, color: "#FFFFFF" }}>

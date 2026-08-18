@@ -119,7 +119,6 @@ export default function DarkstoreLandingPage() {
           paddingBottom: "60px",
           overflow: "hidden"
         }}>
-          {/* Background Photo with Minimal Directional Gradient */}
           <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
             <Image
               src="/images/photo_darkstore_hero.jpg"
@@ -128,12 +127,6 @@ export default function DarkstoreLandingPage() {
               style={{ objectFit: "cover", objectPosition: "center 40%" }}
               priority
             />
-            {/* Minimal Ambient Gradient Overlay */}
-            <div style={{
-              position: "absolute",
-              inset: 0,
-              background: "linear-gradient(90deg, rgba(15, 23, 42, 0.68) 0%, rgba(15, 23, 42, 0.38) 50%, rgba(15, 23, 42, 0.05) 100%)"
-            }} />
           </div>
 
           <div className="container" style={{ position: "relative", zIndex: 1, color: "#FFFFFF" }}>
