@@ -1,0 +1,28 @@
+# Riksho Technologies - robots.txt
+User-agent: *
+Allow: /
+Allow: /city-rides
+Allow: /city-to-city
+Allow: /ride-a-bike-taxi
+Allow: /drive-a-cab
+Allow: /deliver-as-courier
+Allow: /join-a-fleet
+Allow: /darkstore
+Allow: /business
+Allow: /careers
+Allow: /safety
+Allow: /blog
+Allow: /about-us
+Allow: /support
+
+# Disallow crawler access to internal portals, admin APIs, and auth callbacks
+Disallow: /admin/
+Disallow: /business/dashboard/
+Disallow: /darkstore/dashboard/
+Disallow: /api/
+Disallow: /auth/
+
+# Crawl-delay for polite scraping
+Crawl-delay: 2
+
+Sitemap: https://riksho.com/sitemap.xml
