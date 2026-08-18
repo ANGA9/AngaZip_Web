@@ -246,20 +246,20 @@ export default function CareersPage() {
             <div style={{ maxWidth: "760px" }}>
               <h1 style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "clamp(38px, 5.5vw, 62px)",
+                fontSize: "clamp(28px, 5.2vw, 56px)",
                 fontWeight: 800,
                 letterSpacing: "-0.03em",
-                lineHeight: 1.1,
-                marginBottom: "18px",
+                lineHeight: 1.15,
+                marginBottom: "16px",
                 color: "#FFFFFF",
                 textShadow: "0 2px 14px rgba(0, 0, 0, 0.55)"
               }}>
-                Build what moves India.<br />
-                <span style={{ color: "#00C2FF" }}>High ownership, zero red tape.</span>
+                Move the future with us.<br />
+                <span style={{ color: "#00C2FF" }}>Build India&apos;s open mobility stack.</span>
               </h1>
 
               <p style={{
-                fontSize: "clamp(1.05rem, 1.8vw, 1.25rem)",
+                fontSize: "clamp(0.95rem, 2vw, 1.18rem)",
                 lineHeight: 1.6,
                 color: "#FFFFFF",
                 maxWidth: "620px",
