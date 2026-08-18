@@ -34,7 +34,7 @@ export default function CityRidesPage() {
       baseFare: "₹30",
       perKm: "₹12/km",
       features: ["Metropolitan standard", "Congestion bypass", "Instant booking"],
-      image: "/images/ill_about_mission.png",
+      image: "/images/ill_tier_auto.png",
       badge: "Most Popular"
     },
     {
