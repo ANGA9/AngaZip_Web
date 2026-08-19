@@ -166,8 +166,8 @@ export default function BusinessLandingPage() {
 
               {/* Hero Action Button */}
               <div>
-                <a
-                  href="#download"
+                <Link
+                  href="/business/login"
                   style={{
                     display: "inline-flex",
                     alignItems: "center",
@@ -185,7 +185,7 @@ export default function BusinessLandingPage() {
                 >
                   <span>Register Enterprise Account</span>
                   <ArrowRight size={18} strokeWidth={2.5} />
-                </a>
+                </Link>
               </div>
             </div>
           </div>

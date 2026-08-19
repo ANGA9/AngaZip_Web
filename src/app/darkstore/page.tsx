@@ -165,8 +165,8 @@ export default function DarkstoreLandingPage() {
 
               {/* Hero Action Button */}
               <div>
-                <a
-                  href="#download"
+                <Link
+                  href="/darkstore/login"
                   style={{
                     display: "inline-flex",
                     alignItems: "center",
@@ -184,7 +184,7 @@ export default function DarkstoreLandingPage() {
                 >
                   <span>Integrate Darkstore API</span>
                   <ArrowRight size={18} strokeWidth={2.5} />
-                </a>
+                </Link>
               </div>
             </div>
           </div>

@@ -122,19 +122,15 @@ export default function BusinessLogin() {
 
   return (
     <div className="admin-login-wrapper">
-      <nav className="admin-login-navbar">
-        <Link href="/">
-          <img src="/images/final_riksho.png" alt="Riksho" className="admin-login-navbar-logo" />
+      <header className="portal-top-bar">
+        <Link href="/" className="portal-top-brand">
+          <img src="/images/final_riksho.png" alt="Riksho" className="portal-top-logo" />
+          <span className="portal-type-badge">Enterprise Portal</span>
         </Link>
-        <div className="admin-login-navbar-links">
-          <Link href="/business/register" className="admin-login-nav-link">
-            <Store size={18} /> <span className="admin-nav-text">Sell on Riksho</span>
-          </Link>
-          <Link href="/download" className="admin-login-nav-link">
-            <Download size={18} /> <span className="admin-nav-text">Download App</span>
-          </Link>
-        </div>
-      </nav>
+        <Link href="/business" className="portal-back-btn">
+          <span>← Back to Business</span>
+        </Link>
+      </header>
 
       <div className="admin-login-container">
         <div className="admin-login-card">
