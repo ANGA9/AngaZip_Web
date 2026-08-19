@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { supabaseAdminClient } from "@/lib/supabaseAdminClient";
-import { AlertCircle, ArrowLeft, Mail, Phone, ShieldCheck, Download, Store } from "lucide-react";
+import { AlertCircle, ArrowLeft, ArrowRight, Mail, Phone, ShieldCheck, Download, Store } from "lucide-react";
 import "@/styles/portal.css";
 import Link from "next/link";
 
@@ -142,97 +142,153 @@ export default function BusinessLogin() {
 
           {/* Right Form Area */}
           <div className="admin-login-form-area">
-            <h2 className="admin-login-title">Welcome back</h2>
-            <p className="admin-login-sub">
-              Sign in with your email or phone to access the Business Portal.
-            </p>
+            <div style={{ marginBottom: "24px" }}>
+              <h2 className="admin-login-title">Business Portal</h2>
+              <p className="admin-login-sub">
+                Sign in with your registered phone or work email to manage your enterprise fleet.
+              </p>
+            </div>
 
-            {error && <div className="admin-error"><AlertCircle /> {error}</div>}
+            {error && (
+              <div className="admin-error-box">
+                <AlertCircle size={18} style={{ flexShrink: 0 }} />
+                <span>{error}</span>
+              </div>
+            )}
 
             {step === "input" ? (
               <form onSubmit={handleSendCode}>
-                <div className="admin-login-tabs">
+                {/* Segmented Tab Switcher */}
+                <div className="admin-login-segmented">
                   <div 
-                    className={`admin-login-tab ${tab === 'phone' ? 'active' : ''}`}
-                    onClick={() => setTab('phone')}
-                  >
-                    <Phone size={16} /> Phone
-                  </div>
-                  <div 
-                    className={`admin-login-tab ${tab === 'email' ? 'active' : ''}`}
+                    className={`admin-login-segment ${tab === 'email' ? 'active' : ''}`}
                     onClick={() => setTab('email')}
                   >
-                    <Mail size={16} /> Email
+                    <Mail size={16} /> Work Email
+                  </div>
+                  <div 
+                    className={`admin-login-segment ${tab === 'phone' ? 'active' : ''}`}
+                    onClick={() => setTab('phone')}
+                  >
+                    <Phone size={16} /> Mobile Phone
                   </div>
                 </div>
 
-                <label className="admin-field-label">
-                  {tab === "email" ? "Email Address" : "Phone Number"}
-                </label>
-                <input
-                  type={tab === "email" ? "email" : "tel"}
-                  placeholder={tab === "email" ? "Enter your email address" : "Enter your phone number"}
-                  className="admin-input"
-                  value={loginId}
-                  onChange={(e) => setLoginId(e.target.value)}
-                  required
-                />
+                <div className="admin-field-group">
+                  <label className="admin-field-label">
+                    {tab === "email" ? "Registered Work Email" : "Mobile Phone Number"}
+                  </label>
+                  
+                  <div className="admin-input-wrapper">
+                    {tab === "email" ? (
+                      <>
+                        <div className="admin-input-icon">
+                          <Mail size={18} />
+                        </div>
+                        <input
+                          type="email"
+                          placeholder="name@company.com"
+                          className="admin-input-enhanced"
+                          value={loginId}
+                          onChange={(e) => setLoginId(e.target.value)}
+                          required
+                          autoFocus
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <div className="admin-phone-prefix">
+                          <span>🇮🇳</span>
+                          <span>+91</span>
+                        </div>
+                        <input
+                          type="tel"
+                          placeholder="98765 43210"
+                          className="admin-input-enhanced admin-input-phone"
+                          value={loginId}
+                          onChange={(e) => setLoginId(e.target.value)}
+                          required
+                          autoFocus
+                        />
+                      </>
+                    )}
+                  </div>
+                </div>
 
                 <button 
                   type="submit" 
-                  className="admin-btn admin-btn-primary admin-btn-block"
+                  className="admin-btn-hero"
                   disabled={loading}
                 >
-                  {loading ? "Requesting..." : "Request OTP"}
+                  <span>{loading ? "Sending verification code..." : "Request Access OTP"}</span>
+                  <ArrowRight size={18} />
                 </button>
                 
-                <div className="mt-4 text-center text-sm text-gray-500 font-medium">
-                  Don't have an account? <Link href="/business/register" className="text-indigo-600 hover:underline">Sign up</Link>
+                <div className="admin-auth-switch">
+                  Don't have an enterprise account? 
+                  <Link href="/business/register">Register now</Link>
                 </div>
               </form>
             ) : (
               <form onSubmit={handleVerifyCode}>
-                <label className="admin-field-label">
-                  Enter the 6-digit code sent to <strong>{loginId}</strong>
-                </label>
-                <div className="admin-otp-group mt-4">
-                  {otpArray.map((digit, index) => (
-                    <input
-                      key={index}
-                      ref={(el) => { inputRefs.current[index] = el; }}
-                      type="text"
-                      inputMode="numeric"
-                      className="admin-otp-box"
-                      value={digit}
-                      onChange={(e) => handleOtpChange(index, e.target.value)}
-                      onKeyDown={(e) => handleOtpKeyDown(index, e)}
-                      maxLength={6}
-                      required={index === 0}
-                    />
-                  ))}
+                <div className="admin-field-group">
+                  <label className="admin-field-label">
+                    Enter the 6-digit OTP sent to <strong style={{ color: "#0F172A" }}>{loginId}</strong>
+                  </label>
+                  
+                  <div className="admin-otp-group" style={{ marginTop: "12px" }}>
+                    {otpArray.map((digit, index) => (
+                      <input
+                        key={index}
+                        ref={(el) => { inputRefs.current[index] = el; }}
+                        type="text"
+                        inputMode="numeric"
+                        className="admin-otp-box"
+                        value={digit}
+                        onChange={(e) => handleOtpChange(index, e.target.value)}
+                        onKeyDown={(e) => handleOtpKeyDown(index, e)}
+                        maxLength={6}
+                        required={index === 0}
+                      />
+                    ))}
+                  </div>
                 </div>
+
                 <button
                   type="submit"
-                  className="admin-btn admin-btn-primary admin-btn-block"
+                  className="admin-btn-hero"
                   disabled={loading}
                 >
-                  {loading ? "Verifying…" : "Sign In"}
+                  <span>{loading ? "Verifying Credentials…" : "Authenticate & Sign In"}</span>
+                  <ArrowRight size={18} />
                 </button>
+
                 <button
                   type="button"
-                  className="admin-btn admin-btn-secondary admin-btn-block mt-3"
+                  style={{
+                    width: "100%",
+                    height: "46px",
+                    background: "transparent",
+                    border: "1.5px solid #E2E8F0",
+                    borderRadius: "14px",
+                    color: "#475569",
+                    fontWeight: 700,
+                    fontSize: "14px",
+                    cursor: "pointer",
+                    marginTop: "12px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "8px",
+                    transition: "all 0.15s ease"
+                  }}
                   onClick={() => setStep("input")}
                   disabled={loading}
                 >
-                  <ArrowLeft size={18} className="inline mr-2" /> Back
+                  <ArrowLeft size={16} /> Edit {tab === 'email' ? 'Email' : 'Phone'}
                 </button>
               </form>
             )}
-
-            <div className="admin-login-footer">
-              <span className="flex items-center"><ShieldCheck size={16} /> 100% SECURE</span>
-              <span>Business Portal Access</span>
-            </div>
           </div>
         </div>
       </div>
