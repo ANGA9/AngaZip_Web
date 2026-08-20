@@ -1617,9 +1617,9 @@
   height: 48px;
   padding: 0 18px;
   border-radius: 12px;
-  background: #0f172a;
+  background: #ffffff;
   border: 1.5px solid #0f172a;
-  color: #ffffff;
+  color: #0f172a;
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
@@ -1628,7 +1628,8 @@
 }
 
 .phone-verify-action-btn:hover:not(:disabled) {
-  background: #1e293b;
+  background: #f8fafc;
+  border-color: #000000;
 }
 
 .phone-verify-action-btn:disabled {
@@ -1708,15 +1709,15 @@
   font-weight: 700;
   color: #0f172a;
   background: #ffffff;
-  border: 1.5px solid #94a3b8;
+  border: 1.5px solid #0f172a;
   border-radius: 10px;
   outline: none;
   transition: all 0.15s ease;
 }
 
 .inline-otp-input:focus {
-  border-color: #0f172a;
-  background: #ffffff;
+  border-color: #4338ca;
+  box-shadow: 0 0 0 3px rgba(67, 56, 202, 0.15);
 }
 
 .inline-otp-actions {
@@ -1729,9 +1730,9 @@
   height: 38px;
   padding: 0 16px;
   border-radius: 10px;
-  background: #0f172a;
+  background: #ffffff;
   border: 1.5px solid #0f172a;
-  color: #ffffff;
+  color: #0f172a;
   font-size: 12.5px;
   font-weight: 700;
   cursor: pointer;
@@ -1742,7 +1743,8 @@
 }
 
 .inline-otp-btn-confirm:hover:not(:disabled) {
-  background: #1e293b;
+  background: #f8fafc;
+  border-color: #000000;
 }
 
 .inline-otp-btn-cancel {
@@ -1750,7 +1752,7 @@
   padding: 0 12px;
   border-radius: 10px;
   background: transparent;
-  border: 1px solid #cbd5e1;
+  border: 1.5px solid #94a3b8;
   color: #64748b;
   font-size: 12px;
   font-weight: 600;
@@ -1760,5 +1762,6 @@
 .inline-otp-btn-cancel:hover {
   background: #f1f5f9;
   color: #0f172a;
+  border-color: #0f172a;
 }
 
