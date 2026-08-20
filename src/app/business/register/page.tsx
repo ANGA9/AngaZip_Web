@@ -13,8 +13,11 @@ import {
   Building2,
   MapPin,
   Check,
+  CheckCircle2,
   FileText,
   Pen,
+  Loader2,
+  ShieldCheck,
 } from "lucide-react";
 import "@/styles/portal.css";
 import Link from "next/link";
@@ -41,13 +44,14 @@ interface FieldErrors {
 const GSTIN_REGEX = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
 const PAN_REGEX = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
 
-function validateStep1(data: FormData): FieldErrors {
+function validateStep1(data: FormData, isPhoneVerified: boolean): FieldErrors {
   const errors: FieldErrors = {};
   if (!data.contactName.trim()) errors.contactName = "Please enter contact person name";
   if (!data.email.trim()) errors.email = "Please enter your registered work email";
   else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) errors.email = "Please enter a valid work email address (e.g. name@company.com)";
   if (!data.phone.trim()) errors.phone = "Please enter mobile phone number";
   else if (data.phone.length !== 10 || !/^[6-9]\d{9}$/.test(data.phone)) errors.phone = "Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9";
+  else if (!isPhoneVerified) errors.phone = "Please verify your mobile number with OTP before continuing";
   return errors;
 }
 
@@ -107,7 +111,16 @@ function BusinessRegisterContent() {
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
 
-  // OTP verification state
+  // Inline Phone OTP Verification State
+  const [phoneVerified, setPhoneVerified] = useState(false);
+  const [phoneOtpSent, setPhoneOtpSent] = useState(false);
+  const [phoneOtpLoading, setPhoneOtpLoading] = useState(false);
+  const [phoneOtpArray, setPhoneOtpArray] = useState(["", "", "", "", "", ""]);
+  const [phoneOtpCode, setPhoneOtpCode] = useState("");
+  const [phoneOtpError, setPhoneOtpError] = useState("");
+  const phoneOtpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  // Email/Final OTP verification state
   const [otpStep, setOtpStep] = useState(false);
   const [otpArray, setOtpArray] = useState(["", "", "", "", "", ""]);
   const [otpCode, setOtpCode] = useState("");
@@ -138,6 +151,9 @@ function BusinessRegisterContent() {
             phone: initialPhone || parsed.formData.phone || prev.phone,
           }));
         }
+        if (typeof parsed?.phoneVerified === "boolean") {
+          setPhoneVerified(parsed.phoneVerified);
+        }
         if (typeof parsed?.currentStep === "number" && parsed.currentStep >= 0 && parsed.currentStep <= 2) {
           setCurrentStep(parsed.currentStep);
         }
@@ -152,15 +168,20 @@ function BusinessRegisterContent() {
     try {
       const hasContent = Object.values(formData).some((v) => v.trim() !== "");
       if (hasContent) {
-        localStorage.setItem(DRAFT_KEY, JSON.stringify({ formData, currentStep }));
+        localStorage.setItem(DRAFT_KEY, JSON.stringify({ formData, currentStep, phoneVerified }));
       }
     } catch (e) {
       console.warn("Failed to save draft:", e);
     }
-  }, [formData, currentStep]);
+  }, [formData, currentStep, phoneVerified]);
 
   const updateField = (field: keyof FormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+    if (field === "phone") {
+      setPhoneVerified(false);
+      setPhoneOtpSent(false);
+      setPhoneOtpError("");
+    }
     if (fieldErrors[field]) {
       setFieldErrors((prev) => {
         const next = { ...prev };
@@ -170,7 +191,107 @@ function BusinessRegisterContent() {
     }
   };
 
-  // OTP handlers
+  // Inline Phone OTP Handlers
+  const handlePhoneOtpInput = (index: number, val: string) => {
+    if (val.length > 1) {
+      const pasted = val.slice(0, 6).split("");
+      const newOtp = [...phoneOtpArray];
+      pasted.forEach((char, i) => {
+        if (index + i < 6) newOtp[index + i] = char;
+      });
+      setPhoneOtpArray(newOtp);
+      setPhoneOtpCode(newOtp.join(""));
+      const nextIdx = Math.min(index + pasted.length, 5);
+      phoneOtpInputRefs.current[nextIdx]?.focus();
+      return;
+    }
+    const newOtp = [...phoneOtpArray];
+    newOtp[index] = val;
+    setPhoneOtpArray(newOtp);
+    setPhoneOtpCode(newOtp.join(""));
+    if (val !== "" && index < 5) phoneOtpInputRefs.current[index + 1]?.focus();
+  };
+
+  const handlePhoneOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Backspace" && !phoneOtpArray[index] && index > 0) {
+      phoneOtpInputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handleSendPhoneOtp = async () => {
+    const rawNum = formData.phone.trim();
+    if (rawNum.length !== 10 || !/^[6-9]\d{9}$/.test(rawNum)) {
+      setFieldErrors((prev) => ({
+        ...prev,
+        phone: "Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9",
+      }));
+      return;
+    }
+
+    setPhoneOtpLoading(true);
+    setPhoneOtpError("");
+
+    try {
+      const formattedPhone = `+91${rawNum}`;
+      const { error: sendErr } = await supabaseAdminClient.auth.signInWithOtp({
+        phone: formattedPhone,
+        options: { shouldCreateUser: true },
+      });
+
+      if (sendErr) {
+        setPhoneOtpError(sendErr.message);
+        setPhoneOtpLoading(false);
+        return;
+      }
+
+      setPhoneOtpSent(true);
+      setPhoneOtpArray(["", "", "", "", "", ""]);
+      setPhoneOtpCode("");
+    } catch (err: any) {
+      setPhoneOtpError("Failed to send OTP code. Please try again.");
+    } finally {
+      setPhoneOtpLoading(false);
+    }
+  };
+
+  const handleVerifyPhoneOtp = async () => {
+    if (phoneOtpCode.length < 6) {
+      setPhoneOtpError("Please enter the complete 6-digit OTP");
+      return;
+    }
+
+    setPhoneOtpLoading(true);
+    setPhoneOtpError("");
+
+    try {
+      const formattedPhone = `+91${formData.phone.trim()}`;
+      const { error: verifyErr } = await supabaseAdminClient.auth.verifyOtp({
+        phone: formattedPhone,
+        token: phoneOtpCode,
+        type: "sms",
+      });
+
+      if (verifyErr) {
+        setPhoneOtpError(verifyErr.message);
+        setPhoneOtpLoading(false);
+        return;
+      }
+
+      setPhoneVerified(true);
+      setPhoneOtpSent(false);
+      setFieldErrors((prev) => {
+        const next = { ...prev };
+        delete next.phone;
+        return next;
+      });
+    } catch (err: any) {
+      setPhoneOtpError("Invalid or expired OTP code.");
+    } finally {
+      setPhoneOtpLoading(false);
+    }
+  };
+
+  // Main OTP handlers (Email fallback)
   const handleOtpChange = (index: number, value: string) => {
     if (value.length > 1) {
       const pastedCode = value.slice(0, 6).split("");
@@ -202,7 +323,7 @@ function BusinessRegisterContent() {
     setError("");
     let errors: FieldErrors = {};
 
-    if (currentStep === 0) errors = validateStep1(formData);
+    if (currentStep === 0) errors = validateStep1(formData, phoneVerified);
     else if (currentStep === 1) errors = validateStep2(formData);
 
     if (Object.keys(errors).length > 0) {
@@ -220,12 +341,48 @@ function BusinessRegisterContent() {
     setCurrentStep((prev) => Math.max(prev - 1, 0));
   };
 
-  // Final submit — send OTP to verify email
+  // Final submit
   const handleSubmit = async () => {
     setLoading(true);
     setError("");
 
     try {
+      // If phone was already verified in Step 1, user already has an authenticated session!
+      const { data: { session } } = await supabaseAdminClient.auth.getSession();
+      if (session?.user?.id) {
+        // Direct insert
+        const { error: insertError } = await supabaseAdminClient
+          .from("businesses")
+          .insert({
+            owner_user_id: session.user.id,
+            name: formData.businessName.trim(),
+            gstin: formData.gstin.toUpperCase().trim(),
+            pan: formData.pan.toUpperCase().trim(),
+            address: formData.address.trim(),
+            city: formData.city.trim(),
+            contact_name: formData.contactName.trim(),
+            phone: formData.phone.trim(),
+            email: formData.email.trim().toLowerCase(),
+            status: "active",
+          });
+
+        if (insertError) {
+          setError(insertError.message);
+          setLoading(false);
+          return;
+        }
+
+        // Clean up auto-save draft
+        try {
+          localStorage.removeItem(DRAFT_KEY);
+        } catch (e) {}
+
+        // Success — redirect to dashboard
+        router.push("/business/dashboard");
+        return;
+      }
+
+      // If no active session, send OTP to email
       const { error: signInError } = await supabaseAdminClient.auth.signInWithOtp({
         email: formData.email.trim().toLowerCase(),
         options: { shouldCreateUser: true },
@@ -246,7 +403,7 @@ function BusinessRegisterContent() {
     setLoading(false);
   };
 
-  // Verify OTP and create business record
+  // Verify Email OTP and create business record
   const handleVerifyAndCreate = async () => {
     if (otpCode.length < 6) return;
     setLoading(true);
@@ -280,7 +437,7 @@ function BusinessRegisterContent() {
             contact_name: formData.contactName.trim(),
             phone: formData.phone.trim(),
             email: formData.email.trim().toLowerCase(),
-            status: "pending",
+            status: "active",
           });
 
         if (insertError) {
@@ -295,8 +452,8 @@ function BusinessRegisterContent() {
         localStorage.removeItem(DRAFT_KEY);
       } catch (e) {}
 
-      // Success — redirect to login
-      router.push("/business/login?registered=true");
+      // Success — redirect to dashboard
+      router.push("/business/dashboard");
     } catch (err) {
       setError("Something went wrong. Please try again.");
     }
@@ -357,11 +514,12 @@ function BusinessRegisterContent() {
                 </div>
 
                 <button
+                  type="button"
                   className="admin-btn-hero"
                   onClick={handleVerifyAndCreate}
                   disabled={loading || otpCode.length < 6}
                 >
-                  <span>{loading ? "Creating your account…" : "Verify & Create Account"}</span>
+                  <span>{loading ? "Creating Enterprise Account..." : "Confirm & Access Dashboard"}</span>
                   <ArrowRight size={18} />
                 </button>
 
@@ -442,23 +600,130 @@ function BusinessRegisterContent() {
                     </div>
 
                     <div className="admin-field-group">
-                      <label className="admin-field-label">Phone Number *</label>
-                      <div className="admin-input-wrapper">
-                        <div className="admin-phone-prefix" style={fieldErrors.phone ? { borderRightColor: "#EF4444" } : {}}>
-                          <span>🇮🇳</span>
-                          <span>+91</span>
+                      <label className="admin-field-label">Mobile Phone Number *</label>
+                      <div className="phone-input-container">
+                        <div className="phone-input-row">
+                          <div className="admin-input-wrapper" style={{ flex: 1 }}>
+                            <div className="admin-phone-prefix" style={fieldErrors.phone ? { borderRightColor: "#EF4444" } : {}}>
+                              <span>🇮🇳</span>
+                              <span>+91</span>
+                            </div>
+                            <input
+                              type="tel"
+                              placeholder="98765 43210"
+                              className="admin-input-enhanced admin-input-phone"
+                              style={fieldErrors.phone ? { borderColor: "#EF4444" } : {}}
+                              value={formData.phone}
+                              maxLength={10}
+                              disabled={phoneVerified}
+                              onChange={(e) => updateField("phone", e.target.value.replace(/\D/g, "").slice(0, 10))}
+                            />
+                          </div>
+
+                          {phoneVerified ? (
+                            <div className="phone-verified-pill">
+                              <CheckCircle2 size={16} />
+                              <span>Verified</span>
+                              <button
+                                type="button"
+                                onClick={() => { setPhoneVerified(false); setPhoneOtpSent(false); }}
+                                style={{ background: "none", border: "none", color: "#065F46", textDecoration: "underline", fontSize: "11px", cursor: "pointer", marginLeft: 4 }}
+                              >
+                                Edit
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              type="button"
+                              className="phone-verify-action-btn"
+                              onClick={handleSendPhoneOtp}
+                              disabled={phoneOtpLoading || formData.phone.length !== 10}
+                            >
+                              {phoneOtpLoading ? (
+                                <>
+                                  <Loader2 size={14} className="spin-animation" />
+                                  <span>Sending…</span>
+                                </>
+                              ) : (
+                                <span>{phoneOtpSent ? "Resend Code" : "Verify Number"}</span>
+                              )}
+                            </button>
+                          )}
                         </div>
-                        <input
-                          type="tel"
-                          placeholder="98765 43210"
-                          className="admin-input-enhanced admin-input-phone"
-                          style={fieldErrors.phone ? { borderColor: "#EF4444" } : {}}
-                          value={formData.phone}
-                          maxLength={10}
-                          onChange={(e) => updateField("phone", e.target.value.replace(/\D/g, "").slice(0, 10))}
-                        />
+
+                        {/* Inline OTP verification card when OTP is dispatched */}
+                        {phoneOtpSent && !phoneVerified && (
+                          <div className="inline-otp-card">
+                            <div className="inline-otp-header">
+                              <span className="inline-otp-title">
+                                <ShieldCheck size={16} color="#4338CA" />
+                                Enter 6-digit OTP sent to +91 {formData.phone}
+                              </span>
+                              <button
+                                type="button"
+                                className="inline-otp-resend"
+                                onClick={handleSendPhoneOtp}
+                                disabled={phoneOtpLoading}
+                              >
+                                Resend
+                              </button>
+                            </div>
+
+                            {phoneOtpError && (
+                              <div style={{ color: "#EF4444", fontSize: "12.5px", fontWeight: 600, marginBottom: "8px" }}>
+                                ⚠️ {phoneOtpError}
+                              </div>
+                            )}
+
+                            <div className="inline-otp-grid">
+                              {phoneOtpArray.map((digit, index) => (
+                                <input
+                                  key={index}
+                                  ref={(el) => { phoneOtpInputRefs.current[index] = el; }}
+                                  type="text"
+                                  inputMode="numeric"
+                                  className="inline-otp-input"
+                                  value={digit}
+                                  onChange={(e) => handlePhoneOtpInput(index, e.target.value)}
+                                  onKeyDown={(e) => handlePhoneOtpKeyDown(index, e)}
+                                  maxLength={6}
+                                  autoFocus={index === 0}
+                                />
+                              ))}
+                            </div>
+
+                            <div className="inline-otp-actions">
+                              <button
+                                type="button"
+                                className="inline-otp-btn-confirm"
+                                onClick={handleVerifyPhoneOtp}
+                                disabled={phoneOtpLoading || phoneOtpCode.length < 6}
+                              >
+                                {phoneOtpLoading ? (
+                                  <>
+                                    <Loader2 size={14} className="spin-animation" />
+                                    <span>Verifying…</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Check size={14} strokeWidth={3} />
+                                    <span>Confirm OTP</span>
+                                  </>
+                                )}
+                              </button>
+                              <button
+                                type="button"
+                                className="inline-otp-btn-cancel"
+                                onClick={() => { setPhoneOtpSent(false); setPhoneOtpError(""); }}
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        )}
                       </div>
-                      {fieldErrors.phone && (
+
+                      {fieldErrors.phone && !phoneOtpSent && !phoneVerified && (
                         <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "6px", color: "#EF4444", fontSize: "12.5px", fontWeight: 600 }}>
                           <AlertCircle size={14} style={{ flexShrink: 0 }} />
                           <span>{fieldErrors.phone}</span>

@@ -1594,3 +1594,171 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ---------- Inline Phone OTP Verification ---------- */
+.phone-input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.phone-input-row {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.phone-verify-action-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 48px;
+  padding: 0 18px;
+  border-radius: 12px;
+  background: #0f172a;
+  border: 1.5px solid #0f172a;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.phone-verify-action-btn:hover:not(:disabled) {
+  background: #1e293b;
+}
+
+.phone-verify-action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.phone-verified-pill {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 48px;
+  padding: 0 16px;
+  border-radius: 12px;
+  background: #ecfdf5;
+  border: 1.5px solid #059669;
+  color: #065f46;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.inline-otp-card {
+  background: #f8fafc;
+  border: 1.5px solid #0f172a;
+  border-radius: 14px;
+  padding: 16px 18px;
+  animation: modal-fade-in 0.2s ease;
+}
+
+.inline-otp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.inline-otp-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.inline-otp-resend {
+  background: none;
+  border: none;
+  color: #4338ca;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.inline-otp-resend:hover {
+  color: #312e81;
+}
+
+.inline-otp-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+  max-width: 320px;
+  margin-bottom: 12px;
+}
+
+.inline-otp-input {
+  width: 100%;
+  height: 44px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+  background: #ffffff;
+  border: 1.5px solid #94a3b8;
+  border-radius: 10px;
+  outline: none;
+  transition: all 0.15s ease;
+}
+
+.inline-otp-input:focus {
+  border-color: #0f172a;
+  background: #ffffff;
+}
+
+.inline-otp-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.inline-otp-btn-confirm {
+  height: 38px;
+  padding: 0 16px;
+  border-radius: 10px;
+  background: #0f172a;
+  border: 1.5px solid #0f172a;
+  color: #ffffff;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+
+.inline-otp-btn-confirm:hover:not(:disabled) {
+  background: #1e293b;
+}
+
+.inline-otp-btn-cancel {
+  height: 38px;
+  padding: 0 12px;
+  border-radius: 10px;
+  background: transparent;
+  border: 1px solid #cbd5e1;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.inline-otp-btn-cancel:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
