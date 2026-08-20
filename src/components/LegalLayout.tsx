@@ -39,15 +39,31 @@ import {
 
 interface LegalLayoutProps {
   type: "terms" | "privacy" | "cookies";
+  defaultAudience?: "customer" | "partner";
 }
 
-export default function LegalLayout({ type }: LegalLayoutProps) {
-  const [audience, setAudience] = useState<"customer" | "partner">("customer");
+export default function LegalLayout({ type, defaultAudience }: LegalLayoutProps) {
+  const [audience, setAudience] = useState<"customer" | "partner">(defaultAudience || "customer");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [copied, setCopied] = useState<boolean>(false);
   const [activeSectionId, setActiveSectionId] = useState<string>("");
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
   const [isMobileTocOpen, setIsMobileTocOpen] = useState<boolean>(false);
+
+  // Auto-detect audience from URL parameters or subpath on mount
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const audParam = (params.get("audience") || params.get("role") || params.get("type") || params.get("for"))?.toLowerCase();
+      if (audParam === "partner" || audParam === "driver" || audParam === "rider") {
+        setAudience("partner");
+      } else if (audParam === "customer" || audParam === "user") {
+        setAudience("customer");
+      } else if (window.location.pathname.includes("/partner") || window.location.pathname.includes("/driver")) {
+        setAudience("partner");
+      }
+    }
+  }, []);
 
   // Select appropriate document based on type and audience (English-only standard)
   const currentDoc: LegalDocument = useMemo(() => {
