@@ -31,10 +31,21 @@ export default function DeleteAccountPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
+    // Construct pre-formatted email to the statutory Grievance Officer
+    const subject = encodeURIComponent(`Account Deletion Request — ${name} (${phone})`);
+    const body = encodeURIComponent(
+      `Hello Grievance Redressal Officer,\n\nI am submitting a formal request to permanently delete my account and purge all associated personal identifiers under the DPDP Act 2023.\n\nAccount Details:\n- Name: ${name}\n- Registered Phone: ${phone}\n- Account Type: ${audience === "customer" ? "Customer (Riksho)" : "Partner (Riksho Buddy)"}\n- Reason: ${reason || "User requested deletion"}\n\nPlease process this request within the 30-day statutory timeline.\n\nRegards,\n${name}`
+    );
+
+    if (typeof window !== "undefined") {
+      window.location.href = `mailto:team.anga9@gmail.com?subject=${subject}&body=${body}`;
+    }
+
     setTimeout(() => {
       setLoading(false);
       setSubmitted(true);
-    }, 600);
+    }, 500);
   };
 
   return (
@@ -414,7 +425,7 @@ export default function DeleteAccountPage() {
               fontSize: "0.8125rem", 
               color: "#64748B" 
             }}>
-              <span>Grievance Officer: <a href="mailto:grievance@riksho.in" style={{ color: "#4338CA", fontWeight: 600, textDecoration: "none" }}>grievance@riksho.in</a></span>
+              <span>Grievance Officer: <a href="mailto:team.anga9@gmail.com" style={{ color: "#4338CA", fontWeight: 600, textDecoration: "none" }}>team.anga9@gmail.com</a></span>
               <span>Processing Window: <strong>Within 30 Calendar Days</strong></span>
             </div>
           </div>
