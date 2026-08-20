@@ -128,7 +128,8 @@ export default function DarkstoreLogin() {
           <span className="portal-type-badge">Store Ops Hub</span>
         </Link>
         <Link href="/darkstore" className="portal-back-btn">
-          <span>← Back to Darkstore</span>
+          <ArrowLeft size={16} />
+          <span>Back to Darkstore</span>
         </Link>
       </header>
 

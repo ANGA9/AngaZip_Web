@@ -107,7 +107,8 @@ export default function AdminLogin() {
           <span className="portal-type-badge">Admin Control</span>
         </Link>
         <Link href="/" className="portal-back-btn">
-          <span>← Back to Website</span>
+          <ArrowLeft size={16} />
+          <span>Back to Website</span>
         </Link>
       </header>
 

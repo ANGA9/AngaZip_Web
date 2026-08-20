@@ -265,21 +265,14 @@ export default function BusinessRegister() {
           <span className="portal-type-badge">Enterprise Portal</span>
         </Link>
         <Link href="/business/login" className="portal-back-btn">
-          <span>← Back to Login</span>
+          <ArrowLeft size={16} />
+          <span>Back to Login</span>
         </Link>
       </header>
 
-      <div className="admin-login-container">
-        <div className="admin-login-card">
-          {/* Left Illustration Panel */}
-          <div
-            className="admin-login-ill"
-            style={{ backgroundImage: "url('/images/login_ill_business.png')" }}
-          />
-
-          {/* Right Form Area */}
-          <div className="admin-login-form-area">
-            {/* OTP Verification Step */}
+      <div className="admin-login-container" style={{ padding: "10px 20px 60px" }}>
+        <div className="business-register-card">
+          {/* OTP Verification Step */}
             {otpStep ? (
               <>
                 <div style={{ marginBottom: "24px" }}>
@@ -593,7 +586,6 @@ export default function BusinessRegister() {
                 )}
               </>
             )}
-          </div>
         </div>
       </div>
     </div>

@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { supabaseAdminClient } from "@/lib/supabaseAdminClient";
-import { AlertCircle, ArrowLeft, ArrowRight, Mail, Phone, ShieldCheck, Download, Store } from "lucide-react";
+import { AlertCircle, ArrowLeft, ArrowRight, Mail, Phone, Building2, X } from "lucide-react";
 import "@/styles/portal.css";
 import Link from "next/link";
 
@@ -17,6 +17,7 @@ export default function BusinessLogin() {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showNotRegisteredModal, setShowNotRegisteredModal] = useState(false);
 
   const handleOtpChange = (index: number, value: string) => {
     if (value.length > 1) {
@@ -56,16 +57,19 @@ export default function BusinessLogin() {
     setLoading(true);
     setError("");
     
+    const id = loginId.trim();
     let signInError;
     if (tab === "email") {
       const res = await supabaseAdminClient.auth.signInWithOtp({
-        email: loginId,
+        email: id.toLowerCase(),
         options: { shouldCreateUser: false },
       });
       signInError = res.error;
     } else {
+      const formattedPhone = id.startsWith("+") ? id : `+91${id.replace(/^0+/, '')}`;
       const res = await supabaseAdminClient.auth.signInWithOtp({
-        phone: loginId,
+        phone: formattedPhone,
+        options: { shouldCreateUser: false },
       });
       signInError = res.error;
     }
@@ -73,10 +77,17 @@ export default function BusinessLogin() {
     setLoading(false);
 
     if (signInError) {
-      if (signInError.message.includes("Signups not allowed")) {
-         setError("This email is not registered as a business owner.");
+      const msg = signInError.message?.toLowerCase() || "";
+      if (
+        msg.includes("signups not allowed") ||
+        msg.includes("user not found") ||
+        msg.includes("invalid") ||
+        signInError.status === 400 ||
+        signInError.status === 422
+      ) {
+        setShowNotRegisteredModal(true);
       } else {
-         setError(signInError.message);
+        setError(signInError.message);
       }
       return;
     }
@@ -93,17 +104,19 @@ export default function BusinessLogin() {
     setLoading(true);
     setError("");
 
+    const id = loginId.trim();
     let verifyError;
     if (tab === "email") {
       const res = await supabaseAdminClient.auth.verifyOtp({
-        email: loginId,
+        email: id.toLowerCase(),
         token: code,
         type: "email",
       });
       verifyError = res.error;
     } else {
+      const formattedPhone = id.startsWith("+") ? id : `+91${id.replace(/^0+/, '')}`;
       const res = await supabaseAdminClient.auth.verifyOtp({
-        phone: loginId,
+        phone: formattedPhone,
         token: code,
         type: "sms",
       });
@@ -128,7 +141,8 @@ export default function BusinessLogin() {
           <span className="portal-type-badge">Enterprise Portal</span>
         </Link>
         <Link href="/business" className="portal-back-btn">
-          <span>← Back to Business</span>
+          <ArrowLeft size={16} />
+          <span>Back to Business</span>
         </Link>
       </header>
 
@@ -162,13 +176,13 @@ export default function BusinessLogin() {
                 <div className="admin-login-segmented">
                   <div 
                     className={`admin-login-segment ${tab === 'email' ? 'active' : ''}`}
-                    onClick={() => setTab('email')}
+                    onClick={() => { setTab('email'); setError(""); }}
                   >
                     <Mail size={16} /> Work Email
                   </div>
                   <div 
                     className={`admin-login-segment ${tab === 'phone' ? 'active' : ''}`}
-                    onClick={() => setTab('phone')}
+                    onClick={() => { setTab('phone'); setError(""); }}
                   >
                     <Phone size={16} /> Mobile Phone
                   </div>
@@ -269,9 +283,9 @@ export default function BusinessLogin() {
                     width: "100%",
                     height: "46px",
                     background: "transparent",
-                    border: "1.5px solid #E2E8F0",
+                    border: "1.5px solid #0F172A",
                     borderRadius: "14px",
-                    color: "#475569",
+                    color: "#0F172A",
                     fontWeight: 700,
                     fontSize: "14px",
                     cursor: "pointer",
@@ -292,6 +306,45 @@ export default function BusinessLogin() {
           </div>
         </div>
       </div>
+
+      {/* ---------- Not Registered Modal Dialog ---------- */}
+      {showNotRegisteredModal && (
+        <div className="portal-modal-backdrop" onClick={() => setShowNotRegisteredModal(false)}>
+          <div className="portal-modal-card" onClick={(e) => e.stopPropagation()}>
+            <button className="portal-modal-close" onClick={() => setShowNotRegisteredModal(false)}>
+              <X size={16} />
+            </button>
+
+            <div className="portal-modal-icon-badge">
+              <Building2 size={24} />
+            </div>
+
+            <span className="portal-modal-tag">New to Riksho Enterprise?</span>
+            <h3 className="portal-modal-title">No Account Found for This {tab === 'email' ? 'Email' : 'Number'}</h3>
+            
+            <p className="portal-modal-desc">
+              We couldn't find an active enterprise account associated with <strong style={{ color: "#0F172A" }}>{loginId}</strong>. If your business is new to Riksho, you can get onboarded in less than 2 minutes.
+            </p>
+
+            <div className="portal-modal-actions">
+              <button 
+                className="admin-btn-hero"
+                onClick={() => router.push(`/business/register`)}
+              >
+                <span>Create Enterprise Account</span>
+                <ArrowRight size={18} />
+              </button>
+
+              <button 
+                className="portal-modal-btn-secondary"
+                onClick={() => setShowNotRegisteredModal(false)}
+              >
+                Try a Different {tab === 'email' ? 'Email' : 'Phone'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
