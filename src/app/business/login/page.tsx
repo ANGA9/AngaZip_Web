@@ -17,6 +17,7 @@ export default function BusinessLogin() {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [inputError, setInputError] = useState("");
   const [showNotRegisteredModal, setShowNotRegisteredModal] = useState(false);
 
   const handleOtpChange = (index: number, value: string) => {
@@ -52,12 +53,30 @@ export default function BusinessLogin() {
 
   const handleSendCode = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!loginId) return;
-    
-    setLoading(true);
+    setInputError("");
     setError("");
     
     const id = loginId.trim();
+    if (!id) {
+      setInputError(tab === "email" ? "Please enter your registered work email." : "Please enter your mobile phone number.");
+      return;
+    }
+
+    if (tab === "email") {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(id)) {
+        setInputError("Please enter a valid work email address (e.g. name@company.com)");
+        return;
+      }
+    } else {
+      if (id.length !== 10 || !/^[6-9]\d{9}$/.test(id)) {
+        setInputError("Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9");
+        return;
+      }
+    }
+
+    setLoading(true);
+    
     let signInError;
     if (tab === "email") {
       const res = await supabaseAdminClient.auth.signInWithOtp({
@@ -171,18 +190,18 @@ export default function BusinessLogin() {
             )}
 
             {step === "input" ? (
-              <form onSubmit={handleSendCode}>
+              <form onSubmit={handleSendCode} noValidate>
                 {/* Segmented Tab Switcher */}
                 <div className="admin-login-segmented">
                   <div 
                     className={`admin-login-segment ${tab === 'email' ? 'active' : ''}`}
-                    onClick={() => { setTab('email'); setError(""); }}
+                    onClick={() => { setTab('email'); setLoginId(""); setInputError(""); setError(""); }}
                   >
                     <Mail size={16} /> Work Email
                   </div>
                   <div 
                     className={`admin-login-segment ${tab === 'phone' ? 'active' : ''}`}
-                    onClick={() => { setTab('phone'); setError(""); }}
+                    onClick={() => { setTab('phone'); setLoginId(""); setInputError(""); setError(""); }}
                   >
                     <Phone size={16} /> Mobile Phone
                   </div>
@@ -203,15 +222,19 @@ export default function BusinessLogin() {
                           type="email"
                           placeholder="name@company.com"
                           className="admin-input-enhanced"
+                          style={inputError ? { borderColor: "#EF4444" } : {}}
                           value={loginId}
-                          onChange={(e) => setLoginId(e.target.value)}
-                          required
+                          onChange={(e) => {
+                            setLoginId(e.target.value);
+                            if (inputError) setInputError("");
+                            if (error) setError("");
+                          }}
                           autoFocus
                         />
                       </>
                     ) : (
                       <>
-                        <div className="admin-phone-prefix">
+                        <div className="admin-phone-prefix" style={inputError ? { borderRightColor: "#EF4444" } : {}}>
                           <span>🇮🇳</span>
                           <span>+91</span>
                         </div>
@@ -219,14 +242,27 @@ export default function BusinessLogin() {
                           type="tel"
                           placeholder="98765 43210"
                           className="admin-input-enhanced admin-input-phone"
+                          style={inputError ? { borderColor: "#EF4444" } : {}}
                           value={loginId}
-                          onChange={(e) => setLoginId(e.target.value)}
-                          required
+                          maxLength={10}
+                          onChange={(e) => {
+                            const cleaned = e.target.value.replace(/\D/g, "").slice(0, 10);
+                            setLoginId(cleaned);
+                            if (inputError) setInputError("");
+                            if (error) setError("");
+                          }}
                           autoFocus
                         />
                       </>
                     )}
                   </div>
+
+                  {inputError && (
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "8px", color: "#EF4444", fontSize: "13px", fontWeight: 600 }}>
+                      <AlertCircle size={14} style={{ flexShrink: 0 }} />
+                      <span>{inputError}</span>
+                    </div>
+                  )}
                 </div>
 
                 <button 

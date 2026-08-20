@@ -41,11 +41,11 @@ const PAN_REGEX = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
 
 function validateStep1(data: FormData): FieldErrors {
   const errors: FieldErrors = {};
-  if (!data.contactName.trim()) errors.contactName = "Contact name is required";
-  if (!data.email.trim()) errors.email = "Email is required";
-  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) errors.email = "Enter a valid email";
-  if (!data.phone.trim()) errors.phone = "Phone number is required";
-  else if (!/^[6-9]\d{9}$/.test(data.phone.replace(/\s/g, ""))) errors.phone = "Enter a valid 10-digit mobile number";
+  if (!data.contactName.trim()) errors.contactName = "Please enter contact person name";
+  if (!data.email.trim()) errors.email = "Please enter your registered work email";
+  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) errors.email = "Please enter a valid work email address (e.g. name@company.com)";
+  if (!data.phone.trim()) errors.phone = "Please enter mobile phone number";
+  else if (data.phone.length !== 10 || !/^[6-9]\d{9}$/.test(data.phone)) errors.phone = "Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9";
   return errors;
 }
 
@@ -363,12 +363,18 @@ function BusinessRegisterContent() {
                           type="text"
                           placeholder="Enter your full name"
                           className="admin-input-enhanced"
+                          style={fieldErrors.contactName ? { borderColor: "#EF4444" } : {}}
                           value={formData.contactName}
                           onChange={(e) => updateField("contactName", e.target.value)}
                           autoFocus
                         />
                       </div>
-                      {fieldErrors.contactName && <div className="admin-field-error">{fieldErrors.contactName}</div>}
+                      {fieldErrors.contactName && (
+                        <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "6px", color: "#EF4444", fontSize: "12.5px", fontWeight: 600 }}>
+                          <AlertCircle size={14} style={{ flexShrink: 0 }} />
+                          <span>{fieldErrors.contactName}</span>
+                        </div>
+                      )}
                     </div>
 
                     <div className="admin-field-group">
@@ -379,18 +385,24 @@ function BusinessRegisterContent() {
                           type="email"
                           placeholder="name@company.com"
                           className="admin-input-enhanced"
+                          style={fieldErrors.email ? { borderColor: "#EF4444" } : {}}
                           value={formData.email}
                           onChange={(e) => updateField("email", e.target.value)}
                         />
                       </div>
                       <div className="admin-field-hint">This will be your login credential</div>
-                      {fieldErrors.email && <div className="admin-field-error">{fieldErrors.email}</div>}
+                      {fieldErrors.email && (
+                        <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "6px", color: "#EF4444", fontSize: "12.5px", fontWeight: 600 }}>
+                          <AlertCircle size={14} style={{ flexShrink: 0 }} />
+                          <span>{fieldErrors.email}</span>
+                        </div>
+                      )}
                     </div>
 
                     <div className="admin-field-group">
                       <label className="admin-field-label">Phone Number *</label>
                       <div className="admin-input-wrapper">
-                        <div className="admin-phone-prefix">
+                        <div className="admin-phone-prefix" style={fieldErrors.phone ? { borderRightColor: "#EF4444" } : {}}>
                           <span>🇮🇳</span>
                           <span>+91</span>
                         </div>
@@ -398,11 +410,18 @@ function BusinessRegisterContent() {
                           type="tel"
                           placeholder="98765 43210"
                           className="admin-input-enhanced admin-input-phone"
+                          style={fieldErrors.phone ? { borderColor: "#EF4444" } : {}}
                           value={formData.phone}
-                          onChange={(e) => updateField("phone", e.target.value)}
+                          maxLength={10}
+                          onChange={(e) => updateField("phone", e.target.value.replace(/\D/g, "").slice(0, 10))}
                         />
                       </div>
-                      {fieldErrors.phone && <div className="admin-field-error">{fieldErrors.phone}</div>}
+                      {fieldErrors.phone && (
+                        <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "6px", color: "#EF4444", fontSize: "12.5px", fontWeight: 600 }}>
+                          <AlertCircle size={14} style={{ flexShrink: 0 }} />
+                          <span>{fieldErrors.phone}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
@@ -421,12 +440,18 @@ function BusinessRegisterContent() {
                           type="text"
                           placeholder="Acme Logistics Pvt. Ltd."
                           className="admin-input-enhanced"
+                          style={fieldErrors.businessName ? { borderColor: "#EF4444" } : {}}
                           value={formData.businessName}
                           onChange={(e) => updateField("businessName", e.target.value)}
                           autoFocus
                         />
                       </div>
-                      {fieldErrors.businessName && <div className="admin-field-error">{fieldErrors.businessName}</div>}
+                      {fieldErrors.businessName && (
+                        <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "6px", color: "#EF4444", fontSize: "12.5px", fontWeight: 600 }}>
+                          <AlertCircle size={14} style={{ flexShrink: 0 }} />
+                          <span>{fieldErrors.businessName}</span>
+                        </div>
+                      )}
                     </div>
 
                     <div className="admin-field-group">
@@ -440,11 +465,16 @@ function BusinessRegisterContent() {
                           value={formData.gstin}
                           onChange={(e) => updateField("gstin", e.target.value.toUpperCase())}
                           maxLength={15}
-                          style={{ textTransform: "uppercase" }}
+                          style={{ textTransform: "uppercase", ...(fieldErrors.gstin ? { borderColor: "#EF4444" } : {}) }}
                         />
                       </div>
                       <div className="admin-field-hint">15-character GST identification number</div>
-                      {fieldErrors.gstin && <div className="admin-field-error">{fieldErrors.gstin}</div>}
+                      {fieldErrors.gstin && (
+                        <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "6px", color: "#EF4444", fontSize: "12.5px", fontWeight: 600 }}>
+                          <AlertCircle size={14} style={{ flexShrink: 0 }} />
+                          <span>{fieldErrors.gstin}</span>
+                        </div>
+                      )}
                     </div>
 
                     <div className="admin-field-group">
@@ -458,11 +488,16 @@ function BusinessRegisterContent() {
                           value={formData.pan}
                           onChange={(e) => updateField("pan", e.target.value.toUpperCase())}
                           maxLength={10}
-                          style={{ textTransform: "uppercase" }}
+                          style={{ textTransform: "uppercase", ...(fieldErrors.pan ? { borderColor: "#EF4444" } : {}) }}
                         />
                       </div>
                       <div className="admin-field-hint">10-character Permanent Account Number</div>
-                      {fieldErrors.pan && <div className="admin-field-error">{fieldErrors.pan}</div>}
+                      {fieldErrors.pan && (
+                        <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "6px", color: "#EF4444", fontSize: "12.5px", fontWeight: 600 }}>
+                          <AlertCircle size={14} style={{ flexShrink: 0 }} />
+                          <span>{fieldErrors.pan}</span>
+                        </div>
+                      )}
                     </div>
 
                     <div className="admin-field-group">
@@ -470,11 +505,17 @@ function BusinessRegisterContent() {
                       <textarea
                         placeholder="Street address, building, locality"
                         className="admin-textarea-enhanced"
+                        style={fieldErrors.address ? { borderColor: "#EF4444" } : {}}
                         value={formData.address}
                         onChange={(e) => updateField("address", e.target.value)}
                         rows={3}
                       />
-                      {fieldErrors.address && <div className="admin-field-error">{fieldErrors.address}</div>}
+                      {fieldErrors.address && (
+                        <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "6px", color: "#EF4444", fontSize: "12.5px", fontWeight: 600 }}>
+                          <AlertCircle size={14} style={{ flexShrink: 0 }} />
+                          <span>{fieldErrors.address}</span>
+                        </div>
+                      )}
                     </div>
 
                     <div className="admin-field-group">
@@ -485,11 +526,17 @@ function BusinessRegisterContent() {
                           type="text"
                           placeholder="Mumbai"
                           className="admin-input-enhanced"
+                          style={fieldErrors.city ? { borderColor: "#EF4444" } : {}}
                           value={formData.city}
                           onChange={(e) => updateField("city", e.target.value)}
                         />
                       </div>
-                      {fieldErrors.city && <div className="admin-field-error">{fieldErrors.city}</div>}
+                      {fieldErrors.city && (
+                        <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "6px", color: "#EF4444", fontSize: "12.5px", fontWeight: 600 }}>
+                          <AlertCircle size={14} style={{ flexShrink: 0 }} />
+                          <span>{fieldErrors.city}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}

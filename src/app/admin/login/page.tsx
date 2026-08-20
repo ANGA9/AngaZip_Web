@@ -16,13 +16,16 @@ export default function AdminLogin() {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [inputError, setInputError] = useState("");
 
   const handleOtpChange = (index: number, value: string) => {
     if (value.length > 1) {
       const pastedCode = value.slice(0, 6).split('');
       const newOtp = [...otpArray];
       pastedCode.forEach((char, i) => {
-        if (index + i < 6) newOtp[index + i] = char;
+        if (index + i < 6) {
+          newOtp[index + i] = char;
+        }
       });
       setOtpArray(newOtp);
       setCode(newOtp.join(''));
@@ -50,13 +53,25 @@ export default function AdminLogin() {
 
   const handleSendCode = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!loginId) return;
-    
-    setLoading(true);
+    setInputError("");
     setError("");
+
+    const id = loginId.trim();
+    if (!id) {
+      setInputError("Please enter your administrator email address.");
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(id)) {
+      setInputError("Please enter a valid administrator email address (e.g. admin@riksho.com)");
+      return;
+    }
+
+    setLoading(true);
     
     const { error: signInError } = await supabaseAdminClient.auth.signInWithOtp({
-      email: loginId.trim().toLowerCase(),
+      email: id.toLowerCase(),
       options: { shouldCreateUser: false },
     });
 
@@ -137,7 +152,7 @@ export default function AdminLogin() {
             )}
 
             {step === "input" ? (
-              <form onSubmit={handleSendCode}>
+              <form onSubmit={handleSendCode} noValidate>
                 <div className="admin-field-group">
                   <label className="admin-field-label">
                     Administrator Email Address
@@ -151,12 +166,23 @@ export default function AdminLogin() {
                       type="email"
                       placeholder="admin@riksho.com"
                       className="admin-input-enhanced"
+                      style={inputError ? { borderColor: "#EF4444" } : {}}
                       value={loginId}
-                      onChange={(e) => setLoginId(e.target.value)}
-                      required
+                      onChange={(e) => {
+                        setLoginId(e.target.value);
+                        if (inputError) setInputError("");
+                        if (error) setError("");
+                      }}
                       autoFocus
                     />
                   </div>
+
+                  {inputError && (
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "8px", color: "#EF4444", fontSize: "13px", fontWeight: 600 }}>
+                      <AlertCircle size={14} style={{ flexShrink: 0 }} />
+                      <span>{inputError}</span>
+                    </div>
+                  )}
                 </div>
 
                 <button 
