@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, Suspense } from "react";
+import { useState, useRef, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabaseAdminClient } from "@/lib/supabaseAdminClient";
 import {
@@ -18,6 +18,8 @@ import {
 } from "lucide-react";
 import "@/styles/portal.css";
 import Link from "next/link";
+
+const DRAFT_KEY = "riksho_biz_reg_draft_v1";
 
 // ---------- Types ----------
 interface FormData {
@@ -92,7 +94,7 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
   );
 }
 
-// ---------- Inner Component with Query Reading ----------
+// ---------- Inner Component with Query Reading & Auto-Save ----------
 function BusinessRegisterContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -121,6 +123,41 @@ function BusinessRegisterContent() {
     address: "",
     city: "",
   });
+
+  // 💾 1. Restore auto-saved draft on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(DRAFT_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed?.formData) {
+          setFormData((prev) => ({
+            ...prev,
+            ...parsed.formData,
+            email: initialEmail || parsed.formData.email || prev.email,
+            phone: initialPhone || parsed.formData.phone || prev.phone,
+          }));
+        }
+        if (typeof parsed?.currentStep === "number" && parsed.currentStep >= 0 && parsed.currentStep <= 2) {
+          setCurrentStep(parsed.currentStep);
+        }
+      }
+    } catch (e) {
+      console.warn("Failed to load draft:", e);
+    }
+  }, [initialEmail, initialPhone]);
+
+  // 💾 2. Auto-save draft on every change
+  useEffect(() => {
+    try {
+      const hasContent = Object.values(formData).some((v) => v.trim() !== "");
+      if (hasContent) {
+        localStorage.setItem(DRAFT_KEY, JSON.stringify({ formData, currentStep }));
+      }
+    } catch (e) {
+      console.warn("Failed to save draft:", e);
+    }
+  }, [formData, currentStep]);
 
   const updateField = (field: keyof FormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -252,6 +289,11 @@ function BusinessRegisterContent() {
           return;
         }
       }
+
+      // Clean up auto-save draft
+      try {
+        localStorage.removeItem(DRAFT_KEY);
+      } catch (e) {}
 
       // Success — redirect to login
       router.push("/business/login?registered=true");
