@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { supabaseAdminClient } from "@/lib/supabaseAdminClient";
 import { portalFetch } from "@/lib/portalFetch";
-import { LayoutDashboard, Truck, Key, LogOut, Briefcase, Loader2 } from "lucide-react";
+import { LayoutDashboard, Truck, Key, LogOut, Briefcase, Loader2, Settings } from "lucide-react";
 import "@/styles/portal.css";
 
 export default function BusinessLayout({
@@ -37,7 +37,13 @@ export default function BusinessLayout({
         const me = await portalFetch("/business/portal/me").catch(() => null);
         const role = me?.role;
         if (role !== "admin" && role !== "business_owner") {
-          router.push("/business/login");
+          router.push("/business/register");
+          setLoading(false);
+          return;
+        }
+
+        if (!me?.business && role !== "admin") {
+          router.push("/business/register");
           setLoading(false);
           return;
         }
@@ -105,6 +111,14 @@ export default function BusinessLayout({
             className={`admin-nav-item ${pathname === "/business/api-keys" ? "active" : ""}`}
           >
             <Key /> API & Webhooks
+          </Link>
+
+          <div className="admin-nav-section-label">Account</div>
+          <Link
+            href="/business/settings"
+            className={`admin-nav-item ${pathname === "/business/settings" ? "active" : ""}`}
+          >
+            <Settings /> Company Profile
           </Link>
         </nav>
       </aside>

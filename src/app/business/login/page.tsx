@@ -76,6 +76,21 @@ export default function BusinessLogin() {
     }
 
     setLoading(true);
+
+    // 1. Check if this business email/phone is registered in the database
+    try {
+      const { data: isRegistered } = await supabaseAdminClient.rpc("is_business_registered", {
+        lookup_value: id,
+      });
+
+      if (isRegistered === false) {
+        setLoading(false);
+        setShowNotRegisteredModal(true);
+        return;
+      }
+    } catch (e) {
+      console.warn("Registration check bypassed:", e);
+    }
     
     let signInError;
     if (tab === "email") {
@@ -125,6 +140,7 @@ export default function BusinessLogin() {
 
     const id = loginId.trim();
     let verifyError;
+    let authData;
     if (tab === "email") {
       const res = await supabaseAdminClient.auth.verifyOtp({
         email: id.toLowerCase(),
@@ -132,6 +148,7 @@ export default function BusinessLogin() {
         type: "email",
       });
       verifyError = res.error;
+      authData = res.data;
     } else {
       const formattedPhone = id.startsWith("+") ? id : `+91${id.replace(/^0+/, '')}`;
       const res = await supabaseAdminClient.auth.verifyOtp({
@@ -140,15 +157,34 @@ export default function BusinessLogin() {
         type: "sms",
       });
       verifyError = res.error;
+      authData = res.data;
     }
 
-    setLoading(false);
-
     if (verifyError) {
+      setLoading(false);
       setError(verifyError.message);
       return;
     }
 
+    // Check if user has an active business registered in the database
+    const userId = authData?.user?.id;
+    if (userId) {
+      const { data: biz } = await supabaseAdminClient
+        .from("businesses")
+        .select("id")
+        .eq("owner_user_id", userId)
+        .maybeSingle();
+
+      if (!biz) {
+        // User verified OTP, but has NOT registered their business yet!
+        const param = tab === "email" ? `email=${encodeURIComponent(id)}` : `phone=${encodeURIComponent(id)}`;
+        setLoading(false);
+        router.push(`/business/register?${param}`);
+        return;
+      }
+    }
+
+    setLoading(false);
     router.push("/business/dashboard");
   };
 
