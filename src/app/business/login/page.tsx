@@ -329,7 +329,12 @@ export default function BusinessLogin() {
             <div className="portal-modal-actions">
               <button 
                 className="admin-btn-hero"
-                onClick={() => router.push(`/business/register`)}
+                onClick={() => {
+                  const param = tab === 'email' 
+                    ? `email=${encodeURIComponent(loginId.trim())}` 
+                    : `phone=${encodeURIComponent(loginId.trim())}`;
+                  router.push(`/business/register?${param}`);
+                }}
               >
                 <span>Create Enterprise Account</span>
                 <ArrowRight size={18} />

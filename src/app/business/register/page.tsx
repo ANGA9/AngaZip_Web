@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useRef, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { supabaseAdminClient } from "@/lib/supabaseAdminClient";
 import {
   AlertCircle,
@@ -92,9 +92,14 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
   );
 }
 
-// ---------- Main Component ----------
-export default function BusinessRegister() {
+// ---------- Inner Component with Query Reading ----------
+function BusinessRegisterContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const initialEmail = searchParams.get("email") || "";
+  const rawPhone = searchParams.get("phone") || "";
+  const initialPhone = rawPhone.replace(/^\+91/, "").replace(/^0+/, "").trim();
+
   const [currentStep, setCurrentStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -108,8 +113,8 @@ export default function BusinessRegister() {
 
   const [formData, setFormData] = useState<FormData>({
     contactName: "",
-    email: "",
-    phone: "",
+    email: initialEmail,
+    phone: initialPhone,
     businessName: "",
     gstin: "",
     pan: "",
@@ -589,5 +594,31 @@ export default function BusinessRegister() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function BusinessRegister() {
+  return (
+    <Suspense
+      fallback={
+        <div className="admin-login-wrapper">
+          <header className="portal-top-bar">
+            <div className="portal-top-brand">
+              <img src="/images/final_riksho.png" alt="Riksho" className="portal-top-logo" />
+              <span className="portal-type-badge">Enterprise Portal</span>
+            </div>
+          </header>
+          <div className="admin-login-container" style={{ padding: "10px 20px 60px" }}>
+            <div className="business-register-card" style={{ textAlign: "center", padding: "60px 20px" }}>
+              <div className="admin-loading-center" style={{ justifyContent: "center" }}>
+                Loading registration…
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    >
+      <BusinessRegisterContent />
+    </Suspense>
   );
 }
