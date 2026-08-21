@@ -1630,24 +1630,35 @@
   height: 48px;
   padding: 0 18px;
   border-radius: 12px;
-  background: #ffffff;
-  border: 1.5px solid #0f172a;
-  color: #0f172a;
+  background: #4338ca;
+  border: 1px solid #4338ca;
+  color: #ffffff;
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
   white-space: nowrap;
-  transition: all 0.15s ease;
+  box-shadow: 0 2px 8px rgba(67, 56, 202, 0.25);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .phone-verify-action-btn:hover:not(:disabled) {
-  background: #f8fafc;
-  border-color: #000000;
+  background: #3730a3;
+  border-color: #3730a3;
+  box-shadow: 0 4px 12px rgba(67, 56, 202, 0.35);
+  transform: translateY(-1px);
+}
+
+.phone-verify-action-btn:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .phone-verify-action-btn:disabled {
-  opacity: 0.5;
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+  color: #818cf8;
+  box-shadow: none;
   cursor: not-allowed;
+  opacity: 1;
 }
 
 .phone-verified-pill {
