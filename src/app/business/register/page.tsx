@@ -863,221 +863,225 @@ function BusinessRegisterContent() {
                 {currentStep === 1 && (
                   <div>
                     <h2 className="admin-login-title">Business Details</h2>
-                    <p className="admin-login-sub">Tell us about your business.</p>
+                    <p className="admin-login-sub">Verify your corporate tax credentials and business profile.</p>
 
-                    <div className="admin-field-group">
-                      <label className="admin-field-label">Business / Company Name *</label>
-                      <div className="admin-input-wrapper">
-                        <div className="admin-input-icon"><Building2 size={18} /></div>
-                        <input
-                          type="text"
-                          placeholder="Acme Logistics Pvt. Ltd."
-                          className="admin-input-enhanced"
-                          style={fieldErrors.businessName ? { borderColor: "#EF4444" } : {}}
-                          value={formData.businessName}
-                          onChange={(e) => updateField("businessName", e.target.value)}
-                          autoFocus
-                        />
-                      </div>
-                      {fieldErrors.businessName && (
-                        <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "6px", color: "#EF4444", fontSize: "12.5px", fontWeight: 600 }}>
-                          <AlertCircle size={14} style={{ flexShrink: 0 }} />
-                          <span>{fieldErrors.businessName}</span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Tax Document Toggle */}
-                    <div className="admin-field-group">
-                      <label className="admin-field-label">Tax & Corporate Identification *</label>
-                      <div className="admin-login-segmented" style={{ marginBottom: "14px" }}>
-                        <div
-                          className={`admin-login-segment ${taxDocType === "gstin" ? "active" : ""}`}
-                          onClick={() => {
-                            setTaxDocType("gstin");
-                            setFieldErrors((prev) => {
-                              const n = { ...prev };
-                              delete n.gstin;
-                              delete n.pan;
-                              return n;
-                            });
-                          }}
-                        >
-                          <Building2 size={16} /> I have GSTIN (Recommended)
-                        </div>
-                        <div
-                          className={`admin-login-segment ${taxDocType === "pan" ? "active" : ""}`}
-                          onClick={() => {
-                            setTaxDocType("pan");
-                            setFieldErrors((prev) => {
-                              const n = { ...prev };
-                              delete n.gstin;
-                              delete n.pan;
-                              return n;
-                            });
-                          }}
-                        >
-                          <FileText size={16} /> Business PAN Only
-                        </div>
-                      </div>
-                    </div>
-
-                    {taxDocType === "gstin" ? (
-                      <>
+                    <div className="register-step2-grid">
+                      {/* Left Column: Tax & Corporate Identification */}
+                      <div>
+                        {/* Tax Document Toggle */}
                         <div className="admin-field-group">
-                          <label className="admin-field-label">
-                            GST Identification Number (GSTIN) *
-                          </label>
-                          <div className="phone-input-row">
-                            <div className="admin-input-wrapper" style={{ flex: 1 }}>
-                              <div className="admin-input-icon"><Building2 size={18} /></div>
+                          <label className="admin-field-label">Tax Identification *</label>
+                          <div className="admin-login-segmented" style={{ marginBottom: "14px" }}>
+                            <div
+                              className={`admin-login-segment ${taxDocType === "gstin" ? "active" : ""}`}
+                              onClick={() => {
+                                setTaxDocType("gstin");
+                                setFieldErrors((prev) => {
+                                  const n = { ...prev };
+                                  delete n.gstin;
+                                  delete n.pan;
+                                  return n;
+                                });
+                              }}
+                            >
+                              <Building2 size={16} /> GSTIN (Recommended)
+                            </div>
+                            <div
+                              className={`admin-login-segment ${taxDocType === "pan" ? "active" : ""}`}
+                              onClick={() => {
+                                setTaxDocType("pan");
+                                setFieldErrors((prev) => {
+                                  const n = { ...prev };
+                                  delete n.gstin;
+                                  delete n.pan;
+                                  return n;
+                                });
+                              }}
+                            >
+                              <FileText size={16} /> PAN Only
+                            </div>
+                          </div>
+                        </div>
+
+                        {taxDocType === "gstin" ? (
+                          <>
+                            <div className="admin-field-group">
+                              <label className="admin-field-label">
+                                GST Number (GSTIN) *
+                              </label>
+                              <div className="phone-input-row">
+                                <div className="admin-input-wrapper" style={{ flex: 1 }}>
+                                  <div className="admin-input-icon"><Building2 size={18} /></div>
+                                  <input
+                                    type="text"
+                                    placeholder="27AAAAA0000A1Z5"
+                                    className="admin-input-enhanced"
+                                    value={formData.gstin}
+                                    onChange={(e) => updateField("gstin", e.target.value)}
+                                    maxLength={15}
+                                    style={{ textTransform: "uppercase", letterSpacing: "0.05em", ...(fieldErrors.gstin ? { borderColor: "#EF4444" } : {}) }}
+                                  />
+                                </div>
+                                <button
+                                  type="button"
+                                  className="phone-verify-action-btn"
+                                  onClick={handleVerifyGst}
+                                  disabled={gstVerifying || formData.gstin.length !== 15 || !GSTIN_REGEX.test(formData.gstin.toUpperCase())}
+                                >
+                                  {gstVerifying ? (
+                                    <>
+                                      <Loader2 size={14} className="spin-animation" />
+                                      <span>Verifying…</span>
+                                    </>
+                                  ) : (
+                                    <span>Verify & Auto-Fill</span>
+                                  )}
+                                </button>
+                              </div>
+
+                              {/* Live Validated Badge for GSTIN */}
+                              {gstVerifiedData ? (
+                                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "6px", color: "#065F46", fontSize: "12px", fontWeight: 600, background: "#ECFDF5", padding: "6px 10px", borderRadius: "8px", border: "1px solid #A7F3D0" }}>
+                                  <CheckCircle2 size={14} color="#059669" style={{ flexShrink: 0 }} />
+                                  <span>
+                                    {gstVerifiedData.tradeName ? `✓ ${gstVerifiedData.tradeName}` : "✓ Verified Government GST Record"} {gstVerifiedData.live ? "(Live GSTN)" : "(State Verified)"}
+                                  </span>
+                                </div>
+                              ) : (
+                                formData.gstin.length === 15 && GSTIN_REGEX.test(formData.gstin) && !fieldErrors.gstin && (
+                                  <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "6px", color: "#065F46", fontSize: "12px", fontWeight: 600, background: "#ECFDF5", padding: "6px 10px", borderRadius: "8px", border: "1px solid #A7F3D0" }}>
+                                    <CheckCircle2 size={14} color="#059669" style={{ flexShrink: 0 }} />
+                                    <span>
+                                      {GST_STATE_CODES[formData.gstin.slice(0, 2)] || "State Verified"} • PAN Auto-Linked: {formData.gstin.slice(2, 12)}
+                                    </span>
+                                  </div>
+                                )
+                              )}
+
+                              {fieldErrors.gstin && (
+                                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "6px", color: "#EF4444", fontSize: "12px", fontWeight: 600 }}>
+                                  <AlertCircle size={14} style={{ flexShrink: 0 }} />
+                                  <span>{fieldErrors.gstin}</span>
+                                </div>
+                              )}
+                            </div>
+
+                            <div className="admin-field-group">
+                              <label className="admin-field-label">
+                                Corporate PAN (Auto-extracted)
+                              </label>
+                              <div className="admin-input-wrapper">
+                                <div className="admin-input-icon"><FileText size={18} /></div>
+                                <input
+                                  type="text"
+                                  placeholder="ABCDE1234F"
+                                  className="admin-input-enhanced"
+                                  value={formData.pan}
+                                  disabled
+                                  style={{ backgroundColor: "#F8FAFC", color: "#475569", letterSpacing: "0.05em", fontWeight: 700, cursor: "not-allowed" }}
+                                />
+                              </div>
+                            </div>
+                          </>
+                        ) : (
+                          <div className="admin-field-group">
+                            <label className="admin-field-label">Business PAN *</label>
+                            <div className="admin-input-wrapper">
+                              <div className="admin-input-icon"><FileText size={18} /></div>
                               <input
                                 type="text"
-                                placeholder="27AAAAA0000A1Z5"
+                                placeholder="ABCDE1234F"
                                 className="admin-input-enhanced"
-                                value={formData.gstin}
-                                onChange={(e) => updateField("gstin", e.target.value)}
-                                maxLength={15}
-                                style={{ textTransform: "uppercase", letterSpacing: "0.05em", ...(fieldErrors.gstin ? { borderColor: "#EF4444" } : {}) }}
+                                value={formData.pan}
+                                onChange={(e) => updateField("pan", e.target.value)}
+                                maxLength={10}
+                                style={{ textTransform: "uppercase", letterSpacing: "0.05em", ...(fieldErrors.pan ? { borderColor: "#EF4444" } : {}) }}
                               />
                             </div>
-                            <button
-                              type="button"
-                              className="phone-verify-action-btn"
-                              onClick={handleVerifyGst}
-                              disabled={gstVerifying || formData.gstin.length !== 15 || !GSTIN_REGEX.test(formData.gstin.toUpperCase())}
-                            >
-                              {gstVerifying ? (
-                                <>
-                                  <Loader2 size={14} className="spin-animation" />
-                                  <span>Verifying…</span>
-                                </>
-                              ) : (
-                                <span>Verify & Auto-Fill</span>
-                              )}
-                            </button>
-                          </div>
 
-                          {/* Live Validated Badge for GSTIN */}
-                          {gstVerifiedData ? (
-                            <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "6px", color: "#065F46", fontSize: "12.5px", fontWeight: 600, background: "#ECFDF5", padding: "6px 10px", borderRadius: "8px", border: "1px solid #A7F3D0" }}>
-                              <CheckCircle2 size={14} color="#059669" />
-                              <span>
-                                {gstVerifiedData.tradeName ? `✓ Verified: ${gstVerifiedData.tradeName}` : "✓ Verified Government GST Record"} {gstVerifiedData.live ? "(Live GSTN)" : "(State Verified)"}
-                              </span>
-                            </div>
-                          ) : (
-                            formData.gstin.length === 15 && GSTIN_REGEX.test(formData.gstin) && !fieldErrors.gstin && (
-                              <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "6px", color: "#065F46", fontSize: "12.5px", fontWeight: 600, background: "#ECFDF5", padding: "6px 10px", borderRadius: "8px", border: "1px solid #A7F3D0" }}>
-                                <CheckCircle2 size={14} color="#059669" />
+                            {/* Live Validated Badge for PAN */}
+                            {formData.pan.length === 10 && PAN_REGEX.test(formData.pan) && !fieldErrors.pan && (
+                              <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "6px", color: "#065F46", fontSize: "12px", fontWeight: 600, background: "#ECFDF5", padding: "6px 10px", borderRadius: "8px", border: "1px solid #A7F3D0" }}>
+                                <CheckCircle2 size={14} color="#059669" style={{ flexShrink: 0 }} />
                                 <span>
-                                  {GST_STATE_CODES[formData.gstin.slice(0, 2)] || "State Verified"} • PAN Auto-Linked: {formData.gstin.slice(2, 12)} ({PAN_ENTITY_TYPES[formData.gstin[5]] || "Entity"})
+                                  Registered Entity: {PAN_ENTITY_TYPES[formData.pan[3]] || "Valid PAN Format"}
                                 </span>
                               </div>
-                            )
-                          )}
+                            )}
 
-                          {fieldErrors.gstin && (
-                            <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "6px", color: "#EF4444", fontSize: "12.5px", fontWeight: 600 }}>
+                            {fieldErrors.pan && (
+                              <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "6px", color: "#EF4444", fontSize: "12px", fontWeight: 600 }}>
+                                <AlertCircle size={14} style={{ flexShrink: 0 }} />
+                                <span>{fieldErrors.pan}</span>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Right Column: Business Name & Operating Location */}
+                      <div>
+                        <div className="admin-field-group">
+                          <label className="admin-field-label">Business / Display Name *</label>
+                          <div className="admin-input-wrapper">
+                            <div className="admin-input-icon"><Building2 size={18} /></div>
+                            <input
+                              type="text"
+                              placeholder="Acme Logistics Pvt. Ltd."
+                              className="admin-input-enhanced"
+                              style={fieldErrors.businessName ? { borderColor: "#EF4444" } : {}}
+                              value={formData.businessName}
+                              onChange={(e) => updateField("businessName", e.target.value)}
+                              autoFocus
+                            />
+                          </div>
+                          {fieldErrors.businessName && (
+                            <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "6px", color: "#EF4444", fontSize: "12px", fontWeight: 600 }}>
                               <AlertCircle size={14} style={{ flexShrink: 0 }} />
-                              <span>{fieldErrors.gstin}</span>
+                              <span>{fieldErrors.businessName}</span>
                             </div>
                           )}
                         </div>
 
                         <div className="admin-field-group">
-                          <label className="admin-field-label">
-                            Business PAN (Auto-extracted from GSTIN)
-                          </label>
+                          <label className="admin-field-label">Operating Address *</label>
+                          <textarea
+                            placeholder="Building, street, locality"
+                            className="admin-textarea-enhanced"
+                            style={{ minHeight: "68px", resize: "none", ...(fieldErrors.address ? { borderColor: "#EF4444" } : {}) }}
+                            value={formData.address}
+                            onChange={(e) => updateField("address", e.target.value)}
+                            rows={2}
+                          />
+                          {fieldErrors.address && (
+                            <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "6px", color: "#EF4444", fontSize: "12px", fontWeight: 600 }}>
+                              <AlertCircle size={14} style={{ flexShrink: 0 }} />
+                              <span>{fieldErrors.address}</span>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="admin-field-group">
+                          <label className="admin-field-label">City *</label>
                           <div className="admin-input-wrapper">
-                            <div className="admin-input-icon"><FileText size={18} /></div>
+                            <div className="admin-input-icon"><MapPin size={18} /></div>
                             <input
                               type="text"
-                              placeholder="ABCDE1234F"
+                              placeholder="Mumbai / Kolkata"
                               className="admin-input-enhanced"
-                              value={formData.pan}
-                              disabled
-                              style={{ backgroundColor: "#F8FAFC", color: "#475569", letterSpacing: "0.05em", fontWeight: 700, cursor: "not-allowed" }}
+                              style={fieldErrors.city ? { borderColor: "#EF4444" } : {}}
+                              value={formData.city}
+                              onChange={(e) => updateField("city", e.target.value)}
                             />
                           </div>
-                          <div className="admin-field-hint">
-                            Characters 3 to 12 of your GSTIN represent your verified Corporate PAN
-                          </div>
+                          {fieldErrors.city && (
+                            <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "6px", color: "#EF4444", fontSize: "12px", fontWeight: 600 }}>
+                              <AlertCircle size={14} style={{ flexShrink: 0 }} />
+                              <span>{fieldErrors.city}</span>
+                            </div>
+                          )}
                         </div>
-                      </>
-                    ) : (
-                      <div className="admin-field-group">
-                        <label className="admin-field-label">Business PAN *</label>
-                        <div className="admin-input-wrapper">
-                          <div className="admin-input-icon"><FileText size={18} /></div>
-                          <input
-                            type="text"
-                            placeholder="ABCDE1234F"
-                            className="admin-input-enhanced"
-                            value={formData.pan}
-                            onChange={(e) => updateField("pan", e.target.value)}
-                            maxLength={10}
-                            style={{ textTransform: "uppercase", letterSpacing: "0.05em", ...(fieldErrors.pan ? { borderColor: "#EF4444" } : {}) }}
-                          />
-                        </div>
-
-                        {/* Live Validated Badge for PAN */}
-                        {formData.pan.length === 10 && PAN_REGEX.test(formData.pan) && !fieldErrors.pan && (
-                          <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "6px", color: "#065F46", fontSize: "12.5px", fontWeight: 600, background: "#ECFDF5", padding: "6px 10px", borderRadius: "8px", border: "1px solid #A7F3D0" }}>
-                            <CheckCircle2 size={14} color="#059669" />
-                            <span>
-                              Registered Entity Type: {PAN_ENTITY_TYPES[formData.pan[3]] || "Valid PAN Format"} • Verified
-                            </span>
-                          </div>
-                        )}
-
-                        {fieldErrors.pan && (
-                          <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "6px", color: "#EF4444", fontSize: "12.5px", fontWeight: 600 }}>
-                            <AlertCircle size={14} style={{ flexShrink: 0 }} />
-                            <span>{fieldErrors.pan}</span>
-                          </div>
-                        )}
-                        <div className="admin-field-hint">10-character Permanent Account Number issued by Income Tax Dept.</div>
                       </div>
-                    )}
-
-                    <div className="admin-field-group">
-                      <label className="admin-field-label">Business Address *</label>
-                      <textarea
-                        placeholder="Street address, building, locality"
-                        className="admin-textarea-enhanced"
-                        style={fieldErrors.address ? { borderColor: "#EF4444" } : {}}
-                        value={formData.address}
-                        onChange={(e) => updateField("address", e.target.value)}
-                        rows={3}
-                      />
-                      {fieldErrors.address && (
-                        <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "6px", color: "#EF4444", fontSize: "12.5px", fontWeight: 600 }}>
-                          <AlertCircle size={14} style={{ flexShrink: 0 }} />
-                          <span>{fieldErrors.address}</span>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="admin-field-group">
-                      <label className="admin-field-label">City *</label>
-                      <div className="admin-input-wrapper">
-                        <div className="admin-input-icon"><MapPin size={18} /></div>
-                        <input
-                          type="text"
-                          placeholder="Mumbai"
-                          className="admin-input-enhanced"
-                          style={fieldErrors.city ? { borderColor: "#EF4444" } : {}}
-                          value={formData.city}
-                          onChange={(e) => updateField("city", e.target.value)}
-                        />
-                      </div>
-                      {fieldErrors.city && (
-                        <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "6px", color: "#EF4444", fontSize: "12.5px", fontWeight: 600 }}>
-                          <AlertCircle size={14} style={{ flexShrink: 0 }} />
-                          <span>{fieldErrors.city}</span>
-                        </div>
-                      )}
                     </div>
                   </div>
                 )}
