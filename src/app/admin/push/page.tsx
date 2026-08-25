@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { adminFetch } from "@/lib/adminApi";
+import { supabaseAdminClient } from "@/lib/supabaseAdminClient";
 import {
   Bell,
   Send,
@@ -128,7 +129,16 @@ export default function PushNotificationsPage() {
       setSuccess("");
 
       try {
-        await adminFetch("/admin/push/history", { method: "DELETE" });
+        try {
+          await adminFetch("/admin/push/history", { method: "DELETE" });
+        } catch (apiErr: any) {
+          // Direct fallback if Render is still deploying the backend route
+          const { error: sbError } = await supabaseAdminClient
+            .from("push_history")
+            .delete()
+            .neq("id", "00000000-0000-0000-0000-000000000000");
+          if (sbError) throw sbError;
+        }
         setSuccess("Broadcast history cleared successfully!");
         setModalOpen(false);
         fetchHistory(0);
