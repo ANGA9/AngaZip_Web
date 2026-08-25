@@ -3,7 +3,7 @@ import { supabaseAdminClient } from "./supabaseAdminClient";
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://riksho-backend.onrender.com";
 
 /**
- * Authenticated fetch for all portal types (admin, business, store-ops).
+ * Authenticated fetch for all portal types (admin, business, store-ops, promoter).
  * Uses the current Supabase session token — the backend determines
  * the caller's role from the JWT.
  */
@@ -11,9 +11,16 @@ export async function portalFetch(endpoint: string, options: RequestInit = {}) {
   const { data: { session } } = await supabaseAdminClient.auth.getSession();
 
   const headers: Record<string, string> = {
-    "Content-Type": "application/json",
     ...(options.headers as Record<string, string> || {}),
   };
+
+  if (
+    options.body &&
+    !(options.body instanceof FormData) &&
+    !headers["Content-Type"]
+  ) {
+    headers["Content-Type"] = "application/json";
+  }
 
   if (session?.access_token) {
     headers["Authorization"] = `Bearer ${session.access_token}`;
@@ -35,5 +42,11 @@ export async function portalFetch(endpoint: string, options: RequestInit = {}) {
     throw new Error(errMessage);
   }
 
-  return response.json();
+  const contentType = response.headers.get("content-type");
+  if (response.status === 204 || (contentType && !contentType.includes("application/json"))) {
+    return { success: true };
+  }
+
+  const text = await response.text();
+  return text ? JSON.parse(text) : { success: true };
 }
