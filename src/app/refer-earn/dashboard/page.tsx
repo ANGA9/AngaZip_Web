@@ -45,7 +45,8 @@ export default function PromoterDashboard() {
   const [manualDriverId, setManualDriverId] = useState("");
   const [scanLoading, setScanLoading] = useState(false);
   const [scanError, setScanError] = useState("");
-  const [scanSuccess, setScanSuccess] = useState<any>(null);
+  const [scanSuccessModal, setScanSuccessModal] = useState<any>(null);
+  const [alreadyRecruitedModal, setAlreadyRecruitedModal] = useState<any>(null);
   const scannerRef = useRef<Html5Qrcode | null>(null);
 
   // Payout Modal State
@@ -124,7 +125,8 @@ export default function PromoterDashboard() {
   useEffect(() => {
     if (scannerOpen) {
       setScanError("");
-      setScanSuccess(null);
+      setScanSuccessModal(null);
+      setAlreadyRecruitedModal(null);
       setManualDriverId("");
 
       const qrTimer = setTimeout(async () => {
@@ -201,7 +203,6 @@ export default function PromoterDashboard() {
     if (!driverId || scanLoading) return;
     setScanLoading(true);
     setScanError("");
-    setScanSuccess(null);
 
     try {
       const res = await portalFetch("/promoters/link-driver", {
@@ -209,10 +210,43 @@ export default function PromoterDashboard() {
         body: JSON.stringify({ driver_id: driverId }),
       });
 
-      setScanSuccess(res);
+      // Stop camera and close scanner modal
+      if (scannerRef.current) {
+        try { await scannerRef.current.stop(); } catch (e) {}
+        scannerRef.current = null;
+      }
+      setScannerOpen(false);
+
+      // Open Success Dialog Box
+      setScanSuccessModal({
+        driver_name: res.referral?.driver_name || "Riksho Partner",
+        driver_phone: res.referral?.driver_phone || "Registered Driver",
+        reward_amount: res.referral?.reward_amount || 2000,
+        message: res.message || "Driver successfully verified and added to your recruits!",
+      });
+
       await evaluateStatus();
     } catch (err: any) {
-      setScanError(err.message || "Failed to link driver. Please verify that this driver is registered.");
+      const errMsg = err.message || "";
+      if (
+        errMsg.toLowerCase().includes("already") ||
+        errMsg.includes("DRIVER_ALREADY_LINKED") ||
+        errMsg.includes("409")
+      ) {
+        // Stop camera and close scanner modal
+        if (scannerRef.current) {
+          try { await scannerRef.current.stop(); } catch (e) {}
+          scannerRef.current = null;
+        }
+        setScannerOpen(false);
+
+        // Open Already Recruited Dialog Box
+        setAlreadyRecruitedModal({
+          message: errMsg || "This driver has already been recruited and verified by another promoter.",
+        });
+      } else {
+        setScanError(errMsg || "Failed to link driver. Please verify that this driver is registered.");
+      }
     } finally {
       setScanLoading(false);
     }
@@ -848,57 +882,134 @@ export default function PromoterDashboard() {
               </div>
             )}
 
-            {scanSuccess && (
-              <div style={{ backgroundColor: "#ECFDF5", border: "1px solid #A7F3D0", color: "#047857", padding: 16, borderRadius: 12, marginBottom: 14, fontSize: 13 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 6, fontWeight: 700, marginBottom: 4 }}>
-                  <CheckCircle2 size={16} /> Driver Verified Successfully!
-                </div>
-                <p>{scanSuccess.message}</p>
-                <button
-                  onClick={() => {
-                    setScanSuccess(null);
-                    setScannerOpen(false);
-                  }}
-                  className="admin-btn admin-btn-primary admin-btn-sm"
-                  style={{ marginTop: 10, width: "100%" }}
-                >
-                  Done
-                </button>
+            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              <div style={{ borderRadius: 14, overflow: "hidden", background: "#000000", maxWidth: 280, aspectRatio: "1/1", margin: "0 auto", width: "100%" }}>
+                <div id="promoter-qr-reader" style={{ width: "100%", height: "100%" }} />
               </div>
-            )}
 
-            {!scanSuccess && (
-              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-                <div style={{ borderRadius: 14, overflow: "hidden", background: "#000000", maxWidth: 280, aspectRatio: "1/1", margin: "0 auto", width: "100%" }}>
-                  <div id="promoter-qr-reader" style={{ width: "100%", height: "100%" }} />
-                </div>
+              <p style={{ textAlign: "center", fontSize: 12.5, color: "#64748B" }}>
+                Point camera at the QR code displayed in the driver's Riksho Buddy app.
+              </p>
 
-                <p style={{ textAlign: "center", fontSize: 12.5, color: "#64748B" }}>
-                  Point camera at the QR code displayed in the driver's Riksho Buddy app.
-                </p>
-
-                <div style={{ borderTop: "1px solid var(--admin-border)", paddingTop: 14 }}>
-                  <label className="admin-field-label" style={{ fontSize: 12 }}>Or enter Driver ID manually:</label>
-                  <div style={{ display: "flex", gap: 8 }}>
-                    <input
-                      type="text"
-                      value={manualDriverId}
-                      onChange={(e) => setManualDriverId(e.target.value)}
-                      placeholder="e.g. 550e8400-e29b-41d4-a716-446655440000"
-                      className="admin-input"
-                      style={{ fontSize: 12, fontFamily: "monospace" }}
-                    />
-                    <button
-                      onClick={() => handleLinkDriver(manualDriverId)}
-                      disabled={scanLoading || !manualDriverId.trim()}
-                      className="admin-btn admin-btn-primary admin-btn-sm"
-                    >
-                      {scanLoading ? <RefreshCw className="admin-spin" size={14} /> : "Verify"}
-                    </button>
-                  </div>
+              <div style={{ borderTop: "1px solid var(--admin-border)", paddingTop: 14 }}>
+                <label className="admin-field-label" style={{ fontSize: 12 }}>Or enter Driver ID manually:</label>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <input
+                    type="text"
+                    value={manualDriverId}
+                    onChange={(e) => setManualDriverId(e.target.value)}
+                    placeholder="e.g. 550e8400-e29b-41d4-a716-446655440000"
+                    className="admin-input"
+                    style={{ fontSize: 12, fontFamily: "monospace" }}
+                  />
+                  <button
+                    onClick={() => handleLinkDriver(manualDriverId)}
+                    disabled={scanLoading || !manualDriverId.trim()}
+                    className="admin-btn admin-btn-primary admin-btn-sm"
+                  >
+                    {scanLoading ? <RefreshCw className="admin-spin" size={14} /> : "Verify"}
+                  </button>
                 </div>
               </div>
-            )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* DIALOG: Driver Successfully Recruited Modal */}
+      {scanSuccessModal && (
+        <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(15, 23, 42, 0.7)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: 16 }}>
+          <div style={{ backgroundColor: "#FFFFFF", borderRadius: 24, border: "1.5px solid #0F172A", maxWidth: 460, width: "100%", padding: 32, textAlign: "center", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.35)" }}>
+            <div style={{ width: 64, height: 64, borderRadius: 20, backgroundColor: "#ECFDF5", border: "1.5px solid #A7F3D0", color: "#059669", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 18px auto" }}>
+              <CheckCircle2 size={34} />
+            </div>
+
+            <h3 style={{ fontSize: 22, fontWeight: 900, color: "#0F172A", marginBottom: 6, letterSpacing: "-0.02em" }}>
+              Driver Successfully Recruited!
+            </h3>
+            <p style={{ fontSize: 13.5, color: "#64748B", marginBottom: 20 }}>
+              The driver has been verified and added to your recruitment roster.
+            </p>
+
+            <div style={{ backgroundColor: "#F8FAFC", border: "1.5px solid #E2E8F0", borderRadius: 16, padding: "18px 20px", marginBottom: 24, textAlign: "left" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                <span style={{ fontSize: 13, color: "#64748B" }}>Driver Name:</span>
+                <strong style={{ fontSize: 14, color: "#0F172A" }}>{scanSuccessModal.driver_name}</strong>
+              </div>
+              {scanSuccessModal.driver_phone && scanSuccessModal.driver_phone !== "—" && (
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                  <span style={{ fontSize: 13, color: "#64748B" }}>Contact Phone:</span>
+                  <span style={{ fontSize: 13, fontFamily: "monospace", color: "#334155" }}>{scanSuccessModal.driver_phone}</span>
+                </div>
+              )}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px dashed #CBD5E1", paddingTop: 10 }}>
+                <span style={{ fontSize: 13, fontWeight: 600, color: "#059669" }}>Reward Added:</span>
+                <strong style={{ fontSize: 18, fontWeight: 900, color: "#059669" }}>+₹{(scanSuccessModal.reward_amount / 100).toFixed(2)}</strong>
+              </div>
+            </div>
+
+            <div style={{ display: "flex", gap: 10 }}>
+              <button
+                onClick={() => setScanSuccessModal(null)}
+                className="admin-btn admin-btn-secondary"
+                style={{ flex: 1, height: 46, justifyContent: "center" }}
+              >
+                Done
+              </button>
+              <button
+                onClick={() => {
+                  setScanSuccessModal(null);
+                  setScannerOpen(true);
+                }}
+                className="admin-btn admin-btn-primary"
+                style={{ flex: 1.3, height: 46, justifyContent: "center", gap: 6 }}
+              >
+                <QrCode size={16} /> Scan Next Driver
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* DIALOG: Driver Already Recruited Modal */}
+      {alreadyRecruitedModal && (
+        <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(15, 23, 42, 0.7)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: 16 }}>
+          <div style={{ backgroundColor: "#FFFFFF", borderRadius: 24, border: "1.5px solid #0F172A", maxWidth: 460, width: "100%", padding: 32, textAlign: "center", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.35)" }}>
+            <div style={{ width: 64, height: 64, borderRadius: 20, backgroundColor: "#FEF3C7", border: "1.5px solid #FDE68A", color: "#D97706", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 18px auto" }}>
+              <AlertCircle size={34} />
+            </div>
+
+            <h3 style={{ fontSize: 22, fontWeight: 900, color: "#0F172A", marginBottom: 8, letterSpacing: "-0.02em" }}>
+              Driver Already Recruited
+            </h3>
+            <p style={{ fontSize: 13.5, color: "#64748B", lineHeight: 1.5, marginBottom: 20 }}>
+              {alreadyRecruitedModal.message || "This driver has already completed registration with another recruiter. Driver rewards are awarded only once per partner."}
+            </p>
+
+            <div style={{ backgroundColor: "#FFFBEB", border: "1px solid #FDE68A", borderRadius: 14, padding: "14px 16px", marginBottom: 24, fontSize: 13, color: "#92400E", textAlign: "left", display: "flex", gap: 8, alignItems: "flex-start" }}>
+              <Clock size={16} style={{ flexShrink: 0, marginTop: 2, color: "#D97706" }} />
+              <span>Referral bonus cannot be claimed multiple times for the same vehicle or driver account.</span>
+            </div>
+
+            <div style={{ display: "flex", gap: 10 }}>
+              <button
+                onClick={() => setAlreadyRecruitedModal(null)}
+                className="admin-btn admin-btn-secondary"
+                style={{ flex: 1, height: 46, justifyContent: "center" }}
+              >
+                Close
+              </button>
+              <button
+                onClick={() => {
+                  setAlreadyRecruitedModal(null);
+                  setScannerOpen(true);
+                }}
+                className="admin-btn admin-btn-primary"
+                style={{ flex: 1.3, height: 46, justifyContent: "center", gap: 6 }}
+              >
+                <QrCode size={16} /> Scan Another Driver
+              </button>
+            </div>
           </div>
         </div>
       )}
