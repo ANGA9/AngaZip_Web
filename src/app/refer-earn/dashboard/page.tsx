@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { supabaseAdminClient } from "@/lib/supabaseAdminClient";
 import { portalFetch } from "@/lib/portalFetch";
@@ -19,10 +19,8 @@ import {
   Building,
   X,
   LayoutDashboard,
-  Award,
   ArrowRight,
   ShieldCheck,
-  UserCheck,
 } from "lucide-react";
 import { Html5Qrcode } from "html5-qrcode";
 import Link from "next/link";
@@ -33,13 +31,14 @@ export default function PromoterDashboard() {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<"recruits" | "payouts">("recruits");
+  const [approvalStatus, setApprovalStatus] = useState<"unregistered" | "pending" | "approved" | "rejected">("unregistered");
+  const [promoterProfile, setPromoterProfile] = useState<any>(null);
 
-  // Onboarding Name Modal State (appears if newly registered without name)
-  const [showNameModal, setShowNameModal] = useState(false);
+  // Name Onboarding Form State
   const [onboardingName, setOnboardingName] = useState("");
-  const [onboardingEmail, setOnboardingEmail] = useState("");
   const [onboardingLoading, setOnboardingLoading] = useState(false);
   const [onboardingError, setOnboardingError] = useState("");
+  const [checkingStatus, setCheckingStatus] = useState(false);
 
   // QR Scanner Modal State
   const [scannerOpen, setScannerOpen] = useState(false);
@@ -62,57 +61,64 @@ export default function PromoterDashboard() {
   const [payoutError, setPayoutError] = useState("");
   const [payoutSuccess, setPayoutSuccess] = useState("");
 
-  const loadDashboard = async () => {
+  const evaluateStatus = useCallback(async () => {
     try {
-      setLoading(true);
-      // 1. Fetch promoter profile
       const me = await portalFetch("/promoters/me");
+      setPromoterProfile(me);
+
       if (!me.registered || !me.name) {
-        setShowNameModal(true);
-        if (me.user?.email) setOnboardingEmail(me.user.email);
+        setApprovalStatus("unregistered");
+        return;
       }
 
-      // 2. Try fetching dashboard data
-      try {
-        const res = await portalFetch("/promoters/dashboard");
-        setData(res);
-
-        if (res.promoter) {
-          if (res.promoter.upi_id) setUpiId(res.promoter.upi_id);
-          if (res.promoter.bank_account_no) setBankAccountNo(res.promoter.bank_account_no);
-          if (res.promoter.bank_ifsc) setBankIfsc(res.promoter.bank_ifsc);
-          if (res.promoter.bank_name) setBankName(res.promoter.bank_name);
-          if (res.promoter.account_holder_name) setAccountHolderName(res.promoter.account_holder_name);
-        }
-      } catch (dashErr: any) {
-        // If not approved yet, still set basic profile
-        if (me.registered) {
-          setData({
-            promoter: me,
-            stats: { total_recruits: 0, total_earnings: 0, available_balance: 0, withdrawn_amount: 0 },
-            referrals: [],
-            payouts: [],
-          });
-        }
+      if (me.approval_status === "approved") {
+        setApprovalStatus("approved");
+        // Load live dashboard metrics
+        try {
+          const res = await portalFetch("/promoters/dashboard");
+          setData(res);
+          if (res.promoter) {
+            if (res.promoter.upi_id) setUpiId(res.promoter.upi_id);
+            if (res.promoter.bank_account_no) setBankAccountNo(res.promoter.bank_account_no);
+            if (res.promoter.bank_ifsc) setBankIfsc(res.promoter.bank_ifsc);
+            if (res.promoter.bank_name) setBankName(res.promoter.bank_name);
+            if (res.promoter.account_holder_name) setAccountHolderName(res.promoter.account_holder_name);
+          }
+        } catch (e) {}
+      } else if (me.approval_status === "rejected") {
+        setApprovalStatus("rejected");
+      } else {
+        setApprovalStatus("pending");
       }
     } catch (err: any) {
-      console.error("Dashboard error:", err);
+      setApprovalStatus("unregistered");
     } finally {
       setLoading(false);
+      setCheckingStatus(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     const checkSession = async () => {
       const { data: { session } } = await supabaseAdminClient.auth.getSession();
       if (!session) {
-        router.push("/refer-earn");
+        router.push("/refer-earn/login");
         return;
       }
-      loadDashboard();
+      evaluateStatus();
     };
     checkSession();
-  }, [router]);
+  }, [router, evaluateStatus]);
+
+  // Auto-poll approval status every 6 seconds when pending
+  useEffect(() => {
+    if (approvalStatus === "pending") {
+      const interval = setInterval(() => {
+        evaluateStatus();
+      }, 6000);
+      return () => clearInterval(interval);
+    }
+  }, [approvalStatus, evaluateStatus]);
 
   // Start & Stop QR Scanner
   useEffect(() => {
@@ -189,7 +195,7 @@ export default function PromoterDashboard() {
       });
 
       setScanSuccess(res);
-      await loadDashboard();
+      await evaluateStatus();
     } catch (err: any) {
       setScanError(err.message || "Failed to link driver. Please verify that this driver is registered.");
     } finally {
@@ -199,8 +205,9 @@ export default function PromoterDashboard() {
 
   const handleSaveOnboardingName = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!onboardingName.trim()) {
-      setOnboardingError("Please enter your full name.");
+    const cleanName = onboardingName.trim();
+    if (cleanName.length < 3) {
+      setOnboardingError("Please enter your full name (at least 3 characters).");
       return;
     }
 
@@ -211,22 +218,26 @@ export default function PromoterDashboard() {
       const { data: { session } } = await supabaseAdminClient.auth.getSession();
       const phone = session?.user?.phone;
 
-      const res = await portalFetch("/promoters/register", {
+      await portalFetch("/promoters/register", {
         method: "POST",
         body: JSON.stringify({
-          name: onboardingName.trim(),
+          name: cleanName,
           phone: phone || undefined,
-          email: onboardingEmail.trim() || undefined,
         }),
       });
 
-      setShowNameModal(false);
-      await loadDashboard();
+      setApprovalStatus("pending");
+      await evaluateStatus();
     } catch (err: any) {
-      setOnboardingError(err.message || "Failed to save promoter profile.");
+      setOnboardingError(err.message || "Failed to submit promoter registration.");
     } finally {
       setOnboardingLoading(false);
     }
+  };
+
+  const handleManualCheckStatus = async () => {
+    setCheckingStatus(true);
+    await evaluateStatus();
   };
 
   const handleRequestPayout = async (e: React.FormEvent) => {
@@ -275,7 +286,7 @@ export default function PromoterDashboard() {
 
       setPayoutSuccess("Withdrawal request submitted! Payout will be processed to your account.");
       setPayoutAmount("");
-      await loadDashboard();
+      await evaluateStatus();
       setTimeout(() => {
         setPayoutOpen(false);
         setPayoutSuccess("");
@@ -289,25 +300,24 @@ export default function PromoterDashboard() {
 
   const handleSignOut = async () => {
     await supabaseAdminClient.auth.signOut();
-    router.push("/refer-earn");
+    router.push("/refer-earn/login");
   };
 
-  if (loading && !data && !showNameModal) {
+  if (loading) {
     return (
       <div className="admin-layout" style={{ alignItems: "center", justifyContent: "center", minHeight: "100vh" }}>
         <div className="admin-loading-center">
           <RefreshCw size={18} className="admin-spin" />
-          Loading promoter dashboard…
+          Loading promoter portal…
         </div>
       </div>
     );
   }
 
-  const promoter = data?.promoter || {};
+  const promoter = data?.promoter || promoterProfile || {};
   const stats = data?.stats || { total_recruits: 0, total_earnings: 0, available_balance: 0, withdrawn_amount: 0 };
   const referrals = data?.referrals || [];
   const payouts = data?.payouts || [];
-  const isApproved = promoter.approval_status === "approved";
 
   return (
     <div className="admin-layout">
@@ -353,12 +363,12 @@ export default function PromoterDashboard() {
             <span
               className="admin-header-chip"
               style={{
-                backgroundColor: isApproved ? "#ECFDF5" : "#FEF3C7",
-                color: isApproved ? "#047857" : "#B45309",
+                backgroundColor: approvalStatus === "approved" ? "#ECFDF5" : "#FEF3C7",
+                color: approvalStatus === "approved" ? "#047857" : "#B45309",
               }}
             >
-              {isApproved ? <CheckCircle2 size={13} /> : <Clock size={13} />}
-              {isApproved ? "Approved Promoter" : "Under Review"}
+              {approvalStatus === "approved" ? <CheckCircle2 size={13} /> : <Clock size={13} />}
+              {approvalStatus === "approved" ? "Approved Promoter" : "Under Review"}
             </span>
             <button onClick={handleSignOut} className="admin-logout-btn">
               <LogOut size={14} /> Log out
@@ -368,29 +378,6 @@ export default function PromoterDashboard() {
 
         {/* Content Area */}
         <div className="admin-content">
-          {/* Status banner if pending */}
-          {!isApproved && promoter.name && (
-            <div
-              style={{
-                backgroundColor: "#FFFBEB",
-                border: "1px solid #FDE68A",
-                color: "#92400E",
-                borderRadius: "12px",
-                padding: "14px 18px",
-                marginBottom: "24px",
-                fontSize: "13.5px",
-                display: "flex",
-                alignItems: "center",
-                gap: "10px",
-              }}
-            >
-              <Clock size={18} style={{ flexShrink: 0, color: "#D97706" }} />
-              <div>
-                <strong>Application Under Review:</strong> Your promoter onboarding application has been submitted to the Riksho Admin team. Once approved, you can start recruiting drivers and requesting withdrawals.
-              </div>
-            </div>
-          )}
-
           {/* Top Title & Actions */}
           <div
             style={{
@@ -525,7 +512,7 @@ export default function PromoterDashboard() {
             </div>
 
             <button
-              onClick={loadDashboard}
+              onClick={evaluateStatus}
               style={{
                 fontSize: 12,
                 color: "var(--admin-muted)",
@@ -678,19 +665,19 @@ export default function PromoterDashboard() {
         </div>
       </main>
 
-      {/* DIALOG 1: Onboarding Name Modal (Shown if new / no name set) */}
-      {showNameModal && (
-        <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(15, 23, 42, 0.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: 16 }}>
-          <div style={{ backgroundColor: "#FFFFFF", borderRadius: 20, border: "1.5px solid #0F172A", maxWidth: 460, width: "100%", padding: 32, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }}>
-            <div style={{ width: 48, height: 48, borderRadius: 14, backgroundColor: "#EEF2FF", border: "1px solid #C7D2FE", color: "#4338CA", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 18 }}>
-              <Sparkles size={24} />
+      {/* DIALOG 1: Non-skippable Onboarding Name Modal (When user has not submitted name yet) */}
+      {approvalStatus === "unregistered" && (
+        <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(15, 23, 42, 0.7)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: 16 }}>
+          <div style={{ backgroundColor: "#FFFFFF", borderRadius: 24, border: "1.5px solid #0F172A", maxWidth: 460, width: "100%", padding: 36, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.35)" }}>
+            <div style={{ width: 52, height: 52, borderRadius: 16, backgroundColor: "#EEF2FF", border: "1.5px solid #C7D2FE", color: "#4338CA", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
+              <Sparkles size={26} />
             </div>
 
-            <h3 style={{ fontSize: 20, fontWeight: 800, color: "#0F172A", marginBottom: 6 }}>
-              Welcome to Riksho Promoter!
+            <h3 style={{ fontSize: 22, fontWeight: 900, color: "#0F172A", marginBottom: 8, letterSpacing: "-0.02em" }}>
+              Complete Promoter Profile
             </h3>
-            <p style={{ fontSize: 13.5, color: "#64748B", lineHeight: 1.5, marginBottom: 20 }}>
-              Please enter your full name to complete your promoter onboarding profile.
+            <p style={{ fontSize: 14, color: "#64748B", lineHeight: 1.5, marginBottom: 24 }}>
+              Please enter your full name to submit your promoter registration for verification.
             </p>
 
             {onboardingError && (
@@ -701,47 +688,128 @@ export default function PromoterDashboard() {
             )}
 
             <form onSubmit={handleSaveOnboardingName}>
-              <div className="admin-field-group">
+              <div className="admin-field-group" style={{ marginBottom: 20 }}>
                 <label className="admin-field-label">Full Name *</label>
-                <input
-                  type="text"
-                  required
-                  value={onboardingName}
-                  onChange={(e) => setOnboardingName(e.target.value)}
-                  placeholder="e.g. Rahul Sharma"
-                  className="admin-input"
-                  style={{ width: "100%" }}
-                  autoFocus
-                />
+                <div className="admin-input-wrapper">
+                  <input
+                    type="text"
+                    required
+                    value={onboardingName}
+                    onChange={(e) => {
+                      setOnboardingName(e.target.value);
+                      if (onboardingError) setOnboardingError("");
+                    }}
+                    placeholder="Enter at least 3 letters (e.g. Rahul Sharma)"
+                    className="admin-input-enhanced"
+                    style={{ paddingLeft: "16px" }}
+                    autoFocus
+                  />
+                </div>
+                {onboardingName.trim().length > 0 && onboardingName.trim().length < 3 && (
+                  <span style={{ fontSize: 12, color: "#D97706", marginTop: 6, display: "block" }}>
+                    Please enter at least 3 characters ({onboardingName.trim().length}/3)
+                  </span>
+                )}
               </div>
 
-              <div className="admin-field-group">
-                <label className="admin-field-label">Email Address (Optional)</label>
-                <input
-                  type="email"
-                  value={onboardingEmail}
-                  onChange={(e) => setOnboardingEmail(e.target.value)}
-                  placeholder="rahul@example.com"
-                  className="admin-input"
-                  style={{ width: "100%" }}
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={onboardingLoading || !onboardingName.trim()}
-                className="admin-btn-hero"
-                style={{ marginTop: 12 }}
-              >
-                <span>{onboardingLoading ? "Saving Profile…" : "Complete Registration"}</span>
-                <ArrowRight size={18} />
-              </button>
+              {/* Button ONLY appears / is enabled when at least 3 letters are entered */}
+              {onboardingName.trim().length >= 3 && (
+                <button
+                  type="submit"
+                  disabled={onboardingLoading}
+                  className="admin-btn-hero"
+                  style={{ marginTop: 8 }}
+                >
+                  <span>{onboardingLoading ? "Submitting Registration…" : "Submit for Verification"}</span>
+                  <ArrowRight size={18} />
+                </button>
+              )}
             </form>
           </div>
         </div>
       )}
 
-      {/* DIALOG 2: QR Scanner Modal */}
+      {/* DIALOG 2: Non-skippable Pending Approval Dialog (Unclosable until admin approves access) */}
+      {approvalStatus === "pending" && (
+        <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(15, 23, 42, 0.7)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: 16 }}>
+          <div style={{ backgroundColor: "#FFFFFF", borderRadius: 24, border: "1.5px solid #0F172A", maxWidth: 480, width: "100%", padding: 36, textAlign: "center", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.35)" }}>
+            <div style={{ width: 64, height: 64, borderRadius: 20, backgroundColor: "#FEF3C7", border: "1.5px solid #FDE68A", color: "#D97706", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px auto" }}>
+              <Clock size={32} />
+            </div>
+
+            <h3 style={{ fontSize: 22, fontWeight: 900, color: "#0F172A", marginBottom: 10, letterSpacing: "-0.02em" }}>
+              Application Submitted for Verification
+            </h3>
+            <p style={{ fontSize: 14, color: "#64748B", lineHeight: 1.6, marginBottom: 24 }}>
+              Hi <strong style={{ color: "#0F172A" }}>{promoter.name || "Promoter"}</strong>, your registration has been submitted to the Riksho team. An admin will review and approve your account within minutes.
+            </p>
+
+            <div style={{ backgroundColor: "#F8FAFC", border: "1.5px solid #E2E8F0", padding: "14px 18px", borderRadius: 14, display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13, marginBottom: 24 }}>
+              <span style={{ color: "#64748B", fontWeight: 500 }}>Current Status:</span>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "#B45309", fontWeight: 800, fontSize: 12, backgroundColor: "#FEF3C7", padding: "4px 10px", borderRadius: 8, border: "1px solid #FDE68A" }}>
+                <span style={{ width: 6, height: 6, borderRadius: "50%", backgroundColor: "#D97706" }} />
+                PENDING APPROVAL
+              </span>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <button
+                onClick={handleManualCheckStatus}
+                disabled={checkingStatus}
+                className="admin-btn admin-btn-secondary"
+                style={{ width: "100%", height: 48, justifyContent: "center", gap: 8, fontSize: 14, fontWeight: 700 }}
+              >
+                <RefreshCw size={16} className={checkingStatus ? "admin-spin" : ""} />
+                <span>{checkingStatus ? "Checking status…" : "Check Approval Status"}</span>
+              </button>
+
+              <button
+                onClick={handleSignOut}
+                style={{ background: "none", border: "none", color: "#94A3B8", fontSize: 13, cursor: "pointer", padding: "6px" }}
+              >
+                Sign out / Log in with another number
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* DIALOG 3: Rejected Dialog */}
+      {approvalStatus === "rejected" && (
+        <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(15, 23, 42, 0.7)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: 16 }}>
+          <div style={{ backgroundColor: "#FFFFFF", borderRadius: 24, border: "1.5px solid #0F172A", maxWidth: 460, width: "100%", padding: 36, textAlign: "center", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.35)" }}>
+            <div style={{ width: 64, height: 64, borderRadius: 20, backgroundColor: "#FEE2E2", border: "1.5px solid #FECACA", color: "#DC2626", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px auto" }}>
+              <AlertCircle size={32} />
+            </div>
+
+            <h3 style={{ fontSize: 22, fontWeight: 900, color: "#0F172A", marginBottom: 10 }}>
+              Application Not Approved
+            </h3>
+            <p style={{ fontSize: 14, color: "#64748B", lineHeight: 1.6, marginBottom: 24 }}>
+              {promoter.rejection_reason || "Your promoter application was not approved at this time. Please contact support for more details."}
+            </p>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <Link
+                href="/support"
+                className="admin-btn admin-btn-primary"
+                style={{ width: "100%", height: 46, justifyContent: "center", textDecoration: "none" }}
+              >
+                Contact Support
+              </Link>
+              <button
+                onClick={handleSignOut}
+                className="admin-btn admin-btn-secondary"
+                style={{ width: "100%", height: 46, justifyContent: "center" }}
+              >
+                Sign Out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* DIALOG 4: QR Scanner Modal */}
       {scannerOpen && (
         <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(15, 23, 42, 0.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: 16 }}>
           <div style={{ backgroundColor: "#FFFFFF", borderRadius: 20, border: "1.5px solid #0F172A", maxWidth: 440, width: "100%", padding: 24, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }}>
@@ -820,7 +888,7 @@ export default function PromoterDashboard() {
         </div>
       )}
 
-      {/* DIALOG 3: Withdrawal Request Modal */}
+      {/* DIALOG 5: Withdrawal Request Modal */}
       {payoutOpen && (
         <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(15, 23, 42, 0.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: 16 }}>
           <div style={{ backgroundColor: "#FFFFFF", borderRadius: 20, border: "1.5px solid #0F172A", maxWidth: 440, width: "100%", padding: 24, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }}>
