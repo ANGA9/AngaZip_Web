@@ -21,7 +21,7 @@ import {
   LogOut,
 } from "lucide-react";
 import Link from "next/link";
-import "@/styles/portal.css";
+import "@/styles/promoter.css";
 
 export default function ReferEarnAuthPage() {
   const router = useRouter();
@@ -72,7 +72,6 @@ export default function ReferEarnAuthPage() {
         setStep("name");
       }
     } catch (err: any) {
-      // If no promoter profile yet, step to name registration
       setStep("name");
     } finally {
       setLoading(false);
@@ -159,7 +158,7 @@ export default function ReferEarnAuthPage() {
 
     setLoading(true);
     try {
-      const { data, error: verifyError } = await supabaseAdminClient.auth.verifyOtp({
+      const { error: verifyError } = await supabaseAdminClient.auth.verifyOtp({
         phone: formattedPhone,
         token: code,
         type: "sms",
@@ -167,7 +166,6 @@ export default function ReferEarnAuthPage() {
 
       if (verifyError) throw verifyError;
 
-      // Authenticated! Now evaluate promoter status
       await evaluatePromoterStatus();
     } catch (err: any) {
       setError(err.message || "Invalid OTP code. Please try again.");
@@ -216,330 +214,300 @@ export default function ReferEarnAuthPage() {
 
   if (initialChecking) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white">
-        <div className="flex items-center gap-3 bg-slate-900 border border-slate-800 px-6 py-4 rounded-2xl shadow-xl">
-          <RefreshCw className="animate-spin text-indigo-400" size={22} />
-          <span className="font-medium text-slate-300">Checking promoter status…</span>
+      <div className="pr-container" style={{ justifyContent: "center", alignItems: "center" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, background: "#0F172A", border: "1px solid rgba(255,255,255,0.1)", padding: "16px 28px", borderRadius: 16 }}>
+          <RefreshCw className="animate-spin" size={20} color="#818CF8" />
+          <span style={{ fontWeight: 600, color: "#E2E8F0" }}>Loading Riksho Promoter Portal…</span>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+    <div className="pr-container">
       {/* Header */}
-      <header className="border-b border-slate-800/80 bg-slate-900/50 backdrop-blur-md sticky top-0 z-30">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2.5 sm:gap-3">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-indigo-400 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-              <Sparkles className="text-white" size={16} />
+      <header className="pr-header">
+        <div className="pr-header-inner">
+          <div className="pr-brand">
+            <div className="pr-brand-logo">
+              <Sparkles size={18} />
             </div>
-            <div className="flex items-center gap-1.5">
-              <span className="font-black tracking-tight text-base sm:text-lg text-white">RIKSHO</span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-                Promoter
-              </span>
-            </div>
+            <span className="pr-brand-name">RIKSHO</span>
+            <span className="pr-badge-promoter">Brand Promoter</span>
           </div>
 
-          <div className="flex items-center gap-3 sm:gap-4">
-            <Link
-              href="/"
-              className="text-xs text-slate-400 hover:text-white transition-colors"
-            >
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+            <Link href="/" style={{ fontSize: 13, color: "var(--pr-text-muted)", transition: "color 0.2s" }}>
               Main Website
             </Link>
             {promoterProfile && (
               <button
                 onClick={handleLogout}
-                className="text-xs text-rose-400 hover:text-rose-300 flex items-center gap-1 border border-rose-500/20 px-2.5 py-1.5 rounded-lg bg-rose-500/10 transition cursor-pointer"
+                style={{ fontSize: 12, color: "#FDA4AF", display: "flex", alignItems: "center", gap: 6, border: "1px solid var(--pr-rose-border)", padding: "6px 12px", borderRadius: 10, background: "var(--pr-rose-soft)" }}
               >
-                <LogOut size={12} /> <span className="hidden sm:inline">Sign out</span>
+                <LogOut size={13} /> Sign out
               </button>
             )}
           </div>
         </div>
       </header>
 
-      {/* Main Container */}
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12 flex-1 flex flex-col md:flex-row items-center justify-center gap-8 lg:gap-12 w-full">
-        {/* Left Side: Value Proposition */}
-        <div className="flex-1 space-y-4 sm:space-y-6 max-w-lg w-full text-center md:text-left">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold">
-            <TrendingUp size={14} /> Earn ₹20 Per Verified Driver
+      {/* Main Content */}
+      <main className="pr-main">
+        {/* Left Presentation */}
+        <div className="pr-hero">
+          <div className="pr-tag-reward">
+            <TrendingUp size={15} /> Earn ₹20 Per Verified Driver
           </div>
 
-          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
+          <h1 className="pr-title">
             Recruit Drivers. <br />
-            <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-emerald-400 bg-clip-text text-transparent">
-              Earn Instant Cash.
-            </span>
+            <span className="pr-gradient-text">Earn Instant Cash.</span>
           </h1>
 
-          <p className="text-slate-400 text-xs sm:text-sm lg:text-base leading-relaxed">
+          <p className="pr-desc">
             Join Riksho as an authorized Brand Promoter. Scan driver QR codes on the field, verify onboarding, and earn instant rewards straight to your UPI or bank account.
           </p>
 
-          {/* Perks Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 pt-1 text-left">
-            <div className="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-4 space-y-1.5">
-              <div className="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
-                <QrCode size={16} />
+          <div className="pr-perks">
+            <div className="pr-perk-card">
+              <div className="pr-perk-icon indigo">
+                <QrCode size={18} />
               </div>
-              <h3 className="font-semibold text-white text-xs sm:text-sm">Instant QR Verification</h3>
-              <p className="text-[11px] sm:text-xs text-slate-400">Just scan the driver's QR code from their Riksho Buddy app.</p>
+              <h3 className="pr-perk-title">Instant QR Verification</h3>
+              <p className="pr-perk-desc">Just scan the driver's QR code from their Riksho Buddy app.</p>
             </div>
 
-            <div className="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-4 space-y-1.5">
-              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
-                <Wallet size={16} />
+            <div className="pr-perk-card">
+              <div className="pr-perk-icon emerald">
+                <Wallet size={18} />
               </div>
-              <h3 className="font-semibold text-white text-xs sm:text-sm">Direct UPI Payouts</h3>
-              <p className="text-[11px] sm:text-xs text-slate-400">Withdraw earnings directly to your Google Pay, PhonePe, or Bank.</p>
+              <h3 className="pr-perk-title">Direct UPI Payouts</h3>
+              <p className="pr-perk-desc">Withdraw earnings directly to Google Pay, PhonePe, or Bank.</p>
             </div>
           </div>
         </div>
 
-        {/* Right Side: Auth / Registration Form */}
-        <div className="w-full max-w-md">
-          <div className="bg-slate-900/80 border border-slate-800 rounded-3xl p-5 sm:p-8 shadow-2xl backdrop-blur-xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none" />
+        {/* Right Auth Card */}
+        <div className="pr-auth-card">
+          <div className="pr-auth-glow" />
 
-            {/* Error Message */}
-            {error && (
-              <div className="mb-4 sm:mb-5 bg-rose-500/10 border border-rose-500/20 text-rose-300 px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-xl text-xs flex items-center gap-2.5">
-                <AlertCircle size={16} className="shrink-0 text-rose-400" />
-                <span>{error}</span>
+          {/* Alerts */}
+          {error && (
+            <div className="pr-alert error">
+              <AlertCircle size={16} style={{ flexShrink: 0 }} />
+              <span>{error}</span>
+            </div>
+          )}
+
+          {success && (
+            <div className="pr-alert success">
+              <CheckCircle2 size={16} style={{ flexShrink: 0 }} />
+              <span>{success}</span>
+            </div>
+          )}
+
+          {/* STEP 1: Phone Input */}
+          {step === "phone" && (
+            <form onSubmit={handleSendOtp} className="pr-form">
+              <div className="pr-form-header">
+                <h2 className="pr-form-title">Promoter Sign In</h2>
+                <p className="pr-form-subtitle">Enter your 10-digit mobile number to receive an OTP.</p>
               </div>
-            )}
 
-            {/* Success Message */}
-            {success && (
-              <div className="mb-4 sm:mb-5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-xl text-xs flex items-center gap-2.5">
-                <CheckCircle2 size={16} className="shrink-0 text-emerald-400" />
-                <span>{success}</span>
+              <div className="pr-input-group">
+                <label className="pr-input-label">Mobile Number</label>
+                <div className="pr-phone-wrapper">
+                  <div className="pr-phone-prefix">+91</div>
+                  <input
+                    type="tel"
+                    maxLength={10}
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
+                    placeholder="9876543210"
+                    className="pr-phone-input"
+                    autoFocus
+                  />
+                </div>
               </div>
-            )}
 
-            {/* STEP 1: Phone Input */}
-            {step === "phone" && (
-              <form onSubmit={handleSendOtp} className="space-y-4 sm:space-y-5">
-                <div className="space-y-1">
-                  <h2 className="text-lg sm:text-xl font-bold text-white">Promoter Sign In / Register</h2>
-                  <p className="text-xs text-slate-400">Enter your 10-digit mobile number to receive an OTP.</p>
-                </div>
+              <button
+                type="submit"
+                disabled={loading || phone.length < 10}
+                className="pr-btn-primary"
+              >
+                {loading ? (
+                  <RefreshCw className="animate-spin" size={18} />
+                ) : (
+                  <>
+                    Send Verification OTP <ArrowRight size={16} />
+                  </>
+                )}
+              </button>
+            </form>
+          )}
 
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-slate-300">Mobile Number</label>
-                  <div className="flex rounded-xl overflow-hidden border border-slate-700 bg-slate-950 focus-within:border-indigo-500 transition">
-                    <div className="bg-slate-800/80 px-3 sm:px-3.5 flex items-center text-slate-400 text-xs sm:text-sm font-semibold border-r border-slate-700">
-                      +91
-                    </div>
+          {/* STEP 2: OTP Verification */}
+          {step === "otp" && (
+            <form onSubmit={handleVerifyOtp} className="pr-form">
+              <div className="pr-form-header">
+                <h2 className="pr-form-title">Verify Phone Number</h2>
+                <p className="pr-form-subtitle">
+                  We sent a 6-digit code to <strong style={{ color: "#FFFFFF" }}>+91 {phone}</strong>
+                </p>
+              </div>
+
+              <div className="pr-input-group">
+                <div className="pr-otp-grid">
+                  {otpArray.map((digit, idx) => (
                     <input
-                      type="tel"
-                      maxLength={10}
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
-                      placeholder="9876543210"
-                      className="w-full bg-transparent px-3.5 sm:px-4 py-3 text-white text-sm focus:outline-none tracking-wider placeholder:text-slate-600 font-medium"
-                      autoFocus
-                    />
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={loading || phone.length < 10}
-                  className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-semibold py-3 sm:py-3.5 rounded-xl shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 transition text-xs sm:text-sm cursor-pointer disabled:cursor-not-allowed"
-                >
-                  {loading ? (
-                    <RefreshCw className="animate-spin" size={18} />
-                  ) : (
-                    <>
-                      Send Verification OTP <ArrowRight size={16} />
-                    </>
-                  )}
-                </button>
-              </form>
-            )}
-
-            {/* STEP 2: OTP Verification */}
-            {step === "otp" && (
-              <form onSubmit={handleVerifyOtp} className="space-y-4 sm:space-y-5">
-                <div className="space-y-1">
-                  <h2 className="text-lg sm:text-xl font-bold text-white">Verify Phone Number</h2>
-                  <p className="text-xs text-slate-400">
-                    We sent a 6-digit code to <span className="text-slate-200 font-semibold">+91 {phone}</span>
-                  </p>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="flex justify-between gap-1.5 sm:gap-2">
-                    {otpArray.map((digit, idx) => (
-                      <input
-                        key={idx}
-                        ref={(el) => { inputRefs.current[idx] = el; }}
-                        type="text"
-                        inputMode="numeric"
-                        maxLength={1}
-                        value={digit}
-                        onChange={(e) => handleOtpChange(idx, e.target.value)}
-                        onKeyDown={(e) => handleOtpKeyDown(idx, e)}
-                        className="w-10 sm:w-12 h-12 sm:h-14 text-center text-lg sm:text-xl font-bold bg-slate-950 border border-slate-700 focus:border-indigo-500 rounded-xl text-white focus:outline-none transition shadow-inner"
-                      />
-                    ))}
-                  </div>
-
-                  <div className="flex justify-between items-center text-xs pt-1">
-                    <button
-                      type="button"
-                      onClick={() => setStep("phone")}
-                      className="text-slate-400 hover:text-slate-200 transition cursor-pointer"
-                    >
-                      Change Number
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleSendOtp}
-                      disabled={loading}
-                      className="text-indigo-400 hover:text-indigo-300 font-medium transition cursor-pointer"
-                    >
-                      Resend OTP
-                    </button>
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={loading || otpArray.join("").length < 6}
-                  className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-semibold py-3 sm:py-3.5 rounded-xl shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 transition text-xs sm:text-sm cursor-pointer disabled:cursor-not-allowed"
-                >
-                  {loading ? (
-                    <RefreshCw className="animate-spin" size={18} />
-                  ) : (
-                    "Verify & Continue"
-                  )}
-                </button>
-              </form>
-            )}
-
-            {/* STEP 3: Complete Profile (Name & Details) */}
-            {step === "name" && (
-              <form onSubmit={handleRegisterName} className="space-y-4 sm:space-y-5">
-                <div className="space-y-1">
-                  <h2 className="text-lg sm:text-xl font-bold text-white">Promoter Profile</h2>
-                  <p className="text-xs text-slate-400">Tell us your name to submit your promoter onboarding.</p>
-                </div>
-
-                <div className="space-y-3.5 sm:space-y-4">
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-slate-300">Full Name *</label>
-                    <input
+                      key={idx}
+                      ref={(el) => { inputRefs.current[idx] = el; }}
                       type="text"
-                      required
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="e.g. Rahul Sharma"
-                      className="w-full bg-slate-950 border border-slate-700 focus:border-indigo-500 rounded-xl px-4 py-2.5 sm:py-3 text-sm text-white focus:outline-none transition"
-                      autoFocus
+                      inputMode="numeric"
+                      maxLength={1}
+                      value={digit}
+                      onChange={(e) => handleOtpChange(idx, e.target.value)}
+                      onKeyDown={(e) => handleOtpKeyDown(idx, e)}
+                      className="pr-otp-box"
                     />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-slate-300">Email Address (Optional)</label>
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="rahul@example.com"
-                      className="w-full bg-slate-950 border border-slate-700 focus:border-indigo-500 rounded-xl px-4 py-3 text-sm text-white focus:outline-none transition"
-                    />
-                  </div>
+                  ))}
                 </div>
 
-                <button
-                  type="submit"
-                  disabled={loading || !name.trim()}
-                  className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-semibold py-3.5 rounded-xl shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 transition text-sm cursor-pointer disabled:cursor-not-allowed"
-                >
-                  {loading ? (
-                    <RefreshCw className="animate-spin" size={18} />
-                  ) : (
-                    "Submit Application"
-                  )}
-                </button>
-              </form>
-            )}
-
-            {/* STEP 4: Application Pending Approval */}
-            {step === "pending" && (
-              <div className="text-center space-y-5 py-3">
-                <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center mx-auto shadow-xl">
-                  <Clock size={32} />
-                </div>
-
-                <div className="space-y-1.5">
-                  <h2 className="text-xl font-bold text-white">Application Under Review</h2>
-                  <p className="text-xs text-slate-400 leading-relaxed max-w-sm mx-auto">
-                    Hi <span className="text-slate-200 font-semibold">{promoterProfile?.name || name || "Promoter"}</span>, your application has been submitted to the Riksho team. An admin will review and approve your account shortly.
-                  </p>
-                </div>
-
-                <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-3.5 text-xs text-slate-400 flex items-center justify-between">
-                  <span>Status:</span>
-                  <span className="font-semibold text-amber-400 uppercase tracking-wider bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 text-[10px]">
-                    Pending Approval
-                  </span>
-                </div>
-
-                <button
-                  onClick={evaluatePromoterStatus}
-                  disabled={loading}
-                  className="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium py-3 rounded-xl border border-slate-700 flex items-center justify-center gap-2 transition text-xs cursor-pointer"
-                >
-                  <RefreshCw size={14} className={loading ? "animate-spin" : ""} /> Check Approval Status
-                </button>
-              </div>
-            )}
-
-            {/* STEP 5: Application Rejected */}
-            {step === "rejected" && (
-              <div className="text-center space-y-5 py-3">
-                <div className="w-16 h-16 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center mx-auto shadow-xl">
-                  <AlertCircle size={32} />
-                </div>
-
-                <div className="space-y-1.5">
-                  <h2 className="text-xl font-bold text-white">Application Not Approved</h2>
-                  <p className="text-xs text-slate-400 leading-relaxed max-w-sm mx-auto">
-                    {promoterProfile?.rejection_reason || "Your promoter application was not approved at this time."}
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <Link
-                    href="/support"
-                    className="block w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-3 rounded-xl transition text-xs"
-                  >
-                    Contact Support
-                  </Link>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginTop: 4 }}>
                   <button
-                    onClick={handleLogout}
-                    className="w-full bg-slate-800 text-slate-300 font-medium py-2.5 rounded-xl text-xs hover:bg-slate-700 transition"
+                    type="button"
+                    onClick={() => setStep("phone")}
+                    style={{ color: "var(--pr-text-muted)", background: "none", border: "none", cursor: "pointer" }}
                   >
-                    Log Out
+                    Change Number
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleSendOtp}
+                    disabled={loading}
+                    style={{ color: "#818CF8", fontWeight: 600, background: "none", border: "none", cursor: "pointer" }}
+                  >
+                    Resend OTP
                   </button>
                 </div>
               </div>
-            )}
-          </div>
+
+              <button
+                type="submit"
+                disabled={loading || otpArray.join("").length < 6}
+                className="pr-btn-primary"
+              >
+                {loading ? <RefreshCw className="animate-spin" size={18} /> : "Verify & Continue"}
+              </button>
+            </form>
+          )}
+
+          {/* STEP 3: Complete Profile */}
+          {step === "name" && (
+            <form onSubmit={handleRegisterName} className="pr-form">
+              <div className="pr-form-header">
+                <h2 className="pr-form-title">Promoter Onboarding</h2>
+                <p className="pr-form-subtitle">Tell us your name to submit your promoter registration.</p>
+              </div>
+
+              <div className="pr-input-group">
+                <label className="pr-input-label">Full Name *</label>
+                <input
+                  type="text"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="e.g. Rahul Sharma"
+                  className="pr-text-input"
+                  autoFocus
+                />
+              </div>
+
+              <div className="pr-input-group">
+                <label className="pr-input-label">Email Address (Optional)</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="rahul@example.com"
+                  className="pr-text-input"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading || !name.trim()}
+                className="pr-btn-primary"
+              >
+                {loading ? <RefreshCw className="animate-spin" size={18} /> : "Submit Application"}
+              </button>
+            </form>
+          )}
+
+          {/* STEP 4: Application Pending */}
+          {step === "pending" && (
+            <div style={{ textAlign: "center", display: "flex", flexDirection: "column", gap: 18, padding: "8px 0" }}>
+              <div style={{ width: 64, height: 64, borderRadius: 20, background: "var(--pr-amber-soft)", border: "1px solid var(--pr-amber-border)", color: "#FBBF24", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto" }}>
+                <Clock size={32} />
+              </div>
+
+              <div>
+                <h2 style={{ fontSize: 20, fontWeight: 800, color: "#FFFFFF", marginBottom: 6 }}>Application Under Review</h2>
+                <p style={{ fontSize: 13, color: "var(--pr-text-muted)", lineHeight: 1.5 }}>
+                  Hi <strong style={{ color: "#FFFFFF" }}>{promoterProfile?.name || name || "Promoter"}</strong>, your application has been submitted. An admin will review and approve your account shortly.
+                </p>
+              </div>
+
+              <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid var(--pr-border)", borderRadius: 12, padding: "12px 16px", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 12, color: "var(--pr-text-muted)" }}>
+                <span>Current Status:</span>
+                <span style={{ fontWeight: 700, color: "#FBBF24", background: "var(--pr-amber-soft)", padding: "2px 8px", borderRadius: 6, border: "1px solid var(--pr-amber-border)", fontSize: 11, textTransform: "uppercase" }}>
+                  Pending Approval
+                </span>
+              </div>
+
+              <button
+                onClick={evaluatePromoterStatus}
+                disabled={loading}
+                className="pr-btn-secondary"
+              >
+                <RefreshCw size={14} className={loading ? "animate-spin" : ""} /> Check Approval Status
+              </button>
+            </div>
+          )}
+
+          {/* STEP 5: Rejected */}
+          {step === "rejected" && (
+            <div style={{ textAlign: "center", display: "flex", flexDirection: "column", gap: 18, padding: "8px 0" }}>
+              <div style={{ width: 64, height: 64, borderRadius: 20, background: "var(--pr-rose-soft)", border: "1px solid var(--pr-rose-border)", color: "#FB7185", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto" }}>
+                <AlertCircle size={32} />
+              </div>
+
+              <div>
+                <h2 style={{ fontSize: 20, fontWeight: 800, color: "#FFFFFF", marginBottom: 6 }}>Application Not Approved</h2>
+                <p style={{ fontSize: 13, color: "var(--pr-text-muted)", lineHeight: 1.5 }}>
+                  {promoterProfile?.rejection_reason || "Your promoter application was not approved at this time."}
+                </p>
+              </div>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                <Link href="/support" className="pr-btn-primary" style={{ textDecoration: "none" }}>
+                  Contact Support
+                </Link>
+                <button onClick={handleLogout} className="pr-btn-secondary">
+                  Log Out
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-800/60 py-6 text-center text-xs text-slate-500">
+      <footer className="pr-footer">
         © {new Date().getFullYear()} Riksho Mobility Technologies. All rights reserved.
       </footer>
     </div>
   );
 }
+

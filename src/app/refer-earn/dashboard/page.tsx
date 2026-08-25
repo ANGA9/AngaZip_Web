@@ -20,13 +20,9 @@ import {
   X,
   CreditCard,
   Building,
-  ChevronRight,
-  ShieldCheck,
-  Search,
 } from "lucide-react";
 import { Html5Qrcode } from "html5-qrcode";
-import Link from "next/link";
-import "@/styles/portal.css";
+import "@/styles/promoter.css";
 
 export default function PromoterDashboard() {
   const router = useRouter();
@@ -34,7 +30,6 @@ export default function PromoterDashboard() {
   const [data, setData] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<"recruits" | "payouts">("recruits");
   
-  // QR Scanner Modal State
   const [scannerOpen, setScannerOpen] = useState(false);
   const [manualDriverId, setManualDriverId] = useState("");
   const [scanLoading, setScanLoading] = useState(false);
@@ -42,7 +37,6 @@ export default function PromoterDashboard() {
   const [scanSuccess, setScanSuccess] = useState<any>(null);
   const scannerRef = useRef<Html5Qrcode | null>(null);
 
-  // Payout Modal State
   const [payoutOpen, setPayoutOpen] = useState(false);
   const [payoutAmount, setPayoutAmount] = useState("");
   const [payoutMethod, setPayoutMethod] = useState<"upi" | "bank">("upi");
@@ -61,7 +55,6 @@ export default function PromoterDashboard() {
       const res = await portalFetch("/promoters/dashboard");
       setData(res);
 
-      // Pre-fill existing banking info
       if (res.promoter) {
         if (res.promoter.upi_id) setUpiId(res.promoter.upi_id);
         if (res.promoter.bank_account_no) setBankAccountNo(res.promoter.bank_account_no);
@@ -91,76 +84,83 @@ export default function PromoterDashboard() {
     checkSession();
   }, [router]);
 
-  // Start & Stop QR Scanner
   useEffect(() => {
     if (scannerOpen) {
       setScanError("");
       setScanSuccess(null);
       setManualDriverId("");
 
-      const qrRegionId = "promoter-qr-reader";
-      let html5QrCode: Html5Qrcode | null = null;
-
-      const timer = setTimeout(() => {
+      const qrTimer = setTimeout(async () => {
         try {
-          html5QrCode = new Html5Qrcode(qrRegionId);
+          const html5QrCode = new Html5Qrcode("promoter-qr-reader");
           scannerRef.current = html5QrCode;
 
-          html5QrCode.start(
+          await html5QrCode.start(
             { facingMode: "environment" },
-            { fps: 10, qrbox: { width: 250, height: 250 } },
-            (decodedText) => {
-              handleLinkDriver(decodedText);
+            {
+              fps: 10,
+              qrbox: { width: 250, height: 250 },
             },
-            (errorMessage) => {
-              // Ignore standard frame scan errors
-            }
-          ).catch((err) => {
-            console.warn("Camera start failed:", err);
-            setScanError("Could not access camera. Please allow camera permissions or enter Driver ID manually.");
-          });
+            (decodedText) => {
+              handleQrDetected(decodedText);
+            },
+            () => {}
+          );
         } catch (e: any) {
-          setScanError("Camera initialization error. Please use manual entry.");
+          console.warn("Camera start failed:", e);
+          setScanError("Camera access failed. Please ensure camera permissions are allowed, or type the Driver ID manually below.");
         }
       }, 300);
 
       return () => {
-        clearTimeout(timer);
-        if (html5QrCode && html5QrCode.isScanning) {
-          html5QrCode.stop().catch(() => {});
+        clearTimeout(qrTimer);
+        if (scannerRef.current) {
+          scannerRef.current.stop().catch(() => {}).finally(() => {
+            scannerRef.current = null;
+          });
         }
       };
     }
   }, [scannerOpen]);
 
-  const handleCloseScanner = () => {
-    if (scannerRef.current && scannerRef.current.isScanning) {
-      scannerRef.current.stop().catch(() => {});
+  const handleCloseScanner = async () => {
+    if (scannerRef.current) {
+      try {
+        await scannerRef.current.stop();
+      } catch (e) {}
+      scannerRef.current = null;
     }
     setScannerOpen(false);
   };
 
-  const handleLinkDriver = async (driverIdOrQr: string) => {
-    if (!driverIdOrQr || scanLoading) return;
+  const handleQrDetected = async (decodedText: string) => {
+    let driverId = decodedText.trim();
+    try {
+      if (decodedText.startsWith("{") || decodedText.startsWith("[")) {
+        const parsed = JSON.parse(decodedText);
+        driverId = parsed.driver_id || parsed.id || decodedText;
+      }
+    } catch (e) {}
+
+    handleLinkDriver(driverId);
+  };
+
+  const handleLinkDriver = async (driverId: string) => {
+    if (!driverId || scanLoading) return;
     setScanLoading(true);
     setScanError("");
     setScanSuccess(null);
 
-    // Stop scanner if running to prevent duplicate calls
-    if (scannerRef.current && scannerRef.current.isScanning) {
-      scannerRef.current.stop().catch(() => {});
-    }
-
     try {
       const res = await portalFetch("/promoters/link-driver", {
         method: "POST",
-        body: JSON.stringify({ driver_id: driverIdOrQr }),
+        body: JSON.stringify({ driver_id: driverId }),
       });
 
       setScanSuccess(res);
       await loadDashboard();
     } catch (err: any) {
-      setScanError(err.message || "Failed to link driver. Please verify the QR code.");
+      setScanError(err.message || "Failed to link driver. Please verify that this driver is onboarded.");
     } finally {
       setScanLoading(false);
     }
@@ -171,46 +171,46 @@ export default function PromoterDashboard() {
     setPayoutError("");
     setPayoutSuccess("");
 
-    const amountRupees = parseFloat(payoutAmount);
-    if (!amountRupees || amountRupees < 10) {
-      setPayoutError("Minimum withdrawal amount is ₹10.");
+    const amountInRupees = parseFloat(payoutAmount);
+    if (isNaN(amountInRupees) || amountInRupees < 10) {
+      setPayoutError("Minimum payout request is ₹10.");
       return;
     }
 
-    const amountPaise = Math.round(amountRupees * 100);
-    const available = data?.stats?.available_balance || 0;
-
-    if (amountPaise > available) {
-      setPayoutError(`Insufficient balance. You can withdraw up to ₹${(available / 100).toFixed(2)}.`);
+    const availableRupees = (stats.available_balance || 0) / 100;
+    if (amountInRupees > availableRupees) {
+      setPayoutError(`Amount exceeds your available balance of ₹${availableRupees.toFixed(2)}.`);
       return;
     }
 
     if (payoutMethod === "upi" && !upiId.trim()) {
-      setPayoutError("Please enter a valid UPI ID (e.g. yourname@okhdfcbank).");
+      setPayoutError("Please enter your UPI ID.");
       return;
     }
 
-    if (payoutMethod === "bank" && (!bankAccountNo.trim() || !bankIfsc.trim())) {
-      setPayoutError("Please enter your complete bank account number and IFSC code.");
-      return;
+    if (payoutMethod === "bank") {
+      if (!bankAccountNo.trim() || !bankIfsc.trim() || !accountHolderName.trim()) {
+        setPayoutError("Please fill in all mandatory bank details.");
+        return;
+      }
     }
 
     setPayoutLoading(true);
     try {
-      const res = await portalFetch("/promoters/payout-request", {
+      await portalFetch("/promoters/payouts/request", {
         method: "POST",
         body: JSON.stringify({
-          amount: amountPaise,
+          amount: Math.round(amountInRupees * 100),
           payout_method: payoutMethod,
-          upi_id: upiId.trim() || undefined,
-          bank_account_no: bankAccountNo.trim() || undefined,
-          bank_ifsc: bankIfsc.trim() || undefined,
-          bank_name: bankName.trim() || undefined,
-          account_holder_name: accountHolderName.trim() || undefined,
+          upi_id: payoutMethod === "upi" ? upiId.trim() : undefined,
+          bank_account_no: payoutMethod === "bank" ? bankAccountNo.trim() : undefined,
+          bank_ifsc: payoutMethod === "bank" ? bankIfsc.trim().toUpperCase() : undefined,
+          bank_name: payoutMethod === "bank" ? bankName.trim() : undefined,
+          account_holder_name: payoutMethod === "bank" ? accountHolderName.trim() : undefined,
         }),
       });
 
-      setPayoutSuccess("Withdrawal request submitted! Admin will process payment to your account.");
+      setPayoutSuccess("Withdrawal request submitted! Payout will be processed to your account.");
       setPayoutAmount("");
       await loadDashboard();
       setTimeout(() => {
@@ -218,7 +218,7 @@ export default function PromoterDashboard() {
         setPayoutSuccess("");
       }, 2500);
     } catch (err: any) {
-      setPayoutError(err.message || "Failed to submit withdrawal request.");
+      setPayoutError(err.message || "Failed to submit payout request.");
     } finally {
       setPayoutLoading(false);
     }
@@ -231,10 +231,10 @@ export default function PromoterDashboard() {
 
   if (loading && !data) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white">
-        <div className="flex items-center gap-3 bg-slate-900 border border-slate-800 px-6 py-4 rounded-2xl shadow-xl">
-          <RefreshCw className="animate-spin text-indigo-400" size={22} />
-          <span className="font-medium text-slate-300">Loading promoter dashboard…</span>
+      <div className="pr-container" style={{ justifyContent: "center", alignItems: "center" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, background: "#0F172A", border: "1px solid rgba(255,255,255,0.1)", padding: "16px 28px", borderRadius: 16 }}>
+          <RefreshCw className="animate-spin" size={20} color="#818CF8" />
+          <span style={{ fontWeight: 600, color: "#E2E8F0" }}>Loading Promoter Dashboard…</span>
         </div>
       </div>
     );
@@ -246,57 +246,51 @@ export default function PromoterDashboard() {
   const payouts = data?.payouts || [];
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-indigo-500 selection:text-white">
-      {/* Top Navbar */}
-      <header className="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur-md sticky top-0 z-30">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2.5 sm:gap-3">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-indigo-400 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-              <Sparkles className="text-white" size={16} />
+    <div className="pr-container">
+      <header className="pr-header">
+        <div className="pr-header-inner">
+          <div className="pr-brand">
+            <div className="pr-brand-logo">
+              <Sparkles size={18} />
             </div>
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <span className="font-black tracking-tight text-base sm:text-lg text-white">RIKSHO</span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                Promoter
-              </span>
-            </div>
+            <span className="pr-brand-name">RIKSHO</span>
+            <span className="pr-badge-verified">Verified Promoter</span>
           </div>
 
-          <div className="flex items-center gap-2.5 sm:gap-4">
-            <div className="hidden md:flex items-center gap-2 text-xs text-slate-300 bg-slate-800/60 border border-slate-700/60 px-3 py-1.5 rounded-xl">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="truncate max-w-[200px]">{promoter.name || "Promoter"} ({promoter.phone})</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "#CBD5E1", background: "rgba(30, 41, 59, 0.6)", border: "1px solid rgba(255,255,255,0.08)", padding: "6px 14px", borderRadius: 12 }}>
+              <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#34D399", display: "inline-block" }} />
+              <span>{promoter.name || "Promoter"} ({promoter.phone})</span>
             </div>
             <button
               onClick={handleSignOut}
-              className="text-xs text-slate-400 hover:text-rose-400 flex items-center gap-1.5 border border-slate-800 hover:border-rose-500/30 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-rose-500/10 transition cursor-pointer"
+              style={{ fontSize: 12, color: "#94A3B8", display: "flex", alignItems: "center", gap: 6, border: "1px solid var(--pr-border)", padding: "6px 12px", borderRadius: 10, background: "rgba(15,23,42,0.8)", cursor: "pointer" }}
             >
-              <LogOut size={13} /> <span className="hidden sm:inline">Sign Out</span>
+              <LogOut size={13} /> Sign Out
             </button>
           </div>
         </div>
       </header>
 
-      {/* Main Container */}
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8 flex-1 w-full space-y-6 sm:space-y-8">
-        {/* Welcome & Primary Action Banner */}
-        <div className="bg-gradient-to-br from-indigo-900/40 via-slate-900/80 to-slate-900/40 border border-indigo-500/20 rounded-3xl p-5 sm:p-8 relative overflow-hidden backdrop-blur-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-2xl">
-          <div className="space-y-2 z-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 text-xs font-semibold">
+      <main className="pr-dash-container">
+        <div className="pr-action-banner">
+          <div style={{ display: "flex", flexDirection: "column", gap: 8, zIndex: 1 }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 12px", borderRadius: 9999, background: "rgba(99, 102, 241, 0.15)", color: "#818CF8", border: "1px solid rgba(99, 102, 241, 0.3)", fontSize: 12, fontWeight: 700, width: "fit-content" }}>
               <TrendingUp size={14} /> Active Field Campaign
             </div>
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-white">
+            <h1 style={{ fontSize: 26, fontWeight: 900, color: "#FFFFFF", letterSpacing: -0.5 }}>
               Welcome back, {promoter.name || "Promoter"}!
             </h1>
-            <p className="text-slate-400 text-xs sm:text-sm max-w-lg leading-relaxed">
-              Earn <span className="text-emerald-400 font-bold">₹20 for every driver</span> you onboard. Scan the driver's QR code from their Riksho Buddy app to verify and record your recruit instantly.
+            <p style={{ fontSize: 13, color: "var(--pr-text-muted)", maxWidth: 540, lineHeight: 1.5 }}>
+              Earn <strong style={{ color: "#34D399" }}>₹20 for every driver</strong> you onboard. Scan the driver's QR code from their Riksho Buddy app to verify and credit your wallet immediately.
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 z-10 w-full md:w-auto">
+          <div className="pr-banner-actions">
             <button
               onClick={() => setScannerOpen(true)}
-              className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-6 py-3.5 rounded-2xl shadow-xl shadow-indigo-600/30 flex items-center justify-center gap-2.5 transition text-sm cursor-pointer active:scale-95"
+              className="pr-btn-primary"
+              style={{ padding: "0 24px", width: "auto" }}
             >
               <QrCode size={18} />
               <span>Scan Driver QR</span>
@@ -305,91 +299,74 @@ export default function PromoterDashboard() {
             <button
               onClick={() => setPayoutOpen(true)}
               disabled={stats.available_balance < 1000}
-              className="w-full sm:w-auto bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-slate-100 font-semibold px-5 py-3.5 rounded-2xl border border-slate-700 flex items-center justify-center gap-2 transition text-sm cursor-pointer disabled:cursor-not-allowed active:scale-95"
+              className="pr-btn-secondary"
+              style={{ padding: "0 20px", width: "auto" }}
             >
-              <Wallet size={16} className="text-emerald-400" />
+              <Wallet size={16} color="#34D399" />
               <span>Withdraw Payout</span>
             </button>
           </div>
         </div>
 
-        {/* 4 Stats Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          <div className="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-4 sm:p-5 space-y-2 sm:space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] sm:text-xs text-slate-400 font-medium">Total Recruits</span>
-              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-indigo-500/10 text-indigo-400 flex items-center justify-center border border-indigo-500/20">
-                <Users size={14} />
+        <div className="pr-stats-grid">
+          <div className="pr-stat-card">
+            <div className="pr-stat-header">
+              <span className="pr-stat-label">Total Recruits</span>
+              <div className="pr-perk-icon indigo" style={{ width: 30, height: 30, margin: 0 }}>
+                <Users size={15} />
               </div>
             </div>
-            <div className="text-xl sm:text-2xl lg:text-3xl font-black text-white">
-              {stats.total_recruits}
-            </div>
-            <div className="text-[10px] sm:text-[11px] text-slate-500">Verified drivers</div>
+            <div className="pr-stat-value">{stats.total_recruits}</div>
+            <div className="pr-stat-subtext">Verified drivers onboarded</div>
           </div>
 
-          <div className="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-4 sm:p-5 space-y-2 sm:space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] sm:text-xs text-slate-400 font-medium">Total Earnings</span>
-              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center border border-emerald-500/20">
-                <TrendingUp size={14} />
+          <div className="pr-stat-card">
+            <div className="pr-stat-header">
+              <span className="pr-stat-label">Total Earnings</span>
+              <div className="pr-perk-icon emerald" style={{ width: 30, height: 30, margin: 0 }}>
+                <TrendingUp size={15} />
               </div>
             </div>
-            <div className="text-xl sm:text-2xl lg:text-3xl font-black text-emerald-400">
-              ₹{(stats.total_earnings / 100).toFixed(2)}
-            </div>
-            <div className="text-[10px] sm:text-[11px] text-slate-500">Lifetime rewards</div>
+            <div className="pr-stat-value emerald">₹{(stats.total_earnings / 100).toFixed(2)}</div>
+            <div className="pr-stat-subtext">Lifetime reward sum</div>
           </div>
 
-          <div className="bg-slate-900/60 border border-indigo-500/30 bg-indigo-950/20 rounded-2xl p-4 sm:p-5 space-y-2 sm:space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] sm:text-xs text-indigo-300 font-medium">Available Balance</span>
-              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-indigo-500/20 text-indigo-300 flex items-center justify-center border border-indigo-500/30">
-                <Wallet size={14} />
+          <div className="pr-stat-card highlight">
+            <div className="pr-stat-header">
+              <span className="pr-stat-label" style={{ color: "#A5B4FC" }}>Available Balance</span>
+              <div className="pr-perk-icon indigo" style={{ width: 30, height: 30, margin: 0, background: "rgba(99, 102, 241, 0.25)" }}>
+                <Wallet size={15} color="#A5B4FC" />
               </div>
             </div>
-            <div className="text-xl sm:text-2xl lg:text-3xl font-black text-white">
-              ₹{(stats.available_balance / 100).toFixed(2)}
-            </div>
-            <div className="text-[10px] sm:text-[11px] text-indigo-400/80">Ready to withdraw</div>
+            <div className="pr-stat-value">₹{(stats.available_balance / 100).toFixed(2)}</div>
+            <div className="pr-stat-subtext" style={{ color: "#818CF8" }}>Ready for instant payout</div>
           </div>
 
-          <div className="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-4 sm:p-5 space-y-2 sm:space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] sm:text-xs text-slate-400 font-medium">Withdrawn Sum</span>
-              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-slate-800 text-slate-300 flex items-center justify-center border border-slate-700">
-                <CreditCard size={14} />
+          <div className="pr-stat-card">
+            <div className="pr-stat-header">
+              <span className="pr-stat-label">Withdrawn Sum</span>
+              <div className="pr-perk-icon" style={{ width: 30, height: 30, margin: 0, background: "rgba(255,255,255,0.06)", color: "#CBD5E1" }}>
+                <CreditCard size={15} />
               </div>
             </div>
-            <div className="text-xl sm:text-2xl lg:text-3xl font-black text-slate-300">
-              ₹{(stats.withdrawn_amount / 100).toFixed(2)}
-            </div>
-            <div className="text-[10px] sm:text-[11px] text-slate-500">Transferred to UPI/Bank</div>
+            <div className="pr-stat-value" style={{ color: "#CBD5E1" }}>₹{(stats.withdrawn_amount / 100).toFixed(2)}</div>
+            <div className="pr-stat-subtext">Transferred to UPI/Bank</div>
           </div>
         </div>
 
-        {/* Section Tabs */}
-        <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-800 pb-3 gap-3">
-            <div className="flex items-center gap-2 sm:gap-4 overflow-x-auto no-scrollbar">
+        <div>
+          <div className="pr-tabs-row">
+            <div className="pr-tabs">
               <button
                 onClick={() => setActiveTab("recruits")}
-                className={`text-xs sm:text-sm font-bold pb-2 transition flex items-center gap-1.5 sm:gap-2 cursor-pointer whitespace-nowrap ${
-                  activeTab === "recruits"
-                    ? "text-indigo-400 border-b-2 border-indigo-500"
-                    : "text-slate-400 hover:text-slate-200"
-                }`}
+                className={`pr-tab-btn ${activeTab === "recruits" ? "active" : ""}`}
               >
-                <Users size={15} /> Recruits ({referrals.length})
+                <Users size={15} /> Recruited Drivers ({referrals.length})
               </button>
 
               <button
                 onClick={() => setActiveTab("payouts")}
-                className={`text-xs sm:text-sm font-bold pb-2 transition flex items-center gap-1.5 sm:gap-2 cursor-pointer whitespace-nowrap ${
-                  activeTab === "payouts"
-                    ? "text-indigo-400 border-b-2 border-indigo-500"
-                    : "text-slate-400 hover:text-slate-200"
-                }`}
+                className={`pr-tab-btn ${activeTab === "payouts" ? "active" : ""}`}
               >
                 <Wallet size={15} /> Payout History ({payouts.length})
               </button>
@@ -397,78 +374,78 @@ export default function PromoterDashboard() {
 
             <button
               onClick={loadDashboard}
-              className="text-xs text-slate-400 hover:text-white flex items-center gap-1.5 transition self-end sm:self-auto cursor-pointer"
+              style={{ fontSize: 12, color: "var(--pr-text-muted)", display: "flex", alignItems: "center", gap: 6, background: "none", border: "none", cursor: "pointer" }}
             >
-              <RefreshCw size={12} /> Refresh Data
+              <RefreshCw size={13} /> Refresh Data
             </button>
           </div>
 
-          {/* TAB 1: Recruits Table */}
           {activeTab === "recruits" && (
-            <div className="bg-slate-900/60 border border-slate-800/80 rounded-2xl overflow-hidden shadow-xl">
+            <div className="pr-table-card" style={{ marginTop: 16 }}>
               {referrals.length === 0 ? (
-                <div className="text-center py-12 sm:py-16 px-4 space-y-4">
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-slate-800/80 text-slate-400 flex items-center justify-center mx-auto border border-slate-700">
-                    <QrCode size={24} />
+                <div style={{ textAlign: "center", padding: "60px 20px", display: "flex", flexDirection: "column", gap: 14, alignItems: "center" }}>
+                  <div className="pr-perk-icon indigo" style={{ width: 56, height: 56, borderRadius: 16 }}>
+                    <QrCode size={26} />
                   </div>
-                  <div className="space-y-1">
-                    <h3 className="text-base font-bold text-white">No Drivers Recruited Yet</h3>
-                    <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                  <div>
+                    <h3 style={{ fontSize: 16, fontWeight: 700, color: "#FFFFFF", marginBottom: 4 }}>No Drivers Recruited Yet</h3>
+                    <p style={{ fontSize: 13, color: "var(--pr-text-muted)", maxWidth: 360 }}>
                       Tap "Scan Driver QR" to scan your first partner driver and earn ₹20 immediately!
                     </p>
                   </div>
                   <button
                     onClick={() => setScannerOpen(true)}
-                    className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-5 py-2.5 rounded-xl text-xs transition cursor-pointer"
+                    className="pr-btn-primary"
+                    style={{ width: "auto", padding: "0 20px", height: 40, fontSize: 13 }}
                   >
                     Scan First Driver
                   </button>
                 </div>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs">
-                    <thead className="bg-slate-950/60 border-b border-slate-800 text-slate-400 uppercase tracking-wider font-semibold">
+                <div className="pr-table-wrapper">
+                  <table className="pr-table">
+                    <thead>
                       <tr>
-                        <th className="py-3 px-4 sm:px-5 whitespace-nowrap">Driver Name</th>
-                        <th className="py-3 px-4 sm:px-5 whitespace-nowrap">Phone Number</th>
-                        <th className="py-3 px-4 sm:px-5 whitespace-nowrap">Date Verified</th>
-                        <th className="py-3 px-4 sm:px-5 whitespace-nowrap">Reward</th>
-                        <th className="py-3 px-4 sm:px-5 text-right whitespace-nowrap">Status</th>
+                        <th>Driver Name</th>
+                        <th>Phone Number</th>
+                        <th>Date Verified</th>
+                        <th>Reward Earned</th>
+                        <th style={{ textAlign: "right" }}>Status</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-800/60">
+                    <tbody>
                       {referrals.map((r: any) => {
                         const isTest = r.driver_name?.includes("[TEST]");
                         const cleanName = r.driver_name?.replace("[TEST]", "").trim() || "Riksho Partner";
                         return (
-                          <tr key={r.id} className="hover:bg-slate-800/30 transition">
-                            <td className="py-4 px-5 font-semibold text-white">
-                              <div className="flex items-center gap-2">
+                          <tr key={r.id}>
+                            <td style={{ fontWeight: 700, color: "#FFFFFF" }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                                 <span>{cleanName}</span>
                                 {isTest && (
-                                  <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 uppercase tracking-wider">
+                                  <span style={{ fontSize: 10, fontWeight: 800, background: "rgba(99, 102, 241, 0.2)", color: "#A5B4FC", padding: "2px 6px", borderRadius: 4, border: "1px solid rgba(99, 102, 241, 0.3)" }}>
                                     TEST
                                   </span>
                                 )}
                               </div>
                             </td>
-                            <td className="py-4 px-5 text-slate-300 font-mono">
-                              {r.driver_phone}
+                            <td style={{ fontFamily: "monospace", color: "var(--pr-text-muted)" }}>
+                              {r.driver_phone || "—"}
                             </td>
-                          <td className="py-4 px-5 text-slate-400">
-                            {new Date(r.created_at).toLocaleDateString()} {new Date(r.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                          </td>
-                          <td className="py-4 px-5 font-bold text-emerald-400">
-                            +₹{(r.reward_amount / 100).toFixed(2)}
-                          </td>
-                          <td className="py-4 px-5 text-right">
-                            <span className="inline-flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-2.5 py-1 rounded-full text-[11px] font-semibold">
-                              <CheckCircle2 size={12} /> Verified
-                            </span>
-                          </td>
-                        </tr>
-                      );
-                    })}
+                            <td style={{ color: "var(--pr-text-muted)" }}>
+                              {new Date(r.created_at).toLocaleDateString()} {new Date(r.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                            </td>
+                            <td style={{ fontWeight: 800, color: "#34D399" }}>
+                              ₹{(r.reward_amount / 100).toFixed(2)}
+                            </td>
+                            <td style={{ textAlign: "right" }}>
+                              <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "var(--pr-emerald-soft)", border: "1px solid var(--pr-emerald-border)", color: "#34D399", padding: "4px 10px", borderRadius: 9999, fontSize: 11, fontWeight: 700 }}>
+                                <CheckCircle2 size={13} /> Verified
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
@@ -476,67 +453,66 @@ export default function PromoterDashboard() {
             </div>
           )}
 
-          {/* TAB 2: Payouts Table */}
           {activeTab === "payouts" && (
-            <div className="bg-slate-900/60 border border-slate-800/80 rounded-2xl overflow-hidden shadow-xl">
+            <div className="pr-table-card" style={{ marginTop: 16 }}>
               {payouts.length === 0 ? (
-                <div className="text-center py-16 px-4 space-y-4">
-                  <div className="w-14 h-14 rounded-2xl bg-slate-800/80 text-slate-400 flex items-center justify-center mx-auto border border-slate-700">
-                    <Wallet size={28} />
+                <div style={{ textAlign: "center", padding: "60px 20px", display: "flex", flexDirection: "column", gap: 14, alignItems: "center" }}>
+                  <div className="pr-perk-icon emerald" style={{ width: 56, height: 56, borderRadius: 16 }}>
+                    <Wallet size={26} />
                   </div>
-                  <div className="space-y-1">
-                    <h3 className="text-base font-bold text-white">No Payout Requests Yet</h3>
-                    <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                  <div>
+                    <h3 style={{ fontSize: 16, fontWeight: 700, color: "#FFFFFF", marginBottom: 4 }}>No Payout Requests Yet</h3>
+                    <p style={{ fontSize: 13, color: "var(--pr-text-muted)", maxWidth: 360 }}>
                       Once you reach ₹10 in available balance, you can request a withdrawal to your UPI or Bank.
                     </p>
                   </div>
                 </div>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs">
-                    <thead className="bg-slate-950/60 border-b border-slate-800 text-slate-400 uppercase tracking-wider font-semibold">
+                <div className="pr-table-wrapper">
+                  <table className="pr-table">
+                    <thead>
                       <tr>
-                        <th className="py-3 px-4 sm:px-5 whitespace-nowrap">Requested Date</th>
-                        <th className="py-3 px-4 sm:px-5 whitespace-nowrap">Amount</th>
-                        <th className="py-3 px-4 sm:px-5 whitespace-nowrap">Payout Destination</th>
-                        <th className="py-3 px-4 sm:px-5 whitespace-nowrap">Reference / Notes</th>
-                        <th className="py-3 px-4 sm:px-5 text-right whitespace-nowrap">Status</th>
+                        <th>Requested Date</th>
+                        <th>Amount</th>
+                        <th>Payout Destination</th>
+                        <th>Reference / Notes</th>
+                        <th style={{ textAlign: "right" }}>Status</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-800/60">
+                    <tbody>
                       {payouts.map((p: any) => (
-                        <tr key={p.id} className="hover:bg-slate-800/30 transition">
-                          <td className="py-3.5 px-4 sm:px-5 text-slate-400 whitespace-nowrap">
+                        <tr key={p.id}>
+                          <td style={{ color: "var(--pr-text-muted)" }}>
                             {new Date(p.requested_at).toLocaleDateString()} {new Date(p.requested_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                           </td>
-                          <td className="py-3.5 px-4 sm:px-5 font-bold text-white text-sm whitespace-nowrap">
+                          <td style={{ fontWeight: 800, color: "#FFFFFF", fontSize: 15 }}>
                             ₹{(p.amount / 100).toFixed(2)}
                           </td>
-                          <td className="py-3.5 px-4 sm:px-5 text-slate-300 whitespace-nowrap">
+                          <td>
                             {p.payout_method === "upi" ? (
-                              <div className="font-mono text-indigo-300">UPI: {p.upi_id}</div>
+                              <div style={{ fontFamily: "monospace", color: "#A5B4FC" }}>UPI: {p.upi_id}</div>
                             ) : (
                               <div>
-                                <span className="font-medium text-white">{p.bank_name || "Bank"}</span> (A/C: {p.bank_account_no})
+                                <strong style={{ color: "#FFFFFF" }}>{p.bank_name || "Bank"}</strong> (A/C: {p.bank_account_no})
                               </div>
                             )}
                           </td>
-                          <td className="py-3.5 px-4 sm:px-5 text-slate-400 font-mono text-[11px] whitespace-nowrap">
+                          <td style={{ fontFamily: "monospace", fontSize: 12, color: "var(--pr-text-muted)" }}>
                             {p.transaction_ref ? `Txn: ${p.transaction_ref}` : p.admin_notes || "—"}
                           </td>
-                          <td className="py-3.5 px-4 sm:px-5 text-right whitespace-nowrap">
+                          <td style={{ textAlign: "right" }}>
                             {p.status === "paid" && (
-                              <span className="inline-flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-2.5 py-1 rounded-full text-[11px] font-semibold">
+                              <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "var(--pr-emerald-soft)", border: "1px solid var(--pr-emerald-border)", color: "#34D399", padding: "4px 10px", borderRadius: 9999, fontSize: 11, fontWeight: 700 }}>
                                 <CheckCircle2 size={12} /> Paid
                               </span>
                             )}
                             {p.status === "pending" && (
-                              <span className="inline-flex items-center gap-1 bg-amber-500/10 border border-amber-500/20 text-amber-400 px-2.5 py-1 rounded-full text-[11px] font-semibold">
+                              <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "var(--pr-amber-soft)", border: "1px solid var(--pr-amber-border)", color: "#FBBF24", padding: "4px 10px", borderRadius: 9999, fontSize: 11, fontWeight: 700 }}>
                                 <Clock size={12} /> In Review
                               </span>
                             )}
                             {p.status === "rejected" && (
-                              <span className="inline-flex items-center gap-1 bg-rose-500/10 border border-rose-500/20 text-rose-400 px-2.5 py-1 rounded-full text-[11px] font-semibold">
+                              <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "var(--pr-rose-soft)", border: "1px solid var(--pr-rose-border)", color: "#FB7185", padding: "4px 10px", borderRadius: 9999, fontSize: 11, fontWeight: 700 }}>
                                 <AlertCircle size={12} /> Rejected
                               </span>
                             )}
@@ -552,77 +528,70 @@ export default function PromoterDashboard() {
         </div>
       </main>
 
-      {/* MODAL 1: QR Scanner */}
       {scannerOpen && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-5 sm:p-6 space-y-4 sm:space-y-5 shadow-2xl relative max-h-[92vh] overflow-y-auto">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-400 flex items-center justify-center border border-indigo-500/20">
-                  <QrCode size={16} />
-                </div>
-                <h3 className="font-bold text-white text-sm sm:text-base">Scan Driver QR Code</h3>
+        <div className="pr-modal-overlay">
+          <div className="pr-modal-box">
+            <div className="pr-modal-header">
+              <div className="pr-modal-title">
+                <QrCode size={18} color="#818CF8" /> Scan Driver QR Code
               </div>
-              <button
-                onClick={handleCloseScanner}
-                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition cursor-pointer"
-              >
-                <X size={18} />
+              <button onClick={handleCloseScanner} style={{ color: "var(--pr-text-muted)", background: "none", border: "none", cursor: "pointer" }}>
+                <X size={20} />
               </button>
             </div>
 
-            {/* Status alerts */}
             {scanError && (
-              <div className="bg-rose-500/10 border border-rose-500/20 text-rose-300 p-3 sm:p-3.5 rounded-xl text-xs flex items-center gap-2">
-                <AlertCircle size={16} className="shrink-0 text-rose-400" />
+              <div className="pr-alert error">
+                <AlertCircle size={16} style={{ flexShrink: 0 }} />
                 <span>{scanError}</span>
               </div>
             )}
 
             {scanSuccess && (
-              <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 p-4 rounded-xl text-xs space-y-2">
-                <div className="flex items-center gap-2 font-bold text-emerald-400 text-sm">
-                  <CheckCircle2 size={18} /> Recruit Verified Successfully!
+              <div className="pr-alert success" style={{ flexDirection: "column", alignItems: "flex-start", gap: 8 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, fontWeight: 700 }}>
+                  <CheckCircle2 size={16} /> Recruit Verified Successfully!
                 </div>
-                <p>{scanSuccess.message}</p>
+                <p style={{ fontSize: 12 }}>{scanSuccess.message}</p>
                 <button
                   onClick={() => {
                     setScanSuccess(null);
                     setScannerOpen(false);
                   }}
-                  className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 rounded-lg text-xs mt-2 transition cursor-pointer"
+                  className="pr-btn-primary pr-btn-emerald"
+                  style={{ height: 36, fontSize: 12, marginTop: 6 }}
                 >
                   Done
                 </button>
               </div>
             )}
 
-            {/* Camera View */}
             {!scanSuccess && (
-              <div className="space-y-4">
-                <div className="rounded-2xl overflow-hidden bg-black max-w-[280px] sm:max-w-[320px] aspect-square mx-auto flex items-center justify-center border border-slate-800 relative shadow-inner">
-                  <div id="promoter-qr-reader" className="w-full h-full" />
+              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                <div style={{ borderRadius: 18, overflow: "hidden", background: "#000000", maxWidth: 300, aspectRatio: "1/1", margin: "0 auto", border: "1px solid var(--pr-border)", width: "100%" }}>
+                  <div id="promoter-qr-reader" style={{ width: "100%", height: "100%" }} />
                 </div>
 
-                <div className="text-center text-xs text-slate-400">
+                <div style={{ textAlign: "center", fontSize: 12, color: "var(--pr-text-muted)" }}>
                   Point camera at the QR code displayed in the driver's Riksho Buddy app.
                 </div>
 
-                {/* Manual Fallback Entry */}
-                <div className="border-t border-slate-800 pt-3.5 space-y-2">
-                  <span className="text-[11px] text-slate-400 block font-medium">Or enter Driver ID manually:</span>
-                  <div className="flex gap-2">
+                <div style={{ borderTop: "1px solid var(--pr-border)", paddingTop: 14, display: "flex", flexDirection: "column", gap: 8 }}>
+                  <span style={{ fontSize: 11, color: "var(--pr-text-muted)", fontWeight: 600 }}>Or enter Driver ID manually:</span>
+                  <div style={{ display: "flex", gap: 8 }}>
                     <input
                       type="text"
                       value={manualDriverId}
                       onChange={(e) => setManualDriverId(e.target.value)}
                       placeholder="e.g. 550e8400-e29b-41d4-a716-446655440000"
-                      className="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-mono"
+                      className="pr-text-input"
+                      style={{ fontSize: 12, fontFamily: "monospace" }}
                     />
                     <button
                       onClick={() => handleLinkDriver(manualDriverId)}
                       disabled={scanLoading || !manualDriverId.trim()}
-                      className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white px-3.5 sm:px-4 py-2 rounded-xl text-xs font-semibold transition cursor-pointer"
+                      className="pr-btn-primary"
+                      style={{ width: "auto", padding: "0 18px", height: 42, fontSize: 12 }}
                     >
                       {scanLoading ? <RefreshCw className="animate-spin" size={14} /> : "Verify"}
                     </button>
@@ -634,49 +603,42 @@ export default function PromoterDashboard() {
         </div>
       )}
 
-      {/* MODAL 2: Payout / Withdrawal */}
       {payoutOpen && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-5 sm:p-6 space-y-4 sm:space-y-5 shadow-2xl relative max-h-[92vh] overflow-y-auto">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center border border-emerald-500/20">
-                  <Wallet size={16} />
-                </div>
-                <h3 className="font-bold text-white text-sm sm:text-base">Request Withdrawal</h3>
+        <div className="pr-modal-overlay">
+          <div className="pr-modal-box">
+            <div className="pr-modal-header">
+              <div className="pr-modal-title">
+                <Wallet size={18} color="#34D399" /> Request Withdrawal
               </div>
-              <button
-                onClick={() => setPayoutOpen(false)}
-                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition cursor-pointer"
-              >
-                <X size={18} />
+              <button onClick={() => setPayoutOpen(false)} style={{ color: "var(--pr-text-muted)", background: "none", border: "none", cursor: "pointer" }}>
+                <X size={20} />
               </button>
             </div>
 
-            <div className="bg-slate-950/80 border border-slate-800 p-3 sm:p-3.5 rounded-xl flex items-center justify-between text-xs">
-              <span className="text-slate-400">Available Balance:</span>
-              <span className="text-emerald-400 font-bold text-sm">₹{(stats.available_balance / 100).toFixed(2)}</span>
+            <div style={{ background: "rgba(0,0,0,0.5)", border: "1px solid var(--pr-border)", padding: "12px 16px", borderRadius: 14, display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13, marginBottom: 14 }}>
+              <span style={{ color: "var(--pr-text-muted)" }}>Available Balance:</span>
+              <span style={{ fontWeight: 800, color: "#34D399", fontSize: 16 }}>₹{(stats.available_balance / 100).toFixed(2)}</span>
             </div>
 
             {payoutError && (
-              <div className="bg-rose-500/10 border border-rose-500/20 text-rose-300 p-3 sm:p-3.5 rounded-xl text-xs flex items-center gap-2">
-                <AlertCircle size={16} className="shrink-0 text-rose-400" />
+              <div className="pr-alert error">
+                <AlertCircle size={16} style={{ flexShrink: 0 }} />
                 <span>{payoutError}</span>
               </div>
             )}
 
             {payoutSuccess && (
-              <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 p-3 sm:p-3.5 rounded-xl text-xs flex items-center gap-2">
-                <CheckCircle2 size={16} className="shrink-0 text-emerald-400" />
+              <div className="pr-alert success">
+                <CheckCircle2 size={16} style={{ flexShrink: 0 }} />
                 <span>{payoutSuccess}</span>
               </div>
             )}
 
-            <form onSubmit={handleRequestPayout} className="space-y-3.5 sm:space-y-4">
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-300">Amount to Withdraw (₹)</label>
-                <div className="relative">
-                  <span className="absolute left-3.5 top-2.5 text-slate-400 font-semibold text-sm">₹</span>
+            <form onSubmit={handleRequestPayout} className="pr-form">
+              <div className="pr-input-group">
+                <label className="pr-input-label">Amount to Withdraw (₹)</label>
+                <div style={{ position: "relative" }}>
+                  <span style={{ position: "absolute", left: 14, top: 12, color: "#94A3B8", fontWeight: 700 }}>₹</span>
                   <input
                     type="number"
                     step="1"
@@ -686,23 +648,33 @@ export default function PromoterDashboard() {
                     value={payoutAmount}
                     onChange={(e) => setPayoutAmount(e.target.value)}
                     placeholder="e.g. 100"
-                    className="w-full bg-slate-950 border border-slate-700 focus:border-indigo-500 rounded-xl pl-8 pr-4 py-2.5 text-sm text-white focus:outline-none"
+                    className="pr-text-input"
+                    style={{ paddingLeft: 32 }}
                   />
                 </div>
               </div>
 
-              {/* Method Toggle */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-300">Payout Method</label>
-                <div className="grid grid-cols-2 gap-2">
+              <div className="pr-input-group">
+                <label className="pr-input-label">Payout Method</label>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                   <button
                     type="button"
                     onClick={() => setPayoutMethod("upi")}
-                    className={`py-2.5 rounded-xl text-xs font-semibold border transition cursor-pointer flex items-center justify-center gap-1.5 ${
-                      payoutMethod === "upi"
-                        ? "bg-indigo-600/20 border-indigo-500 text-white"
-                        : "bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200"
-                    }`}
+                    style={{
+                      height: 42,
+                      borderRadius: 12,
+                      fontSize: 13,
+                      fontWeight: 700,
+                      border: "1px solid",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 6,
+                      background: payoutMethod === "upi" ? "rgba(99, 102, 241, 0.2)" : "rgba(0,0,0,0.4)",
+                      borderColor: payoutMethod === "upi" ? "#6366F1" : "var(--pr-border)",
+                      color: payoutMethod === "upi" ? "#FFFFFF" : "var(--pr-text-muted)",
+                    }}
                   >
                     <Wallet size={14} /> UPI ID
                   </button>
@@ -710,80 +682,91 @@ export default function PromoterDashboard() {
                   <button
                     type="button"
                     onClick={() => setPayoutMethod("bank")}
-                    className={`py-2.5 rounded-xl text-xs font-semibold border transition cursor-pointer flex items-center justify-center gap-1.5 ${
-                      payoutMethod === "bank"
-                        ? "bg-indigo-600/20 border-indigo-500 text-white"
-                        : "bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200"
-                    }`}
+                    style={{
+                      height: 42,
+                      borderRadius: 12,
+                      fontSize: 13,
+                      fontWeight: 700,
+                      border: "1px solid",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 6,
+                      background: payoutMethod === "bank" ? "rgba(99, 102, 241, 0.2)" : "rgba(0,0,0,0.4)",
+                      borderColor: payoutMethod === "bank" ? "#6366F1" : "var(--pr-border)",
+                      color: payoutMethod === "bank" ? "#FFFFFF" : "var(--pr-text-muted)",
+                    }}
                   >
                     <Building size={14} /> Bank Account
                   </button>
                 </div>
               </div>
 
-              {/* UPI Input */}
               {payoutMethod === "upi" && (
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-slate-300">UPI ID / VPA *</label>
+                <div className="pr-input-group">
+                  <label className="pr-input-label">UPI ID / VPA *</label>
                   <input
                     type="text"
                     required
                     value={upiId}
                     onChange={(e) => setUpiId(e.target.value)}
-                    placeholder="mobile@paytm or user@okhdfcbank"
-                    className="w-full bg-slate-950 border border-slate-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none font-mono"
+                    placeholder="mobile@paytm or name@okhdfcbank"
+                    className="pr-text-input"
+                    style={{ fontFamily: "monospace" }}
                   />
                 </div>
               )}
 
-              {/* Bank Inputs */}
               {payoutMethod === "bank" && (
-                <div className="space-y-3">
-                  <div className="space-y-1">
-                    <label className="text-xs font-semibold text-slate-300">Account Holder Name *</label>
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  <div className="pr-input-group">
+                    <label className="pr-input-label">Account Holder Name *</label>
                     <input
                       type="text"
                       required
                       value={accountHolderName}
                       onChange={(e) => setAccountHolderName(e.target.value)}
                       placeholder="Account holder's name"
-                      className="w-full bg-slate-950 border border-slate-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none"
+                      className="pr-text-input"
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    <div className="space-y-1">
-                      <label className="text-xs font-semibold text-slate-300">Account No *</label>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                    <div className="pr-input-group">
+                      <label className="pr-input-label">Account No *</label>
                       <input
                         type="text"
                         required
                         value={bankAccountNo}
                         onChange={(e) => setBankAccountNo(e.target.value)}
                         placeholder="Account Number"
-                        className="w-full bg-slate-950 border border-slate-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none font-mono"
+                        className="pr-text-input"
+                        style={{ fontFamily: "monospace" }}
                       />
                     </div>
-                    <div className="space-y-1">
-                      <label className="text-xs font-semibold text-slate-300">IFSC Code *</label>
+                    <div className="pr-input-group">
+                      <label className="pr-input-label">IFSC Code *</label>
                       <input
                         type="text"
                         required
                         value={bankIfsc}
                         onChange={(e) => setBankIfsc(e.target.value.toUpperCase())}
                         placeholder="SBIN0001234"
-                        className="w-full bg-slate-950 border border-slate-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none font-mono uppercase"
+                        className="pr-text-input"
+                        style={{ fontFamily: "monospace", textTransform: "uppercase" }}
                       />
                     </div>
                   </div>
 
-                  <div className="space-y-1">
-                    <label className="text-xs font-semibold text-slate-300">Bank Name (Optional)</label>
+                  <div className="pr-input-group">
+                    <label className="pr-input-label">Bank Name (Optional)</label>
                     <input
                       type="text"
                       value={bankName}
                       onChange={(e) => setBankName(e.target.value)}
                       placeholder="e.g. State Bank of India"
-                      className="w-full bg-slate-950 border border-slate-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none"
+                      className="pr-text-input"
                     />
                   </div>
                 </div>
@@ -792,7 +775,8 @@ export default function PromoterDashboard() {
               <button
                 type="submit"
                 disabled={payoutLoading || !payoutAmount}
-                className="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-bold py-3 rounded-xl shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 transition text-xs cursor-pointer active:scale-95"
+                className="pr-btn-primary pr-btn-emerald"
+                style={{ marginTop: 6 }}
               >
                 {payoutLoading ? <RefreshCw className="animate-spin" size={16} /> : "Submit Withdrawal Request"}
               </button>
