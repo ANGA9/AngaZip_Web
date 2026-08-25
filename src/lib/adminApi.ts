@@ -7,9 +7,17 @@ export async function adminFetch(endpoint: string, options: RequestInit = {}) {
   const { data: { session } } = await supabaseAdminClient.auth.getSession();
   
   const headers: Record<string, string> = {
-    "Content-Type": "application/json",
     ...(options.headers as Record<string, string> || {}),
   };
+
+  // Only set Content-Type: application/json if there is actually a body payload!
+  if (
+    options.body &&
+    !(options.body instanceof FormData) &&
+    !headers["Content-Type"]
+  ) {
+    headers["Content-Type"] = "application/json";
+  }
 
   if (session?.access_token) {
     headers["Authorization"] = `Bearer ${session.access_token}`;
@@ -31,5 +39,12 @@ export async function adminFetch(endpoint: string, options: RequestInit = {}) {
     throw new Error(errMessage);
   }
 
-  return response.json();
+  // If response has no content (204 No Content or empty string)
+  const contentType = response.headers.get("content-type");
+  if (response.status === 204 || (contentType && !contentType.includes("application/json"))) {
+    return { success: true };
+  }
+
+  const text = await response.text();
+  return text ? JSON.parse(text) : { success: true };
 }
