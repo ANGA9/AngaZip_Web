@@ -437,14 +437,24 @@ export default function PromoterDashboard() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-800/60">
-                      {referrals.map((r: any) => (
-                        <tr key={r.id} className="hover:bg-slate-800/30 transition">
-                          <td className="py-4 px-5 font-semibold text-white">
-                            {r.driver_name}
-                          </td>
-                          <td className="py-4 px-5 text-slate-300 font-mono">
-                            {r.driver_phone}
-                          </td>
+                      {referrals.map((r: any) => {
+                        const isTest = r.driver_name?.includes("[TEST]");
+                        const cleanName = r.driver_name?.replace("[TEST]", "").trim() || "Riksho Partner";
+                        return (
+                          <tr key={r.id} className="hover:bg-slate-800/30 transition">
+                            <td className="py-4 px-5 font-semibold text-white">
+                              <div className="flex items-center gap-2">
+                                <span>{cleanName}</span>
+                                {isTest && (
+                                  <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 uppercase tracking-wider">
+                                    TEST
+                                  </span>
+                                )}
+                              </div>
+                            </td>
+                            <td className="py-4 px-5 text-slate-300 font-mono">
+                              {r.driver_phone}
+                            </td>
                           <td className="py-4 px-5 text-slate-400">
                             {new Date(r.created_at).toLocaleDateString()} {new Date(r.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                           </td>
@@ -457,7 +467,8 @@ export default function PromoterDashboard() {
                             </span>
                           </td>
                         </tr>
-                      ))}
+                      );
+                    })}
                     </tbody>
                   </table>
                 </div>
