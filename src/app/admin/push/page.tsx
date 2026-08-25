@@ -60,15 +60,19 @@ export default function PushNotificationsPage() {
     try {
       setLoading(true);
       const data = await adminFetch(`/admin/push/history?page=${page}&limit=${ITEMS_PER_PAGE}`);
-      if (data && data.items) {
-        setHistory(data.items);
+      if (data && Array.isArray(data.items)) {
+        setHistory(data.items.slice(0, ITEMS_PER_PAGE));
         setTotalItems(data.total || 0);
-        setTotalPages(data.totalPages || 1);
-        setCurrentPage(data.page || 0);
+        setTotalPages(data.totalPages || Math.ceil((data.total || 0) / ITEMS_PER_PAGE) || 1);
+        setCurrentPage(data.page ?? page);
       } else if (Array.isArray(data)) {
-        setHistory(data);
+        // Fallback: client-side pagination if backend returned raw array
+        const start = page * ITEMS_PER_PAGE;
+        const sliced = data.slice(start, start + ITEMS_PER_PAGE);
+        setHistory(sliced);
         setTotalItems(data.length);
         setTotalPages(Math.ceil(data.length / ITEMS_PER_PAGE) || 1);
+        setCurrentPage(page);
       }
     } catch (err: any) {
       console.error("Failed to fetch push history", err);
@@ -534,7 +538,7 @@ export default function PushNotificationsPage() {
                     </td>
                   </tr>
                 ) : (
-                  history.map((item) => {
+                  history.slice(0, ITEMS_PER_PAGE).map((item) => {
                     const badge = getTargetBadge(item.target);
                     return (
                       <tr key={item.id} style={{ borderBottom: "1px solid var(--admin-border)" }}>
@@ -590,7 +594,7 @@ export default function PushNotificationsPage() {
           </div>
 
           {/* Pagination Footer (8 Items per Page) */}
-          {totalPages > 1 && (
+          {totalItems > 0 && (
             <div
               style={{
                 padding: "14px 24px",
