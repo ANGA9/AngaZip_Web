@@ -249,54 +249,54 @@ export default function PromoterDashboard() {
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-indigo-500 selection:text-white">
       {/* Top Navbar */}
       <header className="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur-md sticky top-0 z-30">
-        <div className="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-indigo-400 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-              <Sparkles className="text-white" size={18} />
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-indigo-400 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+              <Sparkles className="text-white" size={16} />
             </div>
-            <div>
-              <span className="font-black tracking-tight text-lg text-white">RIKSHO</span>
-              <span className="ml-2 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                Verified Promoter
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <span className="font-black tracking-tight text-base sm:text-lg text-white">RIKSHO</span>
+              <span className="px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                Promoter
               </span>
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
-            <div className="hidden sm:flex items-center gap-2 text-xs text-slate-300 bg-slate-800/60 border border-slate-700/60 px-3 py-1.5 rounded-xl">
+          <div className="flex items-center gap-2.5 sm:gap-4">
+            <div className="hidden md:flex items-center gap-2 text-xs text-slate-300 bg-slate-800/60 border border-slate-700/60 px-3 py-1.5 rounded-xl">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>{promoter.name || "Promoter"} ({promoter.phone})</span>
+              <span className="truncate max-w-[200px]">{promoter.name || "Promoter"} ({promoter.phone})</span>
             </div>
             <button
               onClick={handleSignOut}
-              className="text-xs text-slate-400 hover:text-rose-400 flex items-center gap-1.5 border border-slate-800 hover:border-rose-500/30 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-rose-500/10 transition"
+              className="text-xs text-slate-400 hover:text-rose-400 flex items-center gap-1.5 border border-slate-800 hover:border-rose-500/30 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-rose-500/10 transition cursor-pointer"
             >
-              <LogOut size={13} /> Sign Out
+              <LogOut size={13} /> <span className="hidden sm:inline">Sign Out</span>
             </button>
           </div>
         </div>
       </header>
 
       {/* Main Container */}
-      <main className="max-w-6xl mx-auto px-5 py-8 flex-1 w-full space-y-8">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8 flex-1 w-full space-y-6 sm:space-y-8">
         {/* Welcome & Primary Action Banner */}
-        <div className="bg-gradient-to-br from-indigo-900/40 via-slate-900/80 to-slate-900/40 border border-indigo-500/20 rounded-3xl p-6 sm:p-8 relative overflow-hidden backdrop-blur-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div className="bg-gradient-to-br from-indigo-900/40 via-slate-900/80 to-slate-900/40 border border-indigo-500/20 rounded-3xl p-5 sm:p-8 relative overflow-hidden backdrop-blur-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-2xl">
           <div className="space-y-2 z-10">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 text-xs font-semibold">
               <TrendingUp size={14} /> Active Field Campaign
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-white">
               Welcome back, {promoter.name || "Promoter"}!
             </h1>
-            <p className="text-slate-400 text-xs sm:text-sm max-w-lg">
+            <p className="text-slate-400 text-xs sm:text-sm max-w-lg leading-relaxed">
               Earn <span className="text-emerald-400 font-bold">₹20 for every driver</span> you onboard. Scan the driver's QR code from their Riksho Buddy app to verify and record your recruit instantly.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 z-10 w-full md:w-auto">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 z-10 w-full md:w-auto">
             <button
               onClick={() => setScannerOpen(true)}
-              className="flex-1 md:flex-none bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-6 py-3.5 rounded-2xl shadow-xl shadow-indigo-600/30 flex items-center justify-center gap-2.5 transition text-sm cursor-pointer"
+              className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-6 py-3.5 rounded-2xl shadow-xl shadow-indigo-600/30 flex items-center justify-center gap-2.5 transition text-sm cursor-pointer active:scale-95"
             >
               <QrCode size={18} />
               <span>Scan Driver QR</span>
@@ -305,7 +305,7 @@ export default function PromoterDashboard() {
             <button
               onClick={() => setPayoutOpen(true)}
               disabled={stats.available_balance < 1000}
-              className="flex-1 md:flex-none bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-slate-100 font-semibold px-5 py-3.5 rounded-2xl border border-slate-700 flex items-center justify-center gap-2 transition text-sm cursor-pointer disabled:cursor-not-allowed"
+              className="w-full sm:w-auto bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-slate-100 font-semibold px-5 py-3.5 rounded-2xl border border-slate-700 flex items-center justify-center gap-2 transition text-sm cursor-pointer disabled:cursor-not-allowed active:scale-95"
             >
               <Wallet size={16} className="text-emerald-400" />
               <span>Withdraw Payout</span>
@@ -314,92 +314,92 @@ export default function PromoterDashboard() {
         </div>
 
         {/* 4 Stats Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-5 space-y-3">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div className="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-4 sm:p-5 space-y-2 sm:space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-slate-400 font-medium">Total Recruits</span>
-              <div className="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-400 flex items-center justify-center border border-indigo-500/20">
-                <Users size={16} />
+              <span className="text-[11px] sm:text-xs text-slate-400 font-medium">Total Recruits</span>
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-indigo-500/10 text-indigo-400 flex items-center justify-center border border-indigo-500/20">
+                <Users size={14} />
               </div>
             </div>
-            <div className="text-2xl sm:text-3xl font-black text-white">
+            <div className="text-xl sm:text-2xl lg:text-3xl font-black text-white">
               {stats.total_recruits}
             </div>
-            <div className="text-[11px] text-slate-500">Verified drivers onboarded</div>
+            <div className="text-[10px] sm:text-[11px] text-slate-500">Verified drivers</div>
           </div>
 
-          <div className="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-5 space-y-3">
+          <div className="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-4 sm:p-5 space-y-2 sm:space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-slate-400 font-medium">Total Earnings</span>
-              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center border border-emerald-500/20">
-                <TrendingUp size={16} />
+              <span className="text-[11px] sm:text-xs text-slate-400 font-medium">Total Earnings</span>
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center border border-emerald-500/20">
+                <TrendingUp size={14} />
               </div>
             </div>
-            <div className="text-2xl sm:text-3xl font-black text-emerald-400">
+            <div className="text-xl sm:text-2xl lg:text-3xl font-black text-emerald-400">
               ₹{(stats.total_earnings / 100).toFixed(2)}
             </div>
-            <div className="text-[11px] text-slate-500">Lifetime reward sum</div>
+            <div className="text-[10px] sm:text-[11px] text-slate-500">Lifetime rewards</div>
           </div>
 
-          <div className="bg-slate-900/60 border border-indigo-500/30 bg-indigo-950/20 rounded-2xl p-5 space-y-3">
+          <div className="bg-slate-900/60 border border-indigo-500/30 bg-indigo-950/20 rounded-2xl p-4 sm:p-5 space-y-2 sm:space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-indigo-300 font-medium">Available Balance</span>
-              <div className="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-300 flex items-center justify-center border border-indigo-500/30">
-                <Wallet size={16} />
+              <span className="text-[11px] sm:text-xs text-indigo-300 font-medium">Available Balance</span>
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-indigo-500/20 text-indigo-300 flex items-center justify-center border border-indigo-500/30">
+                <Wallet size={14} />
               </div>
             </div>
-            <div className="text-2xl sm:text-3xl font-black text-white">
+            <div className="text-xl sm:text-2xl lg:text-3xl font-black text-white">
               ₹{(stats.available_balance / 100).toFixed(2)}
             </div>
-            <div className="text-[11px] text-indigo-400/80">Ready for instant payout</div>
+            <div className="text-[10px] sm:text-[11px] text-indigo-400/80">Ready to withdraw</div>
           </div>
 
-          <div className="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-5 space-y-3">
+          <div className="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-4 sm:p-5 space-y-2 sm:space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-slate-400 font-medium">Withdrawn Sum</span>
-              <div className="w-8 h-8 rounded-lg bg-slate-800 text-slate-300 flex items-center justify-center border border-slate-700">
-                <CreditCard size={16} />
+              <span className="text-[11px] sm:text-xs text-slate-400 font-medium">Withdrawn Sum</span>
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-slate-800 text-slate-300 flex items-center justify-center border border-slate-700">
+                <CreditCard size={14} />
               </div>
             </div>
-            <div className="text-2xl sm:text-3xl font-black text-slate-300">
+            <div className="text-xl sm:text-2xl lg:text-3xl font-black text-slate-300">
               ₹{(stats.withdrawn_amount / 100).toFixed(2)}
             </div>
-            <div className="text-[11px] text-slate-500">Transferred to UPI/Bank</div>
+            <div className="text-[10px] sm:text-[11px] text-slate-500">Transferred to UPI/Bank</div>
           </div>
         </div>
 
         {/* Section Tabs */}
         <div className="space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-            <div className="flex items-center gap-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-800 pb-3 gap-3">
+            <div className="flex items-center gap-2 sm:gap-4 overflow-x-auto no-scrollbar">
               <button
                 onClick={() => setActiveTab("recruits")}
-                className={`text-sm font-bold pb-2 transition flex items-center gap-2 cursor-pointer ${
+                className={`text-xs sm:text-sm font-bold pb-2 transition flex items-center gap-1.5 sm:gap-2 cursor-pointer whitespace-nowrap ${
                   activeTab === "recruits"
                     ? "text-indigo-400 border-b-2 border-indigo-500"
                     : "text-slate-400 hover:text-slate-200"
                 }`}
               >
-                <Users size={16} /> Recruited Drivers ({referrals.length})
+                <Users size={15} /> Recruits ({referrals.length})
               </button>
 
               <button
                 onClick={() => setActiveTab("payouts")}
-                className={`text-sm font-bold pb-2 transition flex items-center gap-2 cursor-pointer ${
+                className={`text-xs sm:text-sm font-bold pb-2 transition flex items-center gap-1.5 sm:gap-2 cursor-pointer whitespace-nowrap ${
                   activeTab === "payouts"
                     ? "text-indigo-400 border-b-2 border-indigo-500"
                     : "text-slate-400 hover:text-slate-200"
                 }`}
               >
-                <Wallet size={16} /> Payout History ({payouts.length})
+                <Wallet size={15} /> Payout History ({payouts.length})
               </button>
             </div>
 
             <button
               onClick={loadDashboard}
-              className="text-xs text-slate-400 hover:text-white flex items-center gap-1.5 transition"
+              className="text-xs text-slate-400 hover:text-white flex items-center gap-1.5 transition self-end sm:self-auto cursor-pointer"
             >
-              <RefreshCw size={12} /> Refresh
+              <RefreshCw size={12} /> Refresh Data
             </button>
           </div>
 
@@ -407,9 +407,9 @@ export default function PromoterDashboard() {
           {activeTab === "recruits" && (
             <div className="bg-slate-900/60 border border-slate-800/80 rounded-2xl overflow-hidden shadow-xl">
               {referrals.length === 0 ? (
-                <div className="text-center py-16 px-4 space-y-4">
-                  <div className="w-14 h-14 rounded-2xl bg-slate-800/80 text-slate-400 flex items-center justify-center mx-auto border border-slate-700">
-                    <QrCode size={28} />
+                <div className="text-center py-12 sm:py-16 px-4 space-y-4">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-slate-800/80 text-slate-400 flex items-center justify-center mx-auto border border-slate-700">
+                    <QrCode size={24} />
                   </div>
                   <div className="space-y-1">
                     <h3 className="text-base font-bold text-white">No Drivers Recruited Yet</h3>
@@ -429,11 +429,11 @@ export default function PromoterDashboard() {
                   <table className="w-full text-left text-xs">
                     <thead className="bg-slate-950/60 border-b border-slate-800 text-slate-400 uppercase tracking-wider font-semibold">
                       <tr>
-                        <th className="py-3.5 px-5">Driver Name</th>
-                        <th className="py-3.5 px-5">Phone Number</th>
-                        <th className="py-3.5 px-5">Date Verified</th>
-                        <th className="py-3.5 px-5">Reward Earned</th>
-                        <th className="py-3.5 px-5 text-right">Status</th>
+                        <th className="py-3 px-4 sm:px-5 whitespace-nowrap">Driver Name</th>
+                        <th className="py-3 px-4 sm:px-5 whitespace-nowrap">Phone Number</th>
+                        <th className="py-3 px-4 sm:px-5 whitespace-nowrap">Date Verified</th>
+                        <th className="py-3 px-4 sm:px-5 whitespace-nowrap">Reward</th>
+                        <th className="py-3 px-4 sm:px-5 text-right whitespace-nowrap">Status</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-800/60">
@@ -496,23 +496,23 @@ export default function PromoterDashboard() {
                   <table className="w-full text-left text-xs">
                     <thead className="bg-slate-950/60 border-b border-slate-800 text-slate-400 uppercase tracking-wider font-semibold">
                       <tr>
-                        <th className="py-3.5 px-5">Requested Date</th>
-                        <th className="py-3.5 px-5">Amount</th>
-                        <th className="py-3.5 px-5">Payout Destination</th>
-                        <th className="py-3.5 px-5">Reference / Notes</th>
-                        <th className="py-3.5 px-5 text-right">Status</th>
+                        <th className="py-3 px-4 sm:px-5 whitespace-nowrap">Requested Date</th>
+                        <th className="py-3 px-4 sm:px-5 whitespace-nowrap">Amount</th>
+                        <th className="py-3 px-4 sm:px-5 whitespace-nowrap">Payout Destination</th>
+                        <th className="py-3 px-4 sm:px-5 whitespace-nowrap">Reference / Notes</th>
+                        <th className="py-3 px-4 sm:px-5 text-right whitespace-nowrap">Status</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-800/60">
                       {payouts.map((p: any) => (
                         <tr key={p.id} className="hover:bg-slate-800/30 transition">
-                          <td className="py-4 px-5 text-slate-400">
+                          <td className="py-3.5 px-4 sm:px-5 text-slate-400 whitespace-nowrap">
                             {new Date(p.requested_at).toLocaleDateString()} {new Date(p.requested_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                           </td>
-                          <td className="py-4 px-5 font-bold text-white text-sm">
+                          <td className="py-3.5 px-4 sm:px-5 font-bold text-white text-sm whitespace-nowrap">
                             ₹{(p.amount / 100).toFixed(2)}
                           </td>
-                          <td className="py-4 px-5 text-slate-300">
+                          <td className="py-3.5 px-4 sm:px-5 text-slate-300 whitespace-nowrap">
                             {p.payout_method === "upi" ? (
                               <div className="font-mono text-indigo-300">UPI: {p.upi_id}</div>
                             ) : (
@@ -521,10 +521,10 @@ export default function PromoterDashboard() {
                               </div>
                             )}
                           </td>
-                          <td className="py-4 px-5 text-slate-400 font-mono text-[11px]">
+                          <td className="py-3.5 px-4 sm:px-5 text-slate-400 font-mono text-[11px] whitespace-nowrap">
                             {p.transaction_ref ? `Txn: ${p.transaction_ref}` : p.admin_notes || "—"}
                           </td>
-                          <td className="py-4 px-5 text-right">
+                          <td className="py-3.5 px-4 sm:px-5 text-right whitespace-nowrap">
                             {p.status === "paid" && (
                               <span className="inline-flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-2.5 py-1 rounded-full text-[11px] font-semibold">
                                 <CheckCircle2 size={12} /> Paid
@@ -554,18 +554,18 @@ export default function PromoterDashboard() {
 
       {/* MODAL 1: QR Scanner */}
       {scannerOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-5 shadow-2xl relative">
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-5 sm:p-6 space-y-4 sm:space-y-5 shadow-2xl relative max-h-[92vh] overflow-y-auto">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-400 flex items-center justify-center border border-indigo-500/20">
                   <QrCode size={16} />
                 </div>
-                <h3 className="font-bold text-white text-base">Scan Driver QR Code</h3>
+                <h3 className="font-bold text-white text-sm sm:text-base">Scan Driver QR Code</h3>
               </div>
               <button
                 onClick={handleCloseScanner}
-                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition"
+                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition cursor-pointer"
               >
                 <X size={18} />
               </button>
@@ -573,7 +573,7 @@ export default function PromoterDashboard() {
 
             {/* Status alerts */}
             {scanError && (
-              <div className="bg-rose-500/10 border border-rose-500/20 text-rose-300 p-3.5 rounded-xl text-xs flex items-center gap-2">
+              <div className="bg-rose-500/10 border border-rose-500/20 text-rose-300 p-3 sm:p-3.5 rounded-xl text-xs flex items-center gap-2">
                 <AlertCircle size={16} className="shrink-0 text-rose-400" />
                 <span>{scanError}</span>
               </div>
@@ -590,7 +590,7 @@ export default function PromoterDashboard() {
                     setScanSuccess(null);
                     setScannerOpen(false);
                   }}
-                  className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 rounded-lg text-xs mt-2 transition"
+                  className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 rounded-lg text-xs mt-2 transition cursor-pointer"
                 >
                   Done
                 </button>
@@ -600,16 +600,16 @@ export default function PromoterDashboard() {
             {/* Camera View */}
             {!scanSuccess && (
               <div className="space-y-4">
-                <div className="rounded-2xl overflow-hidden bg-black aspect-square flex items-center justify-center border border-slate-800 relative">
+                <div className="rounded-2xl overflow-hidden bg-black max-w-[280px] sm:max-w-[320px] aspect-square mx-auto flex items-center justify-center border border-slate-800 relative shadow-inner">
                   <div id="promoter-qr-reader" className="w-full h-full" />
                 </div>
 
                 <div className="text-center text-xs text-slate-400">
-                  Point your camera at the QR code displayed in the driver's Riksho Buddy app.
+                  Point camera at the QR code displayed in the driver's Riksho Buddy app.
                 </div>
 
                 {/* Manual Fallback Entry */}
-                <div className="border-t border-slate-800 pt-4 space-y-2">
+                <div className="border-t border-slate-800 pt-3.5 space-y-2">
                   <span className="text-[11px] text-slate-400 block font-medium">Or enter Driver ID manually:</span>
                   <div className="flex gap-2">
                     <input
@@ -617,12 +617,12 @@ export default function PromoterDashboard() {
                       value={manualDriverId}
                       onChange={(e) => setManualDriverId(e.target.value)}
                       placeholder="e.g. 550e8400-e29b-41d4-a716-446655440000"
-                      className="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
+                      className="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-mono"
                     />
                     <button
                       onClick={() => handleLinkDriver(manualDriverId)}
                       disabled={scanLoading || !manualDriverId.trim()}
-                      className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white px-4 py-2 rounded-xl text-xs font-semibold transition"
+                      className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white px-3.5 sm:px-4 py-2 rounded-xl text-xs font-semibold transition cursor-pointer"
                     >
                       {scanLoading ? <RefreshCw className="animate-spin" size={14} /> : "Verify"}
                     </button>
@@ -636,43 +636,43 @@ export default function PromoterDashboard() {
 
       {/* MODAL 2: Payout / Withdrawal */}
       {payoutOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-5 shadow-2xl relative">
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-5 sm:p-6 space-y-4 sm:space-y-5 shadow-2xl relative max-h-[92vh] overflow-y-auto">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center border border-emerald-500/20">
                   <Wallet size={16} />
                 </div>
-                <h3 className="font-bold text-white text-base">Request Withdrawal</h3>
+                <h3 className="font-bold text-white text-sm sm:text-base">Request Withdrawal</h3>
               </div>
               <button
                 onClick={() => setPayoutOpen(false)}
-                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition"
+                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition cursor-pointer"
               >
                 <X size={18} />
               </button>
             </div>
 
-            <div className="bg-slate-950/80 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between text-xs">
+            <div className="bg-slate-950/80 border border-slate-800 p-3 sm:p-3.5 rounded-xl flex items-center justify-between text-xs">
               <span className="text-slate-400">Available Balance:</span>
               <span className="text-emerald-400 font-bold text-sm">₹{(stats.available_balance / 100).toFixed(2)}</span>
             </div>
 
             {payoutError && (
-              <div className="bg-rose-500/10 border border-rose-500/20 text-rose-300 p-3.5 rounded-xl text-xs flex items-center gap-2">
+              <div className="bg-rose-500/10 border border-rose-500/20 text-rose-300 p-3 sm:p-3.5 rounded-xl text-xs flex items-center gap-2">
                 <AlertCircle size={16} className="shrink-0 text-rose-400" />
                 <span>{payoutError}</span>
               </div>
             )}
 
             {payoutSuccess && (
-              <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 p-3.5 rounded-xl text-xs flex items-center gap-2">
+              <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 p-3 sm:p-3.5 rounded-xl text-xs flex items-center gap-2">
                 <CheckCircle2 size={16} className="shrink-0 text-emerald-400" />
                 <span>{payoutSuccess}</span>
               </div>
             )}
 
-            <form onSubmit={handleRequestPayout} className="space-y-4">
+            <form onSubmit={handleRequestPayout} className="space-y-3.5 sm:space-y-4">
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-slate-300">Amount to Withdraw (₹)</label>
                 <div className="relative">
@@ -698,7 +698,7 @@ export default function PromoterDashboard() {
                   <button
                     type="button"
                     onClick={() => setPayoutMethod("upi")}
-                    className={`py-2 rounded-xl text-xs font-semibold border transition cursor-pointer flex items-center justify-center gap-1.5 ${
+                    className={`py-2.5 rounded-xl text-xs font-semibold border transition cursor-pointer flex items-center justify-center gap-1.5 ${
                       payoutMethod === "upi"
                         ? "bg-indigo-600/20 border-indigo-500 text-white"
                         : "bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200"
@@ -710,7 +710,7 @@ export default function PromoterDashboard() {
                   <button
                     type="button"
                     onClick={() => setPayoutMethod("bank")}
-                    className={`py-2 rounded-xl text-xs font-semibold border transition cursor-pointer flex items-center justify-center gap-1.5 ${
+                    className={`py-2.5 rounded-xl text-xs font-semibold border transition cursor-pointer flex items-center justify-center gap-1.5 ${
                       payoutMethod === "bank"
                         ? "bg-indigo-600/20 border-indigo-500 text-white"
                         : "bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200"
@@ -747,11 +747,11 @@ export default function PromoterDashboard() {
                       value={accountHolderName}
                       onChange={(e) => setAccountHolderName(e.target.value)}
                       placeholder="Account holder's name"
-                      className="w-full bg-slate-950 border border-slate-700 focus:border-indigo-500 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none"
+                      className="w-full bg-slate-950 border border-slate-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none"
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <div className="space-y-1">
                       <label className="text-xs font-semibold text-slate-300">Account No *</label>
                       <input
@@ -760,7 +760,7 @@ export default function PromoterDashboard() {
                         value={bankAccountNo}
                         onChange={(e) => setBankAccountNo(e.target.value)}
                         placeholder="Account Number"
-                        className="w-full bg-slate-950 border border-slate-700 focus:border-indigo-500 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none font-mono"
+                        className="w-full bg-slate-950 border border-slate-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none font-mono"
                       />
                     </div>
                     <div className="space-y-1">
@@ -771,7 +771,7 @@ export default function PromoterDashboard() {
                         value={bankIfsc}
                         onChange={(e) => setBankIfsc(e.target.value.toUpperCase())}
                         placeholder="SBIN0001234"
-                        className="w-full bg-slate-950 border border-slate-700 focus:border-indigo-500 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none font-mono uppercase"
+                        className="w-full bg-slate-950 border border-slate-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none font-mono uppercase"
                       />
                     </div>
                   </div>
@@ -783,7 +783,7 @@ export default function PromoterDashboard() {
                       value={bankName}
                       onChange={(e) => setBankName(e.target.value)}
                       placeholder="e.g. State Bank of India"
-                      className="w-full bg-slate-950 border border-slate-700 focus:border-indigo-500 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none"
+                      className="w-full bg-slate-950 border border-slate-700 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none"
                     />
                   </div>
                 </div>
@@ -792,7 +792,7 @@ export default function PromoterDashboard() {
               <button
                 type="submit"
                 disabled={payoutLoading || !payoutAmount}
-                className="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-bold py-3 rounded-xl shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 transition text-xs cursor-pointer"
+                className="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-bold py-3 rounded-xl shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 transition text-xs cursor-pointer active:scale-95"
               >
                 {payoutLoading ? <RefreshCw className="animate-spin" size={16} /> : "Submit Withdrawal Request"}
               </button>
