@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { supabaseAdminClient } from "@/lib/supabaseAdminClient";
+import { darkstoreSupabase } from "@/lib/supabaseAdminClient";
 import { AlertCircle, ArrowLeft, ArrowRight, Mail, Phone, ShieldCheck, Download, Store } from "lucide-react";
 import "@/styles/portal.css";
 import Link from "next/link";
@@ -78,14 +78,14 @@ export default function DarkstoreLogin() {
     
     let signInError;
     if (tab === "email") {
-      const res = await supabaseAdminClient.auth.signInWithOtp({
+      const res = await darkstoreSupabase.auth.signInWithOtp({
         email: id.toLowerCase(),
         options: { shouldCreateUser: false },
       });
       signInError = res.error;
     } else {
       const formattedPhone = id.startsWith("+") ? id : `+91${id.replace(/^0+/, '')}`;
-      const res = await supabaseAdminClient.auth.signInWithOtp({
+      const res = await darkstoreSupabase.auth.signInWithOtp({
         phone: formattedPhone,
         options: { shouldCreateUser: false },
       });
@@ -118,7 +118,7 @@ export default function DarkstoreLogin() {
     const id = loginId.trim();
     let verifyError;
     if (tab === "email") {
-      const res = await supabaseAdminClient.auth.verifyOtp({
+      const res = await darkstoreSupabase.auth.verifyOtp({
         email: id.toLowerCase(),
         token: code,
         type: "email",
@@ -126,7 +126,7 @@ export default function DarkstoreLogin() {
       verifyError = res.error;
     } else {
       const formattedPhone = id.startsWith("+") ? id : `+91${id.replace(/^0+/, '')}`;
-      const res = await supabaseAdminClient.auth.verifyOtp({
+      const res = await darkstoreSupabase.auth.verifyOtp({
         phone: formattedPhone,
         token: code,
         type: "sms",

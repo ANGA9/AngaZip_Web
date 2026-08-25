@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { supabaseAdminClient } from "@/lib/supabaseAdminClient";
+import { promoterSupabase } from "@/lib/supabaseAdminClient";
 import { portalFetch } from "@/lib/portalFetch";
 import {
   Users,
@@ -100,7 +100,7 @@ export default function PromoterDashboard() {
 
   useEffect(() => {
     const checkSession = async () => {
-      const { data: { session } } = await supabaseAdminClient.auth.getSession();
+      const { data: { session } } = await promoterSupabase.auth.getSession();
       if (!session) {
         router.push("/refer-earn/login");
         return;
@@ -171,13 +171,28 @@ export default function PromoterDashboard() {
   };
 
   const handleQrDetected = async (decodedText: string) => {
-    let driverId = decodedText.trim();
+    let rawText = decodedText.trim();
+    let driverId = rawText;
+
     try {
-      if (decodedText.startsWith("{") || decodedText.startsWith("[")) {
-        const parsed = JSON.parse(decodedText);
-        driverId = parsed.driver_id || parsed.id || decodedText;
+      if (rawText.startsWith("{") || rawText.startsWith("[")) {
+        const parsed = JSON.parse(rawText);
+        driverId = parsed.driver_id || parsed.id || parsed.userId || rawText;
       }
     } catch (e) {}
+
+    // Check for UUID pattern inside the QR string
+    const uuidMatch = driverId.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);
+    if (uuidMatch) {
+      driverId = uuidMatch[0];
+    } else {
+      driverId = driverId
+        .replace(/^riksho-driver:test:/i, "")
+        .replace(/^riksho-driver:/i, "")
+        .replace(/^test:/i, "")
+        .replace(/^\[TEST\]/i, "")
+        .trim();
+    }
 
     handleLinkDriver(driverId);
   };
@@ -215,7 +230,7 @@ export default function PromoterDashboard() {
     setOnboardingError("");
 
     try {
-      const { data: { session } } = await supabaseAdminClient.auth.getSession();
+      const { data: { session } } = await promoterSupabase.auth.getSession();
       const phone = session?.user?.phone;
 
       await portalFetch("/promoters/register", {
@@ -299,7 +314,7 @@ export default function PromoterDashboard() {
   };
 
   const handleSignOut = async () => {
-    await supabaseAdminClient.auth.signOut();
+    await promoterSupabase.auth.signOut();
     router.push("/refer-earn/login");
   };
 

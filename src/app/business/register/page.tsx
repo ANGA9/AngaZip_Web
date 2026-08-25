@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { supabaseAdminClient } from "@/lib/supabaseAdminClient";
+import { businessSupabase } from "@/lib/supabaseAdminClient";
 import {
   AlertCircle,
   ArrowLeft,
@@ -359,7 +359,7 @@ function BusinessRegisterContent() {
 
     try {
       const formattedPhone = `+91${rawNum}`;
-      const { error: sendErr } = await supabaseAdminClient.auth.signInWithOtp({
+      const { error: sendErr } = await businessSupabase.auth.signInWithOtp({
         phone: formattedPhone,
         options: { shouldCreateUser: true },
       });
@@ -391,7 +391,7 @@ function BusinessRegisterContent() {
 
     try {
       const formattedPhone = `+91${formData.phone.trim()}`;
-      const { error: verifyErr } = await supabaseAdminClient.auth.verifyOtp({
+      const { error: verifyErr } = await businessSupabase.auth.verifyOtp({
         phone: formattedPhone,
         token: phoneOtpCode,
         type: "sms",
@@ -474,10 +474,10 @@ function BusinessRegisterContent() {
 
     try {
       // If phone was already verified in Step 1, user already has an authenticated session!
-      const { data: { session } } = await supabaseAdminClient.auth.getSession();
+      const { data: { session } } = await businessSupabase.auth.getSession();
       if (session?.user?.id) {
         // Direct insert
-        const { error: insertError } = await supabaseAdminClient
+        const { error: insertError } = await businessSupabase
           .from("businesses")
           .insert({
             owner_user_id: session.user.id,
@@ -509,7 +509,7 @@ function BusinessRegisterContent() {
       }
 
       // If no active session, send OTP to email
-      const { error: signInError } = await supabaseAdminClient.auth.signInWithOtp({
+      const { error: signInError } = await businessSupabase.auth.signInWithOtp({
         email: formData.email.trim().toLowerCase(),
         options: { shouldCreateUser: true },
       });
@@ -536,7 +536,7 @@ function BusinessRegisterContent() {
     setError("");
 
     try {
-      const { data, error: verifyError } = await supabaseAdminClient.auth.verifyOtp({
+      const { data, error: verifyError } = await businessSupabase.auth.verifyOtp({
         email: formData.email.trim().toLowerCase(),
         token: otpCode,
         type: "email",
@@ -551,7 +551,7 @@ function BusinessRegisterContent() {
       // Insert business record
       const userId = data?.user?.id;
       if (userId) {
-        const { error: insertError } = await supabaseAdminClient
+        const { error: insertError } = await businessSupabase
           .from("businesses")
           .insert({
             owner_user_id: userId,

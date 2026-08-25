@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import { supabaseAdminClient } from "@/lib/supabaseAdminClient";
+import { businessSupabase } from "@/lib/supabaseAdminClient";
 import { portalFetch } from "@/lib/portalFetch";
 import { LayoutDashboard, Truck, Key, LogOut, Briefcase, Loader2, Settings } from "lucide-react";
 import "@/styles/portal.css";
@@ -26,7 +26,7 @@ export default function BusinessLayout({
 
     const checkSession = async () => {
       try {
-        const { data: { session } } = await supabaseAdminClient.auth.getSession();
+        const { data: { session } } = await businessSupabase.auth.getSession();
         if (!session) {
           router.push("/business/login");
           setLoading(false);
@@ -61,7 +61,7 @@ export default function BusinessLayout({
   }, [pathname, router]);
 
   const handleLogout = async () => {
-    await supabaseAdminClient.auth.signOut();
+    await businessSupabase.auth.signOut();
     router.push("/business/login");
   };
 

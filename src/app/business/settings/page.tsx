@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabaseAdminClient } from "@/lib/supabaseAdminClient";
+import { businessSupabase } from "@/lib/supabaseAdminClient";
 import { portalFetch } from "@/lib/portalFetch";
 import {
   Building2,
@@ -35,11 +35,11 @@ export default function BusinessSettings() {
   useEffect(() => {
     async function loadProfile() {
       try {
-        const { data: { session } } = await supabaseAdminClient.auth.getSession();
+        const { data: { session } } = await businessSupabase.auth.getSession();
         if (!session) return;
 
         // Fetch business details
-        const { data, error: fetchError } = await supabaseAdminClient
+        const { data, error: fetchError } = await businessSupabase
           .from("businesses")
           .select("*")
           .eq("owner_user_id", session.user.id)
@@ -82,7 +82,7 @@ export default function BusinessSettings() {
     setSaveSuccess(false);
 
     try {
-      const { error: updateError } = await supabaseAdminClient
+      const { error: updateError } = await businessSupabase
         .from("businesses")
         .update({
           contact_name: contactName.trim(),

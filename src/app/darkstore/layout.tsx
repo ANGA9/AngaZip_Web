@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import { supabaseAdminClient } from "@/lib/supabaseAdminClient";
+import { darkstoreSupabase } from "@/lib/supabaseAdminClient";
 import { portalFetch } from "@/lib/portalFetch";
 import { Package, LogOut, ShieldCheck, Loader2 } from "lucide-react";
 import "@/styles/portal.css";
@@ -26,7 +26,7 @@ export default function DarkstoreLayout({
 
     const checkSession = async () => {
       try {
-        const { data: { session } } = await supabaseAdminClient.auth.getSession();
+        const { data: { session } } = await darkstoreSupabase.auth.getSession();
         if (!session) {
           router.push("/darkstore/login");
           setLoading(false);
@@ -57,7 +57,7 @@ export default function DarkstoreLayout({
   }, [pathname, router]);
 
   const handleLogout = async () => {
-    await supabaseAdminClient.auth.signOut();
+    await darkstoreSupabase.auth.signOut();
     router.push("/darkstore/login");
   };
 

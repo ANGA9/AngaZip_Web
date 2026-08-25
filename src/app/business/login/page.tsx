@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { supabaseAdminClient } from "@/lib/supabaseAdminClient";
+import { businessSupabase } from "@/lib/supabaseAdminClient";
 import { AlertCircle, ArrowLeft, ArrowRight, Mail, Phone, Building2, X } from "lucide-react";
 import "@/styles/portal.css";
 import Link from "next/link";
@@ -79,7 +79,7 @@ export default function BusinessLogin() {
 
     // 1. Check if this business email/phone is registered in the database
     try {
-      const { data: isRegistered } = await supabaseAdminClient.rpc("is_business_registered", {
+      const { data: isRegistered } = await businessSupabase.rpc("is_business_registered", {
         lookup_value: id,
       });
 
@@ -94,14 +94,14 @@ export default function BusinessLogin() {
     
     let signInError;
     if (tab === "email") {
-      const res = await supabaseAdminClient.auth.signInWithOtp({
+      const res = await businessSupabase.auth.signInWithOtp({
         email: id.toLowerCase(),
         options: { shouldCreateUser: false },
       });
       signInError = res.error;
     } else {
       const formattedPhone = id.startsWith("+") ? id : `+91${id.replace(/^0+/, '')}`;
-      const res = await supabaseAdminClient.auth.signInWithOtp({
+      const res = await businessSupabase.auth.signInWithOtp({
         phone: formattedPhone,
         options: { shouldCreateUser: false },
       });
@@ -142,7 +142,7 @@ export default function BusinessLogin() {
     let verifyError;
     let authData;
     if (tab === "email") {
-      const res = await supabaseAdminClient.auth.verifyOtp({
+      const res = await businessSupabase.auth.verifyOtp({
         email: id.toLowerCase(),
         token: code,
         type: "email",
@@ -151,7 +151,7 @@ export default function BusinessLogin() {
       authData = res.data;
     } else {
       const formattedPhone = id.startsWith("+") ? id : `+91${id.replace(/^0+/, '')}`;
-      const res = await supabaseAdminClient.auth.verifyOtp({
+      const res = await businessSupabase.auth.verifyOtp({
         phone: formattedPhone,
         token: code,
         type: "sms",
@@ -169,7 +169,7 @@ export default function BusinessLogin() {
     // Check if user has an active business registered in the database
     const userId = authData?.user?.id;
     if (userId) {
-      const { data: biz } = await supabaseAdminClient
+      const { data: biz } = await businessSupabase
         .from("businesses")
         .select("id")
         .eq("owner_user_id", userId)

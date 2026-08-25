@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { supabaseAdminClient } from "@/lib/supabaseAdminClient";
+import { promoterSupabase } from "@/lib/supabaseAdminClient";
 import { AlertCircle, ArrowLeft, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import "@/styles/portal.css";
@@ -65,7 +65,7 @@ export default function PromoterLoginPage() {
 
     setLoading(true);
     try {
-      const { error: signInError } = await supabaseAdminClient.auth.signInWithOtp({
+      const { error: signInError } = await promoterSupabase.auth.signInWithOtp({
         phone: formattedPhone,
       });
 
@@ -98,7 +98,7 @@ export default function PromoterLoginPage() {
     setError("");
 
     try {
-      const { error: verifyError } = await supabaseAdminClient.auth.verifyOtp({
+      const { error: verifyError } = await promoterSupabase.auth.verifyOtp({
         phone: formattedPhone,
         token: cleanCode,
         type: "sms",
