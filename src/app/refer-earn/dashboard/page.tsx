@@ -12,24 +12,36 @@ import {
   CheckCircle2,
   AlertCircle,
   Clock,
-  ArrowUpRight,
   RefreshCw,
   LogOut,
   Sparkles,
-  Camera,
-  X,
   CreditCard,
   Building,
+  X,
+  LayoutDashboard,
+  Award,
+  ArrowRight,
+  ShieldCheck,
+  UserCheck,
 } from "lucide-react";
 import { Html5Qrcode } from "html5-qrcode";
-import "@/styles/promoter.css";
+import Link from "next/link";
+import "@/styles/portal.css";
 
 export default function PromoterDashboard() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<"recruits" | "payouts">("recruits");
-  
+
+  // Onboarding Name Modal State (appears if newly registered without name)
+  const [showNameModal, setShowNameModal] = useState(false);
+  const [onboardingName, setOnboardingName] = useState("");
+  const [onboardingEmail, setOnboardingEmail] = useState("");
+  const [onboardingLoading, setOnboardingLoading] = useState(false);
+  const [onboardingError, setOnboardingError] = useState("");
+
+  // QR Scanner Modal State
   const [scannerOpen, setScannerOpen] = useState(false);
   const [manualDriverId, setManualDriverId] = useState("");
   const [scanLoading, setScanLoading] = useState(false);
@@ -37,6 +49,7 @@ export default function PromoterDashboard() {
   const [scanSuccess, setScanSuccess] = useState<any>(null);
   const scannerRef = useRef<Html5Qrcode | null>(null);
 
+  // Payout Modal State
   const [payoutOpen, setPayoutOpen] = useState(false);
   const [payoutAmount, setPayoutAmount] = useState("");
   const [payoutMethod, setPayoutMethod] = useState<"upi" | "bank">("upi");
@@ -52,21 +65,38 @@ export default function PromoterDashboard() {
   const loadDashboard = async () => {
     try {
       setLoading(true);
-      const res = await portalFetch("/promoters/dashboard");
-      setData(res);
+      // 1. Fetch promoter profile
+      const me = await portalFetch("/promoters/me");
+      if (!me.registered || !me.name) {
+        setShowNameModal(true);
+        if (me.user?.email) setOnboardingEmail(me.user.email);
+      }
 
-      if (res.promoter) {
-        if (res.promoter.upi_id) setUpiId(res.promoter.upi_id);
-        if (res.promoter.bank_account_no) setBankAccountNo(res.promoter.bank_account_no);
-        if (res.promoter.bank_ifsc) setBankIfsc(res.promoter.bank_ifsc);
-        if (res.promoter.bank_name) setBankName(res.promoter.bank_name);
-        if (res.promoter.account_holder_name) setAccountHolderName(res.promoter.account_holder_name);
+      // 2. Try fetching dashboard data
+      try {
+        const res = await portalFetch("/promoters/dashboard");
+        setData(res);
+
+        if (res.promoter) {
+          if (res.promoter.upi_id) setUpiId(res.promoter.upi_id);
+          if (res.promoter.bank_account_no) setBankAccountNo(res.promoter.bank_account_no);
+          if (res.promoter.bank_ifsc) setBankIfsc(res.promoter.bank_ifsc);
+          if (res.promoter.bank_name) setBankName(res.promoter.bank_name);
+          if (res.promoter.account_holder_name) setAccountHolderName(res.promoter.account_holder_name);
+        }
+      } catch (dashErr: any) {
+        // If not approved yet, still set basic profile
+        if (me.registered) {
+          setData({
+            promoter: me,
+            stats: { total_recruits: 0, total_earnings: 0, available_balance: 0, withdrawn_amount: 0 },
+            referrals: [],
+            payouts: [],
+          });
+        }
       }
     } catch (err: any) {
-      if (err.message?.includes("PROMOTER_NOT_APPROVED") || err.message?.includes("403") || err.message?.includes("404")) {
-        router.push("/refer-earn");
-        return;
-      }
+      console.error("Dashboard error:", err);
     } finally {
       setLoading(false);
     }
@@ -84,6 +114,7 @@ export default function PromoterDashboard() {
     checkSession();
   }, [router]);
 
+  // Start & Stop QR Scanner
   useEffect(() => {
     if (scannerOpen) {
       setScanError("");
@@ -108,7 +139,7 @@ export default function PromoterDashboard() {
           );
         } catch (e: any) {
           console.warn("Camera start failed:", e);
-          setScanError("Camera access failed. Please ensure camera permissions are allowed, or type the Driver ID manually below.");
+          setScanError("Camera access failed. Please ensure camera permissions are allowed, or enter Driver ID manually.");
         }
       }, 300);
 
@@ -160,9 +191,41 @@ export default function PromoterDashboard() {
       setScanSuccess(res);
       await loadDashboard();
     } catch (err: any) {
-      setScanError(err.message || "Failed to link driver. Please verify that this driver is onboarded.");
+      setScanError(err.message || "Failed to link driver. Please verify that this driver is registered.");
     } finally {
       setScanLoading(false);
+    }
+  };
+
+  const handleSaveOnboardingName = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!onboardingName.trim()) {
+      setOnboardingError("Please enter your full name.");
+      return;
+    }
+
+    setOnboardingLoading(true);
+    setOnboardingError("");
+
+    try {
+      const { data: { session } } = await supabaseAdminClient.auth.getSession();
+      const phone = session?.user?.phone;
+
+      const res = await portalFetch("/promoters/register", {
+        method: "POST",
+        body: JSON.stringify({
+          name: onboardingName.trim(),
+          phone: phone || undefined,
+          email: onboardingEmail.trim() || undefined,
+        }),
+      });
+
+      setShowNameModal(false);
+      await loadDashboard();
+    } catch (err: any) {
+      setOnboardingError(err.message || "Failed to save promoter profile.");
+    } finally {
+      setOnboardingLoading(false);
     }
   };
 
@@ -177,9 +240,9 @@ export default function PromoterDashboard() {
       return;
     }
 
-    const availableRupees = (stats.available_balance || 0) / 100;
+    const availableRupees = (data?.stats?.available_balance || 0) / 100;
     if (amountInRupees > availableRupees) {
-      setPayoutError(`Amount exceeds your available balance of ₹${availableRupees.toFixed(2)}.`);
+      setPayoutError(`Amount exceeds available balance of ₹${availableRupees.toFixed(2)}.`);
       return;
     }
 
@@ -229,12 +292,12 @@ export default function PromoterDashboard() {
     router.push("/refer-earn");
   };
 
-  if (loading && !data) {
+  if (loading && !data && !showNameModal) {
     return (
-      <div className="pr-container" style={{ justifyContent: "center", alignItems: "center" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12, background: "#0F172A", border: "1px solid rgba(255,255,255,0.1)", padding: "16px 28px", borderRadius: 16 }}>
-          <RefreshCw className="animate-spin" size={20} color="#818CF8" />
-          <span style={{ fontWeight: 600, color: "#E2E8F0" }}>Loading Promoter Dashboard…</span>
+      <div className="admin-layout" style={{ alignItems: "center", justifyContent: "center", minHeight: "100vh" }}>
+        <div className="admin-loading-center">
+          <RefreshCw size={18} className="admin-spin" />
+          Loading promoter dashboard…
         </div>
       </div>
     );
@@ -244,322 +307,477 @@ export default function PromoterDashboard() {
   const stats = data?.stats || { total_recruits: 0, total_earnings: 0, available_balance: 0, withdrawn_amount: 0 };
   const referrals = data?.referrals || [];
   const payouts = data?.payouts || [];
+  const isApproved = promoter.approval_status === "approved";
 
   return (
-    <div className="pr-container">
-      <header className="pr-header">
-        <div className="pr-header-inner">
-          <div className="pr-brand">
-            <div className="pr-brand-logo">
-              <Sparkles size={18} />
-            </div>
-            <span className="pr-brand-name">RIKSHO</span>
-            <span className="pr-badge-verified">Verified Promoter</span>
-          </div>
-
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "#CBD5E1", background: "rgba(30, 41, 59, 0.6)", border: "1px solid rgba(255,255,255,0.08)", padding: "6px 14px", borderRadius: 12 }}>
-              <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#34D399", display: "inline-block" }} />
-              <span>{promoter.name || "Promoter"} ({promoter.phone})</span>
-            </div>
-            <button
-              onClick={handleSignOut}
-              style={{ fontSize: 12, color: "#94A3B8", display: "flex", alignItems: "center", gap: 6, border: "1px solid var(--pr-border)", padding: "6px 12px", borderRadius: 10, background: "rgba(15,23,42,0.8)", cursor: "pointer" }}
-            >
-              <LogOut size={13} /> Sign Out
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <main className="pr-dash-container">
-        <div className="pr-action-banner">
-          <div style={{ display: "flex", flexDirection: "column", gap: 8, zIndex: 1 }}>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 12px", borderRadius: 9999, background: "rgba(99, 102, 241, 0.15)", color: "#818CF8", border: "1px solid rgba(99, 102, 241, 0.3)", fontSize: 12, fontWeight: 700, width: "fit-content" }}>
-              <TrendingUp size={14} /> Active Field Campaign
-            </div>
-            <h1 style={{ fontSize: 26, fontWeight: 900, color: "#FFFFFF", letterSpacing: -0.5 }}>
-              Welcome back, {promoter.name || "Promoter"}!
-            </h1>
-            <p style={{ fontSize: 13, color: "var(--pr-text-muted)", maxWidth: 540, lineHeight: 1.5 }}>
-              Earn <strong style={{ color: "#34D399" }}>₹20 for every driver</strong> you onboard. Scan the driver's QR code from their Riksho Buddy app to verify and credit your wallet immediately.
-            </p>
-          </div>
-
-          <div className="pr-banner-actions">
-            <button
-              onClick={() => setScannerOpen(true)}
-              className="pr-btn-primary"
-              style={{ padding: "0 24px", width: "auto" }}
-            >
-              <QrCode size={18} />
-              <span>Scan Driver QR</span>
-            </button>
-
-            <button
-              onClick={() => setPayoutOpen(true)}
-              disabled={stats.available_balance < 1000}
-              className="pr-btn-secondary"
-              style={{ padding: "0 20px", width: "auto" }}
-            >
-              <Wallet size={16} color="#34D399" />
-              <span>Withdraw Payout</span>
-            </button>
-          </div>
+    <div className="admin-layout">
+      {/* Sidebar matching Riksho Admin */}
+      <aside className="admin-sidebar">
+        <div className="admin-sidebar-logo">
+          <img src="/images/final_riksho.png" alt="Riksho Promoter" />
         </div>
 
-        <div className="pr-stats-grid">
-          <div className="pr-stat-card">
-            <div className="pr-stat-header">
-              <span className="pr-stat-label">Total Recruits</span>
-              <div className="pr-perk-icon indigo" style={{ width: 30, height: 30, margin: 0 }}>
-                <Users size={15} />
+        <nav className="admin-sidebar-nav">
+          <div className="admin-nav-section-label">Promoter Hub</div>
+          <button
+            onClick={() => setActiveTab("recruits")}
+            className={`admin-nav-item ${activeTab === "recruits" ? "active" : ""}`}
+            style={{ width: "100%", background: "none", border: "none", cursor: "pointer", textAlign: "left" }}
+          >
+            <LayoutDashboard /> Overview & Recruits
+          </button>
+
+          <button
+            onClick={() => setActiveTab("payouts")}
+            className={`admin-nav-item ${activeTab === "payouts" ? "active" : ""}`}
+            style={{ width: "100%", background: "none", border: "none", cursor: "pointer", textAlign: "left" }}
+          >
+            <Wallet /> Payout History
+          </button>
+
+          <div className="admin-nav-section-label">External</div>
+          <Link href="/" className="admin-nav-item">
+            <ArrowRight /> Main Website
+          </Link>
+        </nav>
+      </aside>
+
+      {/* Main Area */}
+      <main className="admin-main">
+        {/* Top Header */}
+        <header className="admin-header">
+          <div className="admin-header-user">
+            <span className="admin-header-email">
+              {promoter.name || "Promoter"} ({promoter.phone || "Partner"})
+            </span>
+            <span
+              className="admin-header-chip"
+              style={{
+                backgroundColor: isApproved ? "#ECFDF5" : "#FEF3C7",
+                color: isApproved ? "#047857" : "#B45309",
+              }}
+            >
+              {isApproved ? <CheckCircle2 size={13} /> : <Clock size={13} />}
+              {isApproved ? "Approved Promoter" : "Under Review"}
+            </span>
+            <button onClick={handleSignOut} className="admin-logout-btn">
+              <LogOut size={14} /> Log out
+            </button>
+          </div>
+        </header>
+
+        {/* Content Area */}
+        <div className="admin-content">
+          {/* Status banner if pending */}
+          {!isApproved && promoter.name && (
+            <div
+              style={{
+                backgroundColor: "#FFFBEB",
+                border: "1px solid #FDE68A",
+                color: "#92400E",
+                borderRadius: "12px",
+                padding: "14px 18px",
+                marginBottom: "24px",
+                fontSize: "13.5px",
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+              }}
+            >
+              <Clock size={18} style={{ flexShrink: 0, color: "#D97706" }} />
+              <div>
+                <strong>Application Under Review:</strong> Your promoter onboarding application has been submitted to the Riksho Admin team. Once approved, you can start recruiting drivers and requesting withdrawals.
               </div>
             </div>
-            <div className="pr-stat-value">{stats.total_recruits}</div>
-            <div className="pr-stat-subtext">Verified drivers onboarded</div>
+          )}
+
+          {/* Top Title & Actions */}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "flex-start",
+              marginBottom: "24px",
+              flexWrap: "wrap",
+              gap: "16px",
+            }}
+          >
+            <div>
+              <h1 className="admin-page-title">Promoter Dashboard</h1>
+              <p className="admin-page-subtitle">
+                Recruit drivers on the field, verify on-boarding QR codes, and earn ₹20 instant rewards per driver.
+              </p>
+            </div>
+
+            <div style={{ display: "flex", gap: "10px" }}>
+              <button
+                onClick={() => setScannerOpen(true)}
+                className="admin-btn admin-btn-primary"
+                style={{ gap: "8px" }}
+              >
+                <QrCode size={16} /> Scan Driver QR
+              </button>
+
+              <button
+                onClick={() => setPayoutOpen(true)}
+                disabled={stats.available_balance < 1000}
+                className="admin-btn admin-btn-secondary"
+                style={{ gap: "8px" }}
+              >
+                <Wallet size={16} /> Withdraw Payout
+              </button>
+            </div>
           </div>
 
-          <div className="pr-stat-card">
-            <div className="pr-stat-header">
-              <span className="pr-stat-label">Total Earnings</span>
-              <div className="pr-perk-icon emerald" style={{ width: 30, height: 30, margin: 0 }}>
-                <TrendingUp size={15} />
+          {/* Stats Grid matching Riksho Admin */}
+          <div className="admin-stats-grid" style={{ marginBottom: "28px" }}>
+            <div className="admin-stat-card">
+              <div className="admin-stat-head">
+                <span className="admin-stat-title">Total Recruits</span>
+                <span className="admin-stat-icon cyan">
+                  <Users size={18} />
+                </span>
+              </div>
+              <div className="admin-stat-value">{stats.total_recruits}</div>
+              <div style={{ fontSize: "12px", color: "var(--admin-muted)", marginTop: "4px" }}>
+                Verified driver recruits
               </div>
             </div>
-            <div className="pr-stat-value emerald">₹{(stats.total_earnings / 100).toFixed(2)}</div>
-            <div className="pr-stat-subtext">Lifetime reward sum</div>
-          </div>
 
-          <div className="pr-stat-card highlight">
-            <div className="pr-stat-header">
-              <span className="pr-stat-label" style={{ color: "#A5B4FC" }}>Available Balance</span>
-              <div className="pr-perk-icon indigo" style={{ width: 30, height: 30, margin: 0, background: "rgba(99, 102, 241, 0.25)" }}>
-                <Wallet size={15} color="#A5B4FC" />
+            <div className="admin-stat-card">
+              <div className="admin-stat-head">
+                <span className="admin-stat-title">Total Earnings</span>
+                <span className="admin-stat-icon green">
+                  <TrendingUp size={18} />
+                </span>
+              </div>
+              <div className="admin-stat-value" style={{ color: "#059669" }}>
+                ₹{(stats.total_earnings / 100).toFixed(2)}
+              </div>
+              <div style={{ fontSize: "12px", color: "var(--admin-muted)", marginTop: "4px" }}>
+                Lifetime rewards earned
               </div>
             </div>
-            <div className="pr-stat-value">₹{(stats.available_balance / 100).toFixed(2)}</div>
-            <div className="pr-stat-subtext" style={{ color: "#818CF8" }}>Ready for instant payout</div>
-          </div>
 
-          <div className="pr-stat-card">
-            <div className="pr-stat-header">
-              <span className="pr-stat-label">Withdrawn Sum</span>
-              <div className="pr-perk-icon" style={{ width: 30, height: 30, margin: 0, background: "rgba(255,255,255,0.06)", color: "#CBD5E1" }}>
-                <CreditCard size={15} />
+            <div className="admin-stat-card" style={{ borderColor: "#C7D2FE", backgroundColor: "#F5F7FF" }}>
+              <div className="admin-stat-head">
+                <span className="admin-stat-title" style={{ color: "#4338CA", fontWeight: 700 }}>
+                  Available Balance
+                </span>
+                <span className="admin-stat-icon" style={{ backgroundColor: "#EEF2FF", color: "#4338CA" }}>
+                  <Wallet size={18} />
+                </span>
+              </div>
+              <div className="admin-stat-value" style={{ color: "#4338CA" }}>
+                ₹{(stats.available_balance / 100).toFixed(2)}
+              </div>
+              <div style={{ fontSize: "12px", color: "#6366F1", marginTop: "4px" }}>
+                Ready for withdrawal
               </div>
             </div>
-            <div className="pr-stat-value" style={{ color: "#CBD5E1" }}>₹{(stats.withdrawn_amount / 100).toFixed(2)}</div>
-            <div className="pr-stat-subtext">Transferred to UPI/Bank</div>
-          </div>
-        </div>
 
-        <div>
-          <div className="pr-tabs-row">
-            <div className="pr-tabs">
+            <div className="admin-stat-card">
+              <div className="admin-stat-head">
+                <span className="admin-stat-title">Withdrawn Sum</span>
+                <span className="admin-stat-icon amber">
+                  <CreditCard size={18} />
+                </span>
+              </div>
+              <div className="admin-stat-value">₹{(stats.withdrawn_amount / 100).toFixed(2)}</div>
+              <div style={{ fontSize: "12px", color: "var(--admin-muted)", marginTop: "4px" }}>
+                Transferred to UPI / Bank
+              </div>
+            </div>
+          </div>
+
+          {/* Section Tabs */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid var(--admin-border)", marginBottom: "20px" }}>
+            <div style={{ display: "flex", gap: "20px" }}>
               <button
                 onClick={() => setActiveTab("recruits")}
-                className={`pr-tab-btn ${activeTab === "recruits" ? "active" : ""}`}
+                style={{
+                  padding: "10px 4px",
+                  borderBottom: activeTab === "recruits" ? "2px solid #4338CA" : "2px solid transparent",
+                  fontWeight: 700,
+                  fontSize: 14,
+                  color: activeTab === "recruits" ? "#4338CA" : "#64748b",
+                  background: "none",
+                  cursor: "pointer",
+                }}
               >
-                <Users size={15} /> Recruited Drivers ({referrals.length})
+                Recruited Drivers ({referrals.length})
               </button>
 
               <button
                 onClick={() => setActiveTab("payouts")}
-                className={`pr-tab-btn ${activeTab === "payouts" ? "active" : ""}`}
+                style={{
+                  padding: "10px 4px",
+                  borderBottom: activeTab === "payouts" ? "2px solid #4338CA" : "2px solid transparent",
+                  fontWeight: 700,
+                  fontSize: 14,
+                  color: activeTab === "payouts" ? "#4338CA" : "#64748b",
+                  background: "none",
+                  cursor: "pointer",
+                }}
               >
-                <Wallet size={15} /> Payout History ({payouts.length})
+                Payout History ({payouts.length})
               </button>
             </div>
 
             <button
               onClick={loadDashboard}
-              style={{ fontSize: 12, color: "var(--pr-text-muted)", display: "flex", alignItems: "center", gap: 6, background: "none", border: "none", cursor: "pointer" }}
+              style={{
+                fontSize: 12,
+                color: "var(--admin-muted)",
+                display: "flex",
+                alignItems: "center",
+                gap: 4,
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+              }}
             >
               <RefreshCw size={13} /> Refresh Data
             </button>
           </div>
 
+          {/* TAB 1: Recruits Table */}
           {activeTab === "recruits" && (
-            <div className="pr-table-card" style={{ marginTop: 16 }}>
+            <div className="admin-table-container">
               {referrals.length === 0 ? (
-                <div style={{ textAlign: "center", padding: "60px 20px", display: "flex", flexDirection: "column", gap: 14, alignItems: "center" }}>
-                  <div className="pr-perk-icon indigo" style={{ width: 56, height: 56, borderRadius: 16 }}>
-                    <QrCode size={26} />
-                  </div>
-                  <div>
-                    <h3 style={{ fontSize: 16, fontWeight: 700, color: "#FFFFFF", marginBottom: 4 }}>No Drivers Recruited Yet</h3>
-                    <p style={{ fontSize: 13, color: "var(--pr-text-muted)", maxWidth: 360 }}>
-                      Tap "Scan Driver QR" to scan your first partner driver and earn ₹20 immediately!
-                    </p>
-                  </div>
+                <div style={{ textAlign: "center", padding: "48px 16px" }}>
+                  <Users size={36} color="#94a3b8" style={{ margin: "0 auto 12px auto" }} />
+                  <h3 style={{ fontSize: 16, fontWeight: 700, color: "#1e293b", marginBottom: 4 }}>No Driver Recruits Yet</h3>
+                  <p style={{ fontSize: 13, color: "#64748b", maxWidth: 360, margin: "0 auto 16px auto" }}>
+                    Scan the QR code on a newly onboarded driver's phone to verify your recruit and earn ₹20 immediately!
+                  </p>
                   <button
                     onClick={() => setScannerOpen(true)}
-                    className="pr-btn-primary"
-                    style={{ width: "auto", padding: "0 20px", height: 40, fontSize: 13 }}
+                    className="admin-btn admin-btn-primary admin-btn-sm"
                   >
                     Scan First Driver
                   </button>
                 </div>
               ) : (
-                <div className="pr-table-wrapper">
-                  <table className="pr-table">
-                    <thead>
-                      <tr>
-                        <th>Driver Name</th>
-                        <th>Phone Number</th>
-                        <th>Date Verified</th>
-                        <th>Reward Earned</th>
-                        <th style={{ textAlign: "right" }}>Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {referrals.map((r: any) => {
-                        const isTest = r.driver_name?.includes("[TEST]");
-                        const cleanName = r.driver_name?.replace("[TEST]", "").trim() || "Riksho Partner";
-                        return (
-                          <tr key={r.id}>
-                            <td style={{ fontWeight: 700, color: "#FFFFFF" }}>
-                              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                                <span>{cleanName}</span>
-                                {isTest && (
-                                  <span style={{ fontSize: 10, fontWeight: 800, background: "rgba(99, 102, 241, 0.2)", color: "#A5B4FC", padding: "2px 6px", borderRadius: 4, border: "1px solid rgba(99, 102, 241, 0.3)" }}>
-                                    TEST
-                                  </span>
-                                )}
-                              </div>
-                            </td>
-                            <td style={{ fontFamily: "monospace", color: "var(--pr-text-muted)" }}>
-                              {r.driver_phone || "—"}
-                            </td>
-                            <td style={{ color: "var(--pr-text-muted)" }}>
-                              {new Date(r.created_at).toLocaleDateString()} {new Date(r.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                            </td>
-                            <td style={{ fontWeight: 800, color: "#34D399" }}>
-                              ₹{(r.reward_amount / 100).toFixed(2)}
-                            </td>
-                            <td style={{ textAlign: "right" }}>
-                              <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "var(--pr-emerald-soft)", border: "1px solid var(--pr-emerald-border)", color: "#34D399", padding: "4px 10px", borderRadius: 9999, fontSize: 11, fontWeight: 700 }}>
-                                <CheckCircle2 size={13} /> Verified
-                              </span>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
+                <table className="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Driver Name</th>
+                      <th>Phone Number</th>
+                      <th>Date Verified</th>
+                      <th>Reward Amount</th>
+                      <th style={{ textAlign: "right" }}>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {referrals.map((r: any) => {
+                      const isTest = r.driver_name?.includes("[TEST]");
+                      const cleanName = r.driver_name?.replace("[TEST]", "").trim() || "Riksho Partner";
+                      return (
+                        <tr key={r.id}>
+                          <td style={{ fontWeight: 600, color: "#0F172A" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                              <span>{cleanName}</span>
+                              {isTest && (
+                                <span style={{ fontSize: 10, fontWeight: 800, background: "#EEF2FF", color: "#4338CA", padding: "2px 6px", borderRadius: 4, border: "1px solid #C7D2FE" }}>
+                                  TEST
+                                </span>
+                              )}
+                            </div>
+                          </td>
+                          <td style={{ fontFamily: "monospace", color: "#64748b" }}>
+                            {r.driver_phone || "—"}
+                          </td>
+                          <td style={{ color: "#64748b" }}>
+                            {new Date(r.created_at).toLocaleDateString()} {new Date(r.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                          </td>
+                          <td style={{ fontWeight: 700, color: "#059669" }}>
+                            +₹{(r.reward_amount / 100).toFixed(2)}
+                          </td>
+                          <td style={{ textAlign: "right" }}>
+                            <span className="admin-chip" style={{ backgroundColor: "#ECFDF5", color: "#047857" }}>
+                              <CheckCircle2 size={12} /> Verified
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               )}
             </div>
           )}
 
+          {/* TAB 2: Payouts Table */}
           {activeTab === "payouts" && (
-            <div className="pr-table-card" style={{ marginTop: 16 }}>
+            <div className="admin-table-container">
               {payouts.length === 0 ? (
-                <div style={{ textAlign: "center", padding: "60px 20px", display: "flex", flexDirection: "column", gap: 14, alignItems: "center" }}>
-                  <div className="pr-perk-icon emerald" style={{ width: 56, height: 56, borderRadius: 16 }}>
-                    <Wallet size={26} />
-                  </div>
-                  <div>
-                    <h3 style={{ fontSize: 16, fontWeight: 700, color: "#FFFFFF", marginBottom: 4 }}>No Payout Requests Yet</h3>
-                    <p style={{ fontSize: 13, color: "var(--pr-text-muted)", maxWidth: 360 }}>
-                      Once you reach ₹10 in available balance, you can request a withdrawal to your UPI or Bank.
-                    </p>
-                  </div>
+                <div style={{ textAlign: "center", padding: "48px 16px" }}>
+                  <Wallet size={36} color="#94a3b8" style={{ margin: "0 auto 12px auto" }} />
+                  <h3 style={{ fontSize: 16, fontWeight: 700, color: "#1e293b", marginBottom: 4 }}>No Payout Requests Yet</h3>
+                  <p style={{ fontSize: 13, color: "#64748b", maxWidth: 360, margin: "0 auto" }}>
+                    Once you accumulate at least ₹10 in available balance, you can submit a withdrawal request.
+                  </p>
                 </div>
               ) : (
-                <div className="pr-table-wrapper">
-                  <table className="pr-table">
-                    <thead>
-                      <tr>
-                        <th>Requested Date</th>
-                        <th>Amount</th>
-                        <th>Payout Destination</th>
-                        <th>Reference / Notes</th>
-                        <th style={{ textAlign: "right" }}>Status</th>
+                <table className="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Requested Date</th>
+                      <th>Amount</th>
+                      <th>Payout Method & Destination</th>
+                      <th>Transaction Ref / Note</th>
+                      <th style={{ textAlign: "right" }}>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {payouts.map((p: any) => (
+                      <tr key={p.id}>
+                        <td style={{ color: "#64748b" }}>
+                          {new Date(p.requested_at).toLocaleDateString()} {new Date(p.requested_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                        </td>
+                        <td style={{ fontWeight: 700, color: "#0F172A" }}>
+                          ₹{(p.amount / 100).toFixed(2)}
+                        </td>
+                        <td>
+                          {p.payout_method === "upi" ? (
+                            <div style={{ fontFamily: "monospace", color: "#4338CA" }}>UPI: {p.upi_id}</div>
+                          ) : (
+                            <div>
+                              <strong style={{ color: "#0F172A" }}>{p.bank_name || "Bank"}</strong> (A/C: {p.bank_account_no})
+                            </div>
+                          )}
+                        </td>
+                        <td style={{ fontFamily: "monospace", fontSize: 12, color: "#64748b" }}>
+                          {p.transaction_ref ? `Txn: ${p.transaction_ref}` : p.admin_notes || "—"}
+                        </td>
+                        <td style={{ textAlign: "right" }}>
+                          {p.status === "paid" && (
+                            <span className="admin-chip" style={{ backgroundColor: "#ECFDF5", color: "#047857" }}>
+                              <CheckCircle2 size={12} /> Paid
+                            </span>
+                          )}
+                          {p.status === "pending" && (
+                            <span className="admin-chip" style={{ backgroundColor: "#FEF3C7", color: "#B45309" }}>
+                              <Clock size={12} /> In Review
+                            </span>
+                          )}
+                          {p.status === "rejected" && (
+                            <span className="admin-chip" style={{ backgroundColor: "#FEE2E2", color: "#DC2626" }}>
+                              <AlertCircle size={12} /> Rejected
+                            </span>
+                          )}
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      {payouts.map((p: any) => (
-                        <tr key={p.id}>
-                          <td style={{ color: "var(--pr-text-muted)" }}>
-                            {new Date(p.requested_at).toLocaleDateString()} {new Date(p.requested_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                          </td>
-                          <td style={{ fontWeight: 800, color: "#FFFFFF", fontSize: 15 }}>
-                            ₹{(p.amount / 100).toFixed(2)}
-                          </td>
-                          <td>
-                            {p.payout_method === "upi" ? (
-                              <div style={{ fontFamily: "monospace", color: "#A5B4FC" }}>UPI: {p.upi_id}</div>
-                            ) : (
-                              <div>
-                                <strong style={{ color: "#FFFFFF" }}>{p.bank_name || "Bank"}</strong> (A/C: {p.bank_account_no})
-                              </div>
-                            )}
-                          </td>
-                          <td style={{ fontFamily: "monospace", fontSize: 12, color: "var(--pr-text-muted)" }}>
-                            {p.transaction_ref ? `Txn: ${p.transaction_ref}` : p.admin_notes || "—"}
-                          </td>
-                          <td style={{ textAlign: "right" }}>
-                            {p.status === "paid" && (
-                              <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "var(--pr-emerald-soft)", border: "1px solid var(--pr-emerald-border)", color: "#34D399", padding: "4px 10px", borderRadius: 9999, fontSize: 11, fontWeight: 700 }}>
-                                <CheckCircle2 size={12} /> Paid
-                              </span>
-                            )}
-                            {p.status === "pending" && (
-                              <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "var(--pr-amber-soft)", border: "1px solid var(--pr-amber-border)", color: "#FBBF24", padding: "4px 10px", borderRadius: 9999, fontSize: 11, fontWeight: 700 }}>
-                                <Clock size={12} /> In Review
-                              </span>
-                            )}
-                            {p.status === "rejected" && (
-                              <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "var(--pr-rose-soft)", border: "1px solid var(--pr-rose-border)", color: "#FB7185", padding: "4px 10px", borderRadius: 9999, fontSize: 11, fontWeight: 700 }}>
-                                <AlertCircle size={12} /> Rejected
-                              </span>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                    ))}
+                  </tbody>
+                </table>
               )}
             </div>
           )}
         </div>
       </main>
 
-      {scannerOpen && (
-        <div className="pr-modal-overlay">
-          <div className="pr-modal-box">
-            <div className="pr-modal-header">
-              <div className="pr-modal-title">
-                <QrCode size={18} color="#818CF8" /> Scan Driver QR Code
+      {/* DIALOG 1: Onboarding Name Modal (Shown if new / no name set) */}
+      {showNameModal && (
+        <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(15, 23, 42, 0.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: 16 }}>
+          <div style={{ backgroundColor: "#FFFFFF", borderRadius: 20, border: "1.5px solid #0F172A", maxWidth: 460, width: "100%", padding: 32, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }}>
+            <div style={{ width: 48, height: 48, borderRadius: 14, backgroundColor: "#EEF2FF", border: "1px solid #C7D2FE", color: "#4338CA", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 18 }}>
+              <Sparkles size={24} />
+            </div>
+
+            <h3 style={{ fontSize: 20, fontWeight: 800, color: "#0F172A", marginBottom: 6 }}>
+              Welcome to Riksho Promoter!
+            </h3>
+            <p style={{ fontSize: 13.5, color: "#64748B", lineHeight: 1.5, marginBottom: 20 }}>
+              Please enter your full name to complete your promoter onboarding profile.
+            </p>
+
+            {onboardingError && (
+              <div className="admin-error-box" style={{ marginBottom: 16 }}>
+                <AlertCircle size={16} />
+                <span>{onboardingError}</span>
               </div>
-              <button onClick={handleCloseScanner} style={{ color: "var(--pr-text-muted)", background: "none", border: "none", cursor: "pointer" }}>
+            )}
+
+            <form onSubmit={handleSaveOnboardingName}>
+              <div className="admin-field-group">
+                <label className="admin-field-label">Full Name *</label>
+                <input
+                  type="text"
+                  required
+                  value={onboardingName}
+                  onChange={(e) => setOnboardingName(e.target.value)}
+                  placeholder="e.g. Rahul Sharma"
+                  className="admin-input"
+                  style={{ width: "100%" }}
+                  autoFocus
+                />
+              </div>
+
+              <div className="admin-field-group">
+                <label className="admin-field-label">Email Address (Optional)</label>
+                <input
+                  type="email"
+                  value={onboardingEmail}
+                  onChange={(e) => setOnboardingEmail(e.target.value)}
+                  placeholder="rahul@example.com"
+                  className="admin-input"
+                  style={{ width: "100%" }}
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={onboardingLoading || !onboardingName.trim()}
+                className="admin-btn-hero"
+                style={{ marginTop: 12 }}
+              >
+                <span>{onboardingLoading ? "Saving Profile…" : "Complete Registration"}</span>
+                <ArrowRight size={18} />
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* DIALOG 2: QR Scanner Modal */}
+      {scannerOpen && (
+        <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(15, 23, 42, 0.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: 16 }}>
+          <div style={{ backgroundColor: "#FFFFFF", borderRadius: 20, border: "1.5px solid #0F172A", maxWidth: 440, width: "100%", padding: 24, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <QrCode size={20} color="#4338CA" />
+                <h3 style={{ fontSize: 17, fontWeight: 800, color: "#0F172A" }}>Scan Driver QR Code</h3>
+              </div>
+              <button
+                onClick={handleCloseScanner}
+                style={{ background: "none", border: "none", color: "#64748B", cursor: "pointer" }}
+              >
                 <X size={20} />
               </button>
             </div>
 
             {scanError && (
-              <div className="pr-alert error">
-                <AlertCircle size={16} style={{ flexShrink: 0 }} />
+              <div className="admin-error-box" style={{ marginBottom: 14 }}>
+                <AlertCircle size={16} />
                 <span>{scanError}</span>
               </div>
             )}
 
             {scanSuccess && (
-              <div className="pr-alert success" style={{ flexDirection: "column", alignItems: "flex-start", gap: 8 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 6, fontWeight: 700 }}>
-                  <CheckCircle2 size={16} /> Recruit Verified Successfully!
+              <div style={{ backgroundColor: "#ECFDF5", border: "1px solid #A7F3D0", color: "#047857", padding: 16, borderRadius: 12, marginBottom: 14, fontSize: 13 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, fontWeight: 700, marginBottom: 4 }}>
+                  <CheckCircle2 size={16} /> Driver Verified Successfully!
                 </div>
-                <p style={{ fontSize: 12 }}>{scanSuccess.message}</p>
+                <p>{scanSuccess.message}</p>
                 <button
                   onClick={() => {
                     setScanSuccess(null);
                     setScannerOpen(false);
                   }}
-                  className="pr-btn-primary pr-btn-emerald"
-                  style={{ height: 36, fontSize: 12, marginTop: 6 }}
+                  className="admin-btn admin-btn-primary admin-btn-sm"
+                  style={{ marginTop: 10, width: "100%" }}
                 >
                   Done
                 </button>
@@ -568,32 +786,31 @@ export default function PromoterDashboard() {
 
             {!scanSuccess && (
               <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-                <div style={{ borderRadius: 18, overflow: "hidden", background: "#000000", maxWidth: 300, aspectRatio: "1/1", margin: "0 auto", border: "1px solid var(--pr-border)", width: "100%" }}>
+                <div style={{ borderRadius: 14, overflow: "hidden", background: "#000000", maxWidth: 280, aspectRatio: "1/1", margin: "0 auto", width: "100%" }}>
                   <div id="promoter-qr-reader" style={{ width: "100%", height: "100%" }} />
                 </div>
 
-                <div style={{ textAlign: "center", fontSize: 12, color: "var(--pr-text-muted)" }}>
+                <p style={{ textAlign: "center", fontSize: 12.5, color: "#64748B" }}>
                   Point camera at the QR code displayed in the driver's Riksho Buddy app.
-                </div>
+                </p>
 
-                <div style={{ borderTop: "1px solid var(--pr-border)", paddingTop: 14, display: "flex", flexDirection: "column", gap: 8 }}>
-                  <span style={{ fontSize: 11, color: "var(--pr-text-muted)", fontWeight: 600 }}>Or enter Driver ID manually:</span>
+                <div style={{ borderTop: "1px solid var(--admin-border)", paddingTop: 14 }}>
+                  <label className="admin-field-label" style={{ fontSize: 12 }}>Or enter Driver ID manually:</label>
                   <div style={{ display: "flex", gap: 8 }}>
                     <input
                       type="text"
                       value={manualDriverId}
                       onChange={(e) => setManualDriverId(e.target.value)}
                       placeholder="e.g. 550e8400-e29b-41d4-a716-446655440000"
-                      className="pr-text-input"
+                      className="admin-input"
                       style={{ fontSize: 12, fontFamily: "monospace" }}
                     />
                     <button
                       onClick={() => handleLinkDriver(manualDriverId)}
                       disabled={scanLoading || !manualDriverId.trim()}
-                      className="pr-btn-primary"
-                      style={{ width: "auto", padding: "0 18px", height: 42, fontSize: 12 }}
+                      className="admin-btn admin-btn-primary admin-btn-sm"
                     >
-                      {scanLoading ? <RefreshCw className="animate-spin" size={14} /> : "Verify"}
+                      {scanLoading ? <RefreshCw className="admin-spin" size={14} /> : "Verify"}
                     </button>
                   </div>
                 </div>
@@ -603,42 +820,47 @@ export default function PromoterDashboard() {
         </div>
       )}
 
+      {/* DIALOG 3: Withdrawal Request Modal */}
       {payoutOpen && (
-        <div className="pr-modal-overlay">
-          <div className="pr-modal-box">
-            <div className="pr-modal-header">
-              <div className="pr-modal-title">
-                <Wallet size={18} color="#34D399" /> Request Withdrawal
+        <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(15, 23, 42, 0.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: 16 }}>
+          <div style={{ backgroundColor: "#FFFFFF", borderRadius: 20, border: "1.5px solid #0F172A", maxWidth: 440, width: "100%", padding: 24, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <Wallet size={20} color="#059669" />
+                <h3 style={{ fontSize: 17, fontWeight: 800, color: "#0F172A" }}>Request Withdrawal</h3>
               </div>
-              <button onClick={() => setPayoutOpen(false)} style={{ color: "var(--pr-text-muted)", background: "none", border: "none", cursor: "pointer" }}>
+              <button
+                onClick={() => setPayoutOpen(false)}
+                style={{ background: "none", border: "none", color: "#64748B", cursor: "pointer" }}
+              >
                 <X size={20} />
               </button>
             </div>
 
-            <div style={{ background: "rgba(0,0,0,0.5)", border: "1px solid var(--pr-border)", padding: "12px 16px", borderRadius: 14, display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13, marginBottom: 14 }}>
-              <span style={{ color: "var(--pr-text-muted)" }}>Available Balance:</span>
-              <span style={{ fontWeight: 800, color: "#34D399", fontSize: 16 }}>₹{(stats.available_balance / 100).toFixed(2)}</span>
+            <div style={{ backgroundColor: "#F8FAFC", border: "1px solid #E2E8F0", padding: "12px 16px", borderRadius: 12, display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13, marginBottom: 16 }}>
+              <span style={{ color: "#64748B" }}>Available Balance:</span>
+              <strong style={{ color: "#059669", fontSize: 16 }}>₹{(stats.available_balance / 100).toFixed(2)}</strong>
             </div>
 
             {payoutError && (
-              <div className="pr-alert error">
-                <AlertCircle size={16} style={{ flexShrink: 0 }} />
+              <div className="admin-error-box" style={{ marginBottom: 14 }}>
+                <AlertCircle size={16} />
                 <span>{payoutError}</span>
               </div>
             )}
 
             {payoutSuccess && (
-              <div className="pr-alert success">
-                <CheckCircle2 size={16} style={{ flexShrink: 0 }} />
+              <div style={{ backgroundColor: "#ECFDF5", border: "1px solid #A7F3D0", color: "#047857", padding: 14, borderRadius: 12, marginBottom: 14, fontSize: 13, display: "flex", alignItems: "center", gap: 8 }}>
+                <CheckCircle2 size={16} />
                 <span>{payoutSuccess}</span>
               </div>
             )}
 
-            <form onSubmit={handleRequestPayout} className="pr-form">
-              <div className="pr-input-group">
-                <label className="pr-input-label">Amount to Withdraw (₹)</label>
-                <div style={{ position: "relative" }}>
-                  <span style={{ position: "absolute", left: 14, top: 12, color: "#94A3B8", fontWeight: 700 }}>₹</span>
+            <form onSubmit={handleRequestPayout}>
+              <div className="admin-field-group">
+                <label className="admin-field-label">Amount to Withdraw (₹)</label>
+                <div className="admin-input-wrapper">
+                  <span style={{ position: "absolute", left: 14, fontWeight: 700, color: "#64748B" }}>₹</span>
                   <input
                     type="number"
                     step="1"
@@ -648,32 +870,31 @@ export default function PromoterDashboard() {
                     value={payoutAmount}
                     onChange={(e) => setPayoutAmount(e.target.value)}
                     placeholder="e.g. 100"
-                    className="pr-text-input"
-                    style={{ paddingLeft: 32 }}
+                    className="admin-input"
+                    style={{ paddingLeft: 32, width: "100%" }}
                   />
                 </div>
               </div>
 
-              <div className="pr-input-group">
-                <label className="pr-input-label">Payout Method</label>
+              <div className="admin-field-group">
+                <label className="admin-field-label">Payout Method</label>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                   <button
                     type="button"
                     onClick={() => setPayoutMethod("upi")}
                     style={{
-                      height: 42,
-                      borderRadius: 12,
+                      padding: "9px 12px",
+                      borderRadius: 10,
                       fontSize: 13,
                       fontWeight: 700,
-                      border: "1px solid",
                       cursor: "pointer",
+                      border: payoutMethod === "upi" ? "1.5px solid #4338CA" : "1px solid #CBD5E1",
+                      backgroundColor: payoutMethod === "upi" ? "#EEF2FF" : "#FFFFFF",
+                      color: payoutMethod === "upi" ? "#4338CA" : "#64748B",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
                       gap: 6,
-                      background: payoutMethod === "upi" ? "rgba(99, 102, 241, 0.2)" : "rgba(0,0,0,0.4)",
-                      borderColor: payoutMethod === "upi" ? "#6366F1" : "var(--pr-border)",
-                      color: payoutMethod === "upi" ? "#FFFFFF" : "var(--pr-text-muted)",
                     }}
                   >
                     <Wallet size={14} /> UPI ID
@@ -683,19 +904,18 @@ export default function PromoterDashboard() {
                     type="button"
                     onClick={() => setPayoutMethod("bank")}
                     style={{
-                      height: 42,
-                      borderRadius: 12,
+                      padding: "9px 12px",
+                      borderRadius: 10,
                       fontSize: 13,
                       fontWeight: 700,
-                      border: "1px solid",
                       cursor: "pointer",
+                      border: payoutMethod === "bank" ? "1.5px solid #4338CA" : "1px solid #CBD5E1",
+                      backgroundColor: payoutMethod === "bank" ? "#EEF2FF" : "#FFFFFF",
+                      color: payoutMethod === "bank" ? "#4338CA" : "#64748B",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
                       gap: 6,
-                      background: payoutMethod === "bank" ? "rgba(99, 102, 241, 0.2)" : "rgba(0,0,0,0.4)",
-                      borderColor: payoutMethod === "bank" ? "#6366F1" : "var(--pr-border)",
-                      color: payoutMethod === "bank" ? "#FFFFFF" : "var(--pr-text-muted)",
                     }}
                   >
                     <Building size={14} /> Bank Account
@@ -704,69 +924,71 @@ export default function PromoterDashboard() {
               </div>
 
               {payoutMethod === "upi" && (
-                <div className="pr-input-group">
-                  <label className="pr-input-label">UPI ID / VPA *</label>
+                <div className="admin-field-group">
+                  <label className="admin-field-label">UPI ID / VPA *</label>
                   <input
                     type="text"
                     required
                     value={upiId}
                     onChange={(e) => setUpiId(e.target.value)}
-                    placeholder="mobile@paytm or name@okhdfcbank"
-                    className="pr-text-input"
-                    style={{ fontFamily: "monospace" }}
+                    placeholder="mobile@paytm or user@okhdfcbank"
+                    className="admin-input"
+                    style={{ width: "100%", fontFamily: "monospace" }}
                   />
                 </div>
               )}
 
               {payoutMethod === "bank" && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                  <div className="pr-input-group">
-                    <label className="pr-input-label">Account Holder Name *</label>
+                  <div className="admin-field-group">
+                    <label className="admin-field-label">Account Holder Name *</label>
                     <input
                       type="text"
                       required
                       value={accountHolderName}
                       onChange={(e) => setAccountHolderName(e.target.value)}
                       placeholder="Account holder's name"
-                      className="pr-text-input"
+                      className="admin-input"
+                      style={{ width: "100%" }}
                     />
                   </div>
 
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-                    <div className="pr-input-group">
-                      <label className="pr-input-label">Account No *</label>
+                    <div className="admin-field-group">
+                      <label className="admin-field-label">Account Number *</label>
                       <input
                         type="text"
                         required
                         value={bankAccountNo}
                         onChange={(e) => setBankAccountNo(e.target.value)}
                         placeholder="Account Number"
-                        className="pr-text-input"
-                        style={{ fontFamily: "monospace" }}
+                        className="admin-input"
+                        style={{ width: "100%", fontFamily: "monospace" }}
                       />
                     </div>
-                    <div className="pr-input-group">
-                      <label className="pr-input-label">IFSC Code *</label>
+                    <div className="admin-field-group">
+                      <label className="admin-field-label">IFSC Code *</label>
                       <input
                         type="text"
                         required
                         value={bankIfsc}
                         onChange={(e) => setBankIfsc(e.target.value.toUpperCase())}
                         placeholder="SBIN0001234"
-                        className="pr-text-input"
-                        style={{ fontFamily: "monospace", textTransform: "uppercase" }}
+                        className="admin-input"
+                        style={{ width: "100%", fontFamily: "monospace", textTransform: "uppercase" }}
                       />
                     </div>
                   </div>
 
-                  <div className="pr-input-group">
-                    <label className="pr-input-label">Bank Name (Optional)</label>
+                  <div className="admin-field-group">
+                    <label className="admin-field-label">Bank Name (Optional)</label>
                     <input
                       type="text"
                       value={bankName}
                       onChange={(e) => setBankName(e.target.value)}
                       placeholder="e.g. State Bank of India"
-                      className="pr-text-input"
+                      className="admin-input"
+                      style={{ width: "100%" }}
                     />
                   </div>
                 </div>
@@ -775,10 +997,10 @@ export default function PromoterDashboard() {
               <button
                 type="submit"
                 disabled={payoutLoading || !payoutAmount}
-                className="pr-btn-primary pr-btn-emerald"
-                style={{ marginTop: 6 }}
+                className="admin-btn admin-btn-primary"
+                style={{ width: "100%", marginTop: 8 }}
               >
-                {payoutLoading ? <RefreshCw className="animate-spin" size={16} /> : "Submit Withdrawal Request"}
+                {payoutLoading ? <RefreshCw className="admin-spin" size={16} /> : "Submit Withdrawal Request"}
               </button>
             </form>
           </div>
