@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { supabaseAdminClient } from "@/lib/supabaseAdminClient";
 import { adminFetch } from "@/lib/adminApi";
-import { LayoutDashboard, Users, LogOut, ShieldCheck, Loader2, Bell, UserMinus, MessageSquareX, Award } from "lucide-react";
+import { LayoutDashboard, Users, LogOut, ShieldCheck, Loader2, Bell, UserMinus, MessageSquareX, Award, Tag } from "lucide-react";
 import "@/styles/portal.css";
 
 export default function AdminLayout({
@@ -117,6 +117,12 @@ export default function AdminLayout({
             className={`admin-nav-item ${pathname.startsWith("/admin/promoters") ? "active" : ""}`}
           >
             <Award /> Brand Promoters
+          </Link>
+          <Link
+            href="/admin/promos"
+            className={`admin-nav-item ${pathname.startsWith("/admin/promos") ? "active" : ""}`}
+          >
+            <Tag /> Promo Codes
           </Link>
           {/* Phase 2:
           <Link href="/admin/rides" className="admin-nav-item"><Route /> Rides</Link>
