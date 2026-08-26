@@ -102,20 +102,7 @@ export default function AdminPromosPage() {
   const fetchPromos = async () => {
     setLoading(true);
     try {
-      // 1. Try Backend API endpoint
-      try {
-        const res = await adminFetch("/admin/promos");
-        if (res?.promos) {
-          setPromos(res.promos);
-          setStats(res.stats || calculateStats(res.promos));
-          setLoading(false);
-          return;
-        }
-      } catch (apiErr: any) {
-        console.log("Backend API not reachable or 404, falling back to direct Supabase query:", apiErr.message);
-      }
-
-      // 2. Direct Supabase Query Fallback
+      // Direct Supabase Query (eliminates remote 404 network errors)
       const { data: supaPromos, error: supaErr } = await adminSupabase
         .from("driver_promo_codes")
         .select("*")
@@ -194,69 +181,40 @@ export default function AdminPromosPage() {
     setFormError("");
 
     try {
-      let createdSuccessfully = false;
+      const { data: { user } } = await adminSupabase.auth.getUser();
 
-      // 1. Try Backend API
-      try {
-        await adminFetch("/admin/promos", {
-          method: "POST",
-          body: JSON.stringify({
-            code: cleanCode,
-            type: formType,
-            amount: payloadAmount,
-            duration_days: payloadDays,
-            plan_name: payloadPlanName,
-            max_redemptions: formMaxRedemptions ? parseInt(formMaxRedemptions) : null,
-            expires_at: formExpiresAt ? new Date(formExpiresAt).toISOString() : null,
-            description: formDescription.trim() || undefined,
-            is_active: formIsActive,
-          }),
+      // Check if code already exists in db
+      const { data: existing } = await adminSupabase
+        .from("driver_promo_codes")
+        .select("id")
+        .eq("code", cleanCode)
+        .maybeSingle();
+
+      if (existing) {
+        throw new Error(`Promo code "${cleanCode}" already exists. Please choose a different code.`);
+      }
+
+      const { error: insertErr } = await adminSupabase
+        .from("driver_promo_codes")
+        .insert({
+          code: cleanCode,
+          type: formType,
+          amount: payloadAmount,
+          duration_days: payloadDays,
+          plan_name: payloadPlanName,
+          max_redemptions: formMaxRedemptions ? parseInt(formMaxRedemptions) : null,
+          expires_at: formExpiresAt ? new Date(formExpiresAt).toISOString() : null,
+          description: formDescription.trim() || null,
+          is_active: formIsActive,
+          created_by: user?.id || null,
         });
-        createdSuccessfully = true;
-      } catch (apiErr: any) {
-        // If 404 (Route not found on remote backend), insert directly into Supabase table
-        if (apiErr.message?.includes("404") || apiErr.message?.includes("not found")) {
-          const { data: { user } } = await adminSupabase.auth.getUser();
 
-          // Check if code already exists in db
-          const { data: existing } = await adminSupabase
-            .from("driver_promo_codes")
-            .select("id")
-            .eq("code", cleanCode)
-            .maybeSingle();
+      if (insertErr) throw insertErr;
 
-          if (existing) {
-            throw new Error(`Promo code "${cleanCode}" already exists. Please choose a different code.`);
-          }
-
-          const { error: insertErr } = await adminSupabase
-            .from("driver_promo_codes")
-            .insert({
-              code: cleanCode,
-              type: formType,
-              amount: payloadAmount,
-              duration_days: payloadDays,
-              plan_name: payloadPlanName,
-              max_redemptions: formMaxRedemptions ? parseInt(formMaxRedemptions) : null,
-              expires_at: formExpiresAt ? new Date(formExpiresAt).toISOString() : null,
-              description: formDescription.trim() || null,
-              is_active: formIsActive,
-              created_by: user?.id || null,
-            });
-
-          if (insertErr) throw insertErr;
-          createdSuccessfully = true;
-        } else {
-          throw apiErr;
-        }
-      }
-
-      if (createdSuccessfully) {
-        showNotification("success", `Promo code "${cleanCode}" created successfully!`);
-        setCreateModalOpen(false);
-        resetForm();
-        fetchPromos();
-      }
+      showNotification("success", `Promo code "${cleanCode}" created successfully!`);
+      setCreateModalOpen(false);
+      resetForm();
+      fetchPromos();
     } catch (err: any) {
       setFormError(err.message || "Failed to create promo code.");
     } finally {
@@ -279,17 +237,12 @@ export default function AdminPromosPage() {
 
   const handleToggleStatus = async (promo: PromoCode) => {
     try {
-      try {
-        await adminFetch(`/admin/promos/${promo.id}`, {
-          method: "PATCH",
-          body: JSON.stringify({ is_active: !promo.is_active }),
-        });
-      } catch (apiErr) {
-        await adminSupabase
-          .from("driver_promo_codes")
-          .update({ is_active: !promo.is_active, updated_at: new Date().toISOString() })
-          .eq("id", promo.id);
-      }
+      const { error } = await adminSupabase
+        .from("driver_promo_codes")
+        .update({ is_active: !promo.is_active, updated_at: new Date().toISOString() })
+        .eq("id", promo.id);
+
+      if (error) throw error;
       showNotification("success", `Code "${promo.code}" is now ${!promo.is_active ? "Active" : "Inactive"}.`);
       fetchPromos();
     } catch (err: any) {
@@ -301,16 +254,12 @@ export default function AdminPromosPage() {
     if (!confirm(`Are you sure you want to delete promo code "${promo.code}"?`)) return;
 
     try {
-      try {
-        await adminFetch(`/admin/promos/${promo.id}`, {
-          method: "DELETE",
-        });
-      } catch (apiErr) {
-        await adminSupabase
-          .from("driver_promo_codes")
-          .delete()
-          .eq("id", promo.id);
-      }
+      const { error } = await adminSupabase
+        .from("driver_promo_codes")
+        .delete()
+        .eq("id", promo.id);
+
+      if (error) throw error;
       showNotification("success", `Promo code "${promo.code}" deleted.`);
       fetchPromos();
     } catch (err: any) {
