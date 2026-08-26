@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { adminFetch } from "@/lib/adminApi";
+import { adminSupabase } from "@/lib/supabaseAdminClient";
 import {
   Tag,
   Gift,
@@ -61,7 +62,7 @@ export default function AdminPromosPage() {
   const [typeFilter, setTypeFilter] = useState<"all" | "credit" | "free_pass">("all");
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
-  // Modal State for creating promo code
+  // Modal State for creating promo code (strictly max 6 chars)
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [formType, setFormType] = useState<"credit" | "free_pass">("credit");
   const [formCode, setFormCode] = useState("");
@@ -82,12 +83,51 @@ export default function AdminPromosPage() {
     setTimeout(() => setNotification(null), 4500);
   };
 
+  const calculateStats = (promoList: PromoCode[]) => {
+    const totalCodes = promoList.length;
+    const activeCodes = promoList.filter((p) => p.is_active).length;
+    const totalRedemptions = promoList.reduce((sum, p) => sum + (p.redemption_count || 0), 0);
+    const totalValueDistributed = promoList.reduce(
+      (sum, p) => sum + (p.redemption_count || 0) * Number(p.amount || 0),
+      0
+    );
+    return {
+      total_codes: totalCodes,
+      active_codes: activeCodes,
+      total_redemptions: totalRedemptions,
+      total_value_distributed: totalValueDistributed,
+    };
+  };
+
   const fetchPromos = async () => {
     setLoading(true);
     try {
-      const res = await adminFetch("/admin/promos");
-      setPromos(res.promos || []);
-      if (res.stats) setStats(res.stats);
+      // 1. Try Backend API endpoint
+      try {
+        const res = await adminFetch("/admin/promos");
+        if (res?.promos) {
+          setPromos(res.promos);
+          setStats(res.stats || calculateStats(res.promos));
+          setLoading(false);
+          return;
+        }
+      } catch (apiErr: any) {
+        console.log("Backend API not reachable or 404, falling back to direct Supabase query:", apiErr.message);
+      }
+
+      // 2. Direct Supabase Query Fallback
+      const { data: supaPromos, error: supaErr } = await adminSupabase
+        .from("driver_promo_codes")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (supaErr) {
+        throw supaErr;
+      }
+
+      const list = supaPromos || [];
+      setPromos(list);
+      setStats(calculateStats(list));
     } catch (err: any) {
       showNotification("error", err.message || "Failed to load promo codes.");
     } finally {
@@ -118,14 +158,14 @@ export default function AdminPromosPage() {
 
   const handleCreatePromo = async (e: React.FormEvent) => {
     e.preventDefault();
-    const cleanCode = formCode.trim().toUpperCase();
+    const cleanCode = formCode.trim().toUpperCase().replace(/[^A-Z0-9_-]/g, "").slice(0, 6);
 
     if (!cleanCode) {
-      setFormError("Please enter or generate a promo code.");
+      setFormError("Please enter or generate a 6-character promo code.");
       return;
     }
-    if (cleanCode.length < 3 || cleanCode.length > 15) {
-      setFormError("Code must be between 3 and 15 characters (e.g. 6 letters/numbers).");
+    if (cleanCode.length < 3 || cleanCode.length > 6) {
+      setFormError("Promo code must be between 3 and 6 characters (e.g. 6 letters/numbers).");
       return;
     }
 
@@ -154,25 +194,69 @@ export default function AdminPromosPage() {
     setFormError("");
 
     try {
-      await adminFetch("/admin/promos", {
-        method: "POST",
-        body: JSON.stringify({
-          code: cleanCode,
-          type: formType,
-          amount: payloadAmount,
-          duration_days: payloadDays,
-          plan_name: payloadPlanName,
-          max_redemptions: formMaxRedemptions ? parseInt(formMaxRedemptions) : null,
-          expires_at: formExpiresAt ? new Date(formExpiresAt).toISOString() : null,
-          description: formDescription.trim() || undefined,
-          is_active: formIsActive,
-        }),
-      });
+      let createdSuccessfully = false;
 
-      showNotification("success", `Promo code "${cleanCode}" created successfully!`);
-      setCreateModalOpen(false);
-      resetForm();
-      fetchPromos();
+      // 1. Try Backend API
+      try {
+        await adminFetch("/admin/promos", {
+          method: "POST",
+          body: JSON.stringify({
+            code: cleanCode,
+            type: formType,
+            amount: payloadAmount,
+            duration_days: payloadDays,
+            plan_name: payloadPlanName,
+            max_redemptions: formMaxRedemptions ? parseInt(formMaxRedemptions) : null,
+            expires_at: formExpiresAt ? new Date(formExpiresAt).toISOString() : null,
+            description: formDescription.trim() || undefined,
+            is_active: formIsActive,
+          }),
+        });
+        createdSuccessfully = true;
+      } catch (apiErr: any) {
+        // If 404 (Route not found on remote backend), insert directly into Supabase table
+        if (apiErr.message?.includes("404") || apiErr.message?.includes("not found")) {
+          const { data: { user } } = await adminSupabase.auth.getUser();
+
+          // Check if code already exists in db
+          const { data: existing } = await adminSupabase
+            .from("driver_promo_codes")
+            .select("id")
+            .eq("code", cleanCode)
+            .maybeSingle();
+
+          if (existing) {
+            throw new Error(`Promo code "${cleanCode}" already exists. Please choose a different code.`);
+          }
+
+          const { error: insertErr } = await adminSupabase
+            .from("driver_promo_codes")
+            .insert({
+              code: cleanCode,
+              type: formType,
+              amount: payloadAmount,
+              duration_days: payloadDays,
+              plan_name: payloadPlanName,
+              max_redemptions: formMaxRedemptions ? parseInt(formMaxRedemptions) : null,
+              expires_at: formExpiresAt ? new Date(formExpiresAt).toISOString() : null,
+              description: formDescription.trim() || null,
+              is_active: formIsActive,
+              created_by: user?.id || null,
+            });
+
+          if (insertErr) throw insertErr;
+          createdSuccessfully = true;
+        } else {
+          throw apiErr;
+        }
+      }
+
+      if (createdSuccessfully) {
+        showNotification("success", `Promo code "${cleanCode}" created successfully!`);
+        setCreateModalOpen(false);
+        resetForm();
+        fetchPromos();
+      }
     } catch (err: any) {
       setFormError(err.message || "Failed to create promo code.");
     } finally {
@@ -195,10 +279,17 @@ export default function AdminPromosPage() {
 
   const handleToggleStatus = async (promo: PromoCode) => {
     try {
-      await adminFetch(`/admin/promos/${promo.id}`, {
-        method: "PATCH",
-        body: JSON.stringify({ is_active: !promo.is_active }),
-      });
+      try {
+        await adminFetch(`/admin/promos/${promo.id}`, {
+          method: "PATCH",
+          body: JSON.stringify({ is_active: !promo.is_active }),
+        });
+      } catch (apiErr) {
+        await adminSupabase
+          .from("driver_promo_codes")
+          .update({ is_active: !promo.is_active, updated_at: new Date().toISOString() })
+          .eq("id", promo.id);
+      }
       showNotification("success", `Code "${promo.code}" is now ${!promo.is_active ? "Active" : "Inactive"}.`);
       fetchPromos();
     } catch (err: any) {
@@ -210,9 +301,16 @@ export default function AdminPromosPage() {
     if (!confirm(`Are you sure you want to delete promo code "${promo.code}"?`)) return;
 
     try {
-      await adminFetch(`/admin/promos/${promo.id}`, {
-        method: "DELETE",
-      });
+      try {
+        await adminFetch(`/admin/promos/${promo.id}`, {
+          method: "DELETE",
+        });
+      } catch (apiErr) {
+        await adminSupabase
+          .from("driver_promo_codes")
+          .delete()
+          .eq("id", promo.id);
+      }
       showNotification("success", `Promo code "${promo.code}" deleted.`);
       fetchPromos();
     } catch (err: any) {
@@ -268,7 +366,7 @@ export default function AdminPromosPage() {
             <Tag size={26} color="#4338CA" /> Driver Promo Codes & Vouchers
           </h1>
           <p style={{ fontSize: 14, color: "#64748B", margin: 0 }}>
-            Issue wallet credit vouchers or grant unlimited free platform access passes (X days) to drivers.
+            Issue 6-character wallet credit vouchers or grant unlimited free platform access passes (X days) to drivers.
           </p>
         </div>
 
@@ -590,7 +688,7 @@ export default function AdminPromosPage() {
         )}
       </div>
 
-      {/* Create Promo Modal */}
+      {/* Create Promo Modal (Strictly 6-Character Max Code) */}
       {createModalOpen && (
         <div
           style={{
@@ -697,26 +795,35 @@ export default function AdminPromosPage() {
                 </div>
               </div>
 
-              {/* Code Input with Randomizer */}
+              {/* Code Input with Strict 6-Character Limit and Randomizer */}
               <div style={{ marginBottom: 16 }}>
-                <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#334155", marginBottom: 6 }}>
-                  Promo Code (e.g. 6-Character)
-                </label>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                  <label style={{ fontSize: 13, fontWeight: 600, color: "#334155" }}>
+                    Promo Code (Max 6 Characters)
+                  </label>
+                  <span style={{ fontSize: 11, fontWeight: 600, color: formCode.length === 6 ? "#4338CA" : "#94A3B8" }}>
+                    {formCode.length} / 6
+                  </span>
+                </div>
                 <div style={{ display: "flex", gap: 8 }}>
                   <input
                     type="text"
                     value={formCode}
-                    onChange={(e) => setFormCode(e.target.value.toUpperCase())}
-                    placeholder={formType === "credit" ? "e.g. RIK100" : "e.g. FREE7DAYS"}
-                    maxLength={15}
+                    onChange={(e) => {
+                      const val = e.target.value.toUpperCase().replace(/[^A-Z0-9_-]/g, "").slice(0, 6);
+                      setFormCode(val);
+                      if (formError) setFormError("");
+                    }}
+                    placeholder={formType === "credit" ? "RIK100" : "RIDE06"}
+                    maxLength={6}
                     style={{
                       flex: 1,
                       padding: "10px 14px",
                       borderRadius: 10,
                       border: "1px solid #CBD5E1",
-                      fontSize: 15,
+                      fontSize: 16,
                       fontWeight: 700,
-                      letterSpacing: 1,
+                      letterSpacing: 2,
                       fontFamily: "monospace",
                       textTransform: "uppercase",
                       outline: "none",
