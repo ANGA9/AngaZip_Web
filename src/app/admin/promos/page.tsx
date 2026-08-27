@@ -36,6 +36,8 @@ interface PromoCode {
   redemption_count: number;
   expires_at: string | null;
   is_active: boolean;
+  is_deleted?: boolean;
+  deleted_at?: string | null;
   description: string | null;
   created_at: string;
 }
@@ -61,6 +63,10 @@ export default function AdminPromosPage() {
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
   const [typeFilter, setTypeFilter] = useState<"all" | "credit" | "free_pass">("all");
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
+
+  // Modal State for deleting / archiving promo code
+  const [promoToDelete, setPromoToDelete] = useState<PromoCode | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   // Modal State for creating promo code (strictly max 6 chars)
   const [createModalOpen, setCreateModalOpen] = useState(false);
@@ -102,10 +108,11 @@ export default function AdminPromosPage() {
   const fetchPromos = async () => {
     setLoading(true);
     try {
-      // Direct Supabase Query (eliminates remote 404 network errors)
+      // Direct Supabase Query (filtering out deleted codes)
       const { data: supaPromos, error: supaErr } = await adminSupabase
         .from("driver_promo_codes")
         .select("*")
+        .or("is_deleted.is.null,is_deleted.eq.false")
         .order("created_at", { ascending: false });
 
       if (supaErr) {
@@ -183,33 +190,56 @@ export default function AdminPromosPage() {
     try {
       const { data: { user } } = await adminSupabase.auth.getUser();
 
-      // Check if code already exists in db
+      // Check if active code already exists in db
       const { data: existing } = await adminSupabase
         .from("driver_promo_codes")
-        .select("id")
+        .select("id, is_deleted")
         .eq("code", cleanCode)
         .maybeSingle();
 
-      if (existing) {
+      if (existing && !existing.is_deleted) {
         throw new Error(`Promo code "${cleanCode}" already exists. Please choose a different code.`);
       }
 
-      const { error: insertErr } = await adminSupabase
-        .from("driver_promo_codes")
-        .insert({
-          code: cleanCode,
-          type: formType,
-          amount: payloadAmount,
-          duration_days: payloadDays,
-          plan_name: payloadPlanName,
-          max_redemptions: formMaxRedemptions ? parseInt(formMaxRedemptions) : null,
-          expires_at: formExpiresAt ? new Date(formExpiresAt).toISOString() : null,
-          description: formDescription.trim() || null,
-          is_active: formIsActive,
-          created_by: user?.id || null,
-        });
+      if (existing && existing.is_deleted) {
+        const { error: updateErr } = await adminSupabase
+          .from("driver_promo_codes")
+          .update({
+            type: formType,
+            amount: payloadAmount,
+            duration_days: payloadDays,
+            plan_name: payloadPlanName,
+            max_redemptions: formMaxRedemptions ? parseInt(formMaxRedemptions) : null,
+            expires_at: formExpiresAt ? new Date(formExpiresAt).toISOString() : null,
+            description: formDescription.trim() || null,
+            is_active: formIsActive,
+            is_deleted: false,
+            deleted_at: null,
+            created_by: user?.id || null,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", existing.id);
 
-      if (insertErr) throw insertErr;
+        if (updateErr) throw updateErr;
+      } else {
+        const { error: insertErr } = await adminSupabase
+          .from("driver_promo_codes")
+          .insert({
+            code: cleanCode,
+            type: formType,
+            amount: payloadAmount,
+            duration_days: payloadDays,
+            plan_name: payloadPlanName,
+            max_redemptions: formMaxRedemptions ? parseInt(formMaxRedemptions) : null,
+            expires_at: formExpiresAt ? new Date(formExpiresAt).toISOString() : null,
+            description: formDescription.trim() || null,
+            is_active: formIsActive,
+            is_deleted: false,
+            created_by: user?.id || null,
+          });
+
+        if (insertErr) throw insertErr;
+      }
 
       showNotification("success", `Promo code "${cleanCode}" created successfully!`);
       setCreateModalOpen(false);
@@ -250,20 +280,33 @@ export default function AdminPromosPage() {
     }
   };
 
-  const handleDelete = async (promo: PromoCode) => {
-    if (!confirm(`Are you sure you want to delete promo code "${promo.code}"?`)) return;
+  const handleDeleteClick = (promo: PromoCode) => {
+    setPromoToDelete(promo);
+  };
+
+  const confirmDeletePromo = async () => {
+    if (!promoToDelete) return;
+    setDeleting(true);
 
     try {
       const { error } = await adminSupabase
         .from("driver_promo_codes")
-        .delete()
-        .eq("id", promo.id);
+        .update({
+          is_active: false,
+          is_deleted: true,
+          deleted_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", promoToDelete.id);
 
       if (error) throw error;
-      showNotification("success", `Promo code "${promo.code}" deleted.`);
+      showNotification("success", `Promo code "${promoToDelete.code}" deleted. New claims are now blocked.`);
+      setPromoToDelete(null);
       fetchPromos();
     } catch (err: any) {
       showNotification("error", err.message || "Failed to delete promo code.");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -614,8 +657,8 @@ export default function AdminPromosPage() {
                             {promo.is_active ? <ToggleRight size={22} /> : <ToggleLeft size={22} />}
                           </button>
                           <button
-                            onClick={() => handleDelete(promo)}
-                            title="Delete"
+                            onClick={() => handleDeleteClick(promo)}
+                            title="Delete / Discontinue Promo"
                             style={{
                               background: "none",
                               border: "none",
@@ -995,6 +1038,141 @@ export default function AdminPromosPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Promo Confirmation Modal */}
+      {promoToDelete && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(15, 23, 42, 0.65)",
+            backdropFilter: "blur(4px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 99999,
+            padding: 20,
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "#FFFFFF",
+              borderRadius: 20,
+              width: "100%",
+              maxWidth: 480,
+              padding: 28,
+              boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+              border: "1px solid #F1F5F9",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 18 }}>
+              <div
+                style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 14,
+                  backgroundColor: "#FEE2E2",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Trash2 size={24} color="#DC2626" />
+              </div>
+              <div>
+                <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0, color: "#0F172A" }}>
+                  Delete Promo Code?
+                </h2>
+                <div style={{ display: "inline-block", backgroundColor: "#FEF2F2", color: "#B91C1C", border: "1px solid #FECACA", padding: "2px 8px", borderRadius: 6, fontSize: 13, fontWeight: 700, marginTop: 4, letterSpacing: 0.5 }}>
+                  {promoToDelete.code}
+                </div>
+              </div>
+            </div>
+
+            {/* Explanation box detailing the exact business rules */}
+            <div
+              style={{
+                backgroundColor: "#F8FAFC",
+                borderRadius: 12,
+                padding: "14px 16px",
+                border: "1px solid #E2E8F0",
+                fontSize: 13,
+                color: "#334155",
+                lineHeight: "1.5",
+                marginBottom: 20,
+              }}
+            >
+              <div style={{ fontWeight: 600, color: "#0F172A", marginBottom: 6 }}>
+                What happens when this code is deleted:
+              </div>
+              <ul style={{ margin: 0, paddingLeft: 18, color: "#475569" }}>
+                <li style={{ marginBottom: 6 }}>
+                  <strong>New claims blocked:</strong> No driver will be able to claim or redeem <code>{promoToDelete.code}</code>.
+                </li>
+                <li style={{ marginBottom: 6 }}>
+                  <strong>Active drivers protected:</strong> Any driver who has <em>already claimed</em> this promo will keep their active drive pass or usable balance until it naturally expires.
+                </li>
+                <li>
+                  <strong>No re-use:</strong> Once a driver&apos;s existing claimed pass or balance finishes, they cannot use or claim this code again.
+                </li>
+              </ul>
+            </div>
+
+            <div style={{ display: "flex", gap: 12 }}>
+              <button
+                type="button"
+                disabled={deleting}
+                onClick={() => setPromoToDelete(null)}
+                style={{
+                  flex: 1,
+                  padding: "12px",
+                  borderRadius: 10,
+                  border: "1px solid #CBD5E1",
+                  backgroundColor: "#FFFFFF",
+                  color: "#475569",
+                  fontWeight: 600,
+                  fontSize: 14,
+                  cursor: deleting ? "not-allowed" : "pointer",
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={deleting}
+                onClick={confirmDeletePromo}
+                style={{
+                  flex: 1.5,
+                  padding: "12px",
+                  borderRadius: 10,
+                  border: "none",
+                  backgroundColor: "#DC2626",
+                  color: "#FFFFFF",
+                  fontWeight: 600,
+                  fontSize: 14,
+                  cursor: deleting ? "not-allowed" : "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 8,
+                  boxShadow: "0 4px 12px rgba(220, 38, 38, 0.25)",
+                }}
+              >
+                {deleting ? (
+                  <>
+                    <Loader2 className="animate-spin" size={16} /> Deleting...
+                  </>
+                ) : (
+                  "Yes, Delete Promo"
+                )}
+              </button>
+            </div>
           </div>
         </div>
       )}
