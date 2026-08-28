@@ -30,39 +30,41 @@ export default function IncompleteDriversPage() {
       <p className="admin-page-subtitle">Users who have authenticated via OTP but have not submitted the onboarding form.</p>
 
       <div className="admin-table-container" style={{ marginTop: 24 }}>
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>Phone Number</th>
-              <th>First Seen</th>
-              <th>Last Sign In</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
+        <div className="admin-table-scroll">
+          <table className="admin-table">
+            <thead>
               <tr>
-                <td colSpan={3} style={{ textAlign: "center", padding: "40px" }}>
-                  <Loader2 className="admin-spin" style={{ margin: "0 auto" }} />
-                </td>
+                <th>Phone Number</th>
+                <th>First Seen</th>
+                <th>Last Sign In</th>
               </tr>
-            ) : users.length === 0 ? (
-              <tr>
-                <td colSpan={3} style={{ textAlign: "center", padding: "40px", color: "#6b7280" }}>
-                  <UserMinus size={40} style={{ margin: "0 auto 12px", opacity: 0.2 }} />
-                  No incomplete onboardings found.
-                </td>
-              </tr>
-            ) : (
-              users.map(user => (
-                <tr key={user.id}>
-                  <td style={{ fontWeight: 600 }}>{user.phone}</td>
-                  <td>{new Date(user.created_at).toLocaleString()}</td>
-                  <td>{user.last_sign_in_at ? new Date(user.last_sign_in_at).toLocaleString() : "Never"}</td>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan={3} style={{ textAlign: "center", padding: "40px" }}>
+                    <Loader2 className="admin-spin" style={{ margin: "0 auto" }} />
+                  </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : users.length === 0 ? (
+                <tr>
+                  <td colSpan={3} style={{ textAlign: "center", padding: "40px", color: "#6b7280" }}>
+                    <UserMinus size={40} style={{ margin: "0 auto 12px", opacity: 0.2 }} />
+                    No incomplete onboardings found.
+                  </td>
+                </tr>
+              ) : (
+                users.map(user => (
+                  <tr key={user.id}>
+                    <td style={{ fontWeight: 600 }}>{user.phone}</td>
+                    <td>{new Date(user.created_at).toLocaleString()}</td>
+                    <td>{user.last_sign_in_at ? new Date(user.last_sign_in_at).toLocaleString() : "Never"}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

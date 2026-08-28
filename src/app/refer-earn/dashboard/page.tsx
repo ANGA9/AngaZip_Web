@@ -21,6 +21,7 @@ import {
   LayoutDashboard,
   ArrowRight,
   ShieldCheck,
+  Menu,
 } from "lucide-react";
 import { Html5Qrcode } from "html5-qrcode";
 import Link from "next/link";
@@ -33,6 +34,7 @@ export default function PromoterDashboard() {
   const [activeTab, setActiveTab] = useState<"recruits" | "payouts">("recruits");
   const [approvalStatus, setApprovalStatus] = useState<"unregistered" | "pending" | "approved" | "rejected">("unregistered");
   const [promoterProfile, setPromoterProfile] = useState<any>(null);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   // Name Onboarding Form State
   const [onboardingName, setOnboardingName] = useState("");
@@ -370,8 +372,27 @@ export default function PromoterDashboard() {
 
   return (
     <div className="admin-layout">
+      {/* Mobile Backdrop Overlay */}
+      <div
+        className={`admin-sidebar-backdrop ${mobileNavOpen ? "open" : ""}`}
+        onClick={() => setMobileNavOpen(false)}
+        aria-hidden="true"
+      />
+
       {/* Sidebar matching Riksho Admin */}
-      <aside className="admin-sidebar">
+      <aside className={`admin-sidebar ${mobileNavOpen ? "open" : ""}`}>
+        {/* Mobile Sidebar Header with Close Button */}
+        <div className="admin-sidebar-header-mobile">
+          <img src="/images/final_riksho.png" alt="Riksho Promoter" style={{ height: "26px" }} />
+          <button
+            className="admin-sidebar-close-btn"
+            onClick={() => setMobileNavOpen(false)}
+            aria-label="Close navigation"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
         <div className="admin-sidebar-logo">
           <img src="/images/final_riksho.png" alt="Riksho Promoter" />
         </div>
@@ -379,7 +400,10 @@ export default function PromoterDashboard() {
         <nav className="admin-sidebar-nav">
           <div className="admin-nav-section-label">Promoter Hub</div>
           <button
-            onClick={() => setActiveTab("recruits")}
+            onClick={() => {
+              setActiveTab("recruits");
+              setMobileNavOpen(false);
+            }}
             className={`admin-nav-item ${activeTab === "recruits" ? "active" : ""}`}
             style={{ width: "100%", background: "none", border: "none", cursor: "pointer", textAlign: "left" }}
           >
@@ -387,7 +411,10 @@ export default function PromoterDashboard() {
           </button>
 
           <button
-            onClick={() => setActiveTab("payouts")}
+            onClick={() => {
+              setActiveTab("payouts");
+              setMobileNavOpen(false);
+            }}
             className={`admin-nav-item ${activeTab === "payouts" ? "active" : ""}`}
             style={{ width: "100%", background: "none", border: "none", cursor: "pointer", textAlign: "left" }}
           >
@@ -395,7 +422,7 @@ export default function PromoterDashboard() {
           </button>
 
           <div className="admin-nav-section-label">External</div>
-          <Link href="/" className="admin-nav-item">
+          <Link href="/" className="admin-nav-item" onClick={() => setMobileNavOpen(false)}>
             <ArrowRight /> Main Website
           </Link>
         </nav>
@@ -405,8 +432,30 @@ export default function PromoterDashboard() {
       <main className="admin-main">
         {/* Top Header */}
         <header className="admin-header">
+          {/* Mobile Hamburger & Logo */}
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <button
+              className="admin-mobile-menu-btn"
+              onClick={() => setMobileNavOpen(true)}
+              aria-label="Open menu"
+            >
+              <Menu size={20} />
+            </button>
+            <div className="admin-mobile-brand">
+              <img src="/images/final_riksho.png" alt="Riksho Promoter" />
+            </div>
+          </div>
+
           <div className="admin-header-user">
-            <span className="admin-header-email">
+            <span
+              className="admin-header-email"
+              style={{
+                maxWidth: 160,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
               {promoter.name || "Promoter"} ({promoter.phone || "Partner"})
             </span>
             <span
@@ -417,7 +466,7 @@ export default function PromoterDashboard() {
               }}
             >
               {approvalStatus === "approved" ? <CheckCircle2 size={13} /> : <Clock size={13} />}
-              {approvalStatus === "approved" ? "Approved Promoter" : "Under Review"}
+              {approvalStatus === "approved" ? "Approved" : "Under Review"}
             </span>
             <button onClick={handleSignOut} className="admin-logout-btn">
               <LogOut size={14} /> Log out
@@ -445,11 +494,11 @@ export default function PromoterDashboard() {
               </p>
             </div>
 
-            <div style={{ display: "flex", gap: "10px" }}>
+            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", width: "100%", maxWidth: "380px" }}>
               <button
                 onClick={() => setScannerOpen(true)}
                 className="admin-btn admin-btn-primary"
-                style={{ gap: "8px" }}
+                style={{ gap: "8px", flex: 1, minWidth: "140px", justifyContent: "center" }}
               >
                 <QrCode size={16} /> Scan Driver QR
               </button>
@@ -458,7 +507,7 @@ export default function PromoterDashboard() {
                 onClick={() => setPayoutOpen(true)}
                 disabled={stats.available_balance < 1000}
                 className="admin-btn admin-btn-secondary"
-                style={{ gap: "8px" }}
+                style={{ gap: "8px", flex: 1, minWidth: "140px", justifyContent: "center" }}
               >
                 <Wallet size={16} /> Withdraw Payout
               </button>
@@ -595,51 +644,53 @@ export default function PromoterDashboard() {
                   </button>
                 </div>
               ) : (
-                <table className="admin-table">
-                  <thead>
-                    <tr>
-                      <th>Driver Name</th>
-                      <th>Phone Number</th>
-                      <th>Date Verified</th>
-                      <th>Reward Amount</th>
-                      <th style={{ textAlign: "right" }}>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {referrals.map((r: any) => {
-                      const isTest = r.driver_name?.includes("[TEST]");
-                      const cleanName = r.driver_name?.replace("[TEST]", "").trim() || "Riksho Partner";
-                      return (
-                        <tr key={r.id}>
-                          <td style={{ fontWeight: 600, color: "#0F172A" }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                              <span>{cleanName}</span>
-                              {isTest && (
-                                <span style={{ fontSize: 10, fontWeight: 800, background: "#EEF2FF", color: "#4338CA", padding: "2px 6px", borderRadius: 4, border: "1px solid #C7D2FE" }}>
-                                  TEST
-                                </span>
-                              )}
-                            </div>
-                          </td>
-                          <td style={{ fontFamily: "monospace", color: "#64748b" }}>
-                            {r.driver_phone || "—"}
-                          </td>
-                          <td style={{ color: "#64748b" }}>
-                            {new Date(r.created_at).toLocaleDateString()} {new Date(r.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                          </td>
-                          <td style={{ fontWeight: 700, color: "#059669" }}>
-                            +₹{(r.reward_amount / 100).toFixed(2)}
-                          </td>
-                          <td style={{ textAlign: "right" }}>
-                            <span className="admin-chip" style={{ backgroundColor: "#ECFDF5", color: "#047857" }}>
-                              <CheckCircle2 size={12} /> Verified
-                            </span>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+                <div className="admin-table-scroll">
+                  <table className="admin-table">
+                    <thead>
+                      <tr>
+                        <th>Driver Name</th>
+                        <th>Phone Number</th>
+                        <th>Date Verified</th>
+                        <th>Reward Amount</th>
+                        <th style={{ textAlign: "right" }}>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {referrals.map((r: any) => {
+                        const isTest = r.driver_name?.includes("[TEST]");
+                        const cleanName = r.driver_name?.replace("[TEST]", "").trim() || "Riksho Partner";
+                        return (
+                          <tr key={r.id}>
+                            <td style={{ fontWeight: 600, color: "#0F172A" }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                <span>{cleanName}</span>
+                                {isTest && (
+                                  <span style={{ fontSize: 10, fontWeight: 800, background: "#EEF2FF", color: "#4338CA", padding: "2px 6px", borderRadius: 4, border: "1px solid #C7D2FE" }}>
+                                    TEST
+                                  </span>
+                                )}
+                              </div>
+                            </td>
+                            <td style={{ fontFamily: "monospace", color: "#64748b" }}>
+                              {r.driver_phone || "—"}
+                            </td>
+                            <td style={{ color: "#64748b" }}>
+                              {new Date(r.created_at).toLocaleDateString()} {new Date(r.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                            </td>
+                            <td style={{ fontWeight: 700, color: "#059669" }}>
+                              +₹{(r.reward_amount / 100).toFixed(2)}
+                            </td>
+                            <td style={{ textAlign: "right" }}>
+                              <span className="admin-chip" style={{ backgroundColor: "#ECFDF5", color: "#047857" }}>
+                                <CheckCircle2 size={12} /> Verified
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
               )}
             </div>
           )}
@@ -656,58 +707,60 @@ export default function PromoterDashboard() {
                   </p>
                 </div>
               ) : (
-                <table className="admin-table">
-                  <thead>
-                    <tr>
-                      <th>Requested Date</th>
-                      <th>Amount</th>
-                      <th>Payout Method & Destination</th>
-                      <th>Transaction Ref / Note</th>
-                      <th style={{ textAlign: "right" }}>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {payouts.map((p: any) => (
-                      <tr key={p.id}>
-                        <td style={{ color: "#64748b" }}>
-                          {new Date(p.requested_at).toLocaleDateString()} {new Date(p.requested_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                        </td>
-                        <td style={{ fontWeight: 700, color: "#0F172A" }}>
-                          ₹{(p.amount / 100).toFixed(2)}
-                        </td>
-                        <td>
-                          {p.payout_method === "upi" ? (
-                            <div style={{ fontFamily: "monospace", color: "#4338CA" }}>UPI: {p.upi_id}</div>
-                          ) : (
-                            <div>
-                              <strong style={{ color: "#0F172A" }}>{p.bank_name || "Bank"}</strong> (A/C: {p.bank_account_no})
-                            </div>
-                          )}
-                        </td>
-                        <td style={{ fontFamily: "monospace", fontSize: 12, color: "#64748b" }}>
-                          {p.transaction_ref ? `Txn: ${p.transaction_ref}` : p.admin_notes || "—"}
-                        </td>
-                        <td style={{ textAlign: "right" }}>
-                          {p.status === "paid" && (
-                            <span className="admin-chip" style={{ backgroundColor: "#ECFDF5", color: "#047857" }}>
-                              <CheckCircle2 size={12} /> Paid
-                            </span>
-                          )}
-                          {p.status === "pending" && (
-                            <span className="admin-chip" style={{ backgroundColor: "#FEF3C7", color: "#B45309" }}>
-                              <Clock size={12} /> In Review
-                            </span>
-                          )}
-                          {p.status === "rejected" && (
-                            <span className="admin-chip" style={{ backgroundColor: "#FEE2E2", color: "#DC2626" }}>
-                              <AlertCircle size={12} /> Rejected
-                            </span>
-                          )}
-                        </td>
+                <div className="admin-table-scroll">
+                  <table className="admin-table">
+                    <thead>
+                      <tr>
+                        <th>Requested Date</th>
+                        <th>Amount</th>
+                        <th>Payout Method & Destination</th>
+                        <th>Transaction Ref / Note</th>
+                        <th style={{ textAlign: "right" }}>Status</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {payouts.map((p: any) => (
+                        <tr key={p.id}>
+                          <td style={{ color: "#64748b" }}>
+                            {new Date(p.requested_at).toLocaleDateString()} {new Date(p.requested_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                          </td>
+                          <td style={{ fontWeight: 700, color: "#0F172A" }}>
+                            ₹{(p.amount / 100).toFixed(2)}
+                          </td>
+                          <td>
+                            {p.payout_method === "upi" ? (
+                              <div style={{ fontFamily: "monospace", color: "#4338CA" }}>UPI: {p.upi_id}</div>
+                            ) : (
+                              <div>
+                                <strong style={{ color: "#0F172A" }}>{p.bank_name || "Bank"}</strong> (A/C: {p.bank_account_no})
+                              </div>
+                            )}
+                          </td>
+                          <td style={{ fontFamily: "monospace", fontSize: 12, color: "#64748b" }}>
+                            {p.transaction_ref ? `Txn: ${p.transaction_ref}` : p.admin_notes || "—"}
+                          </td>
+                          <td style={{ textAlign: "right" }}>
+                            {p.status === "paid" && (
+                              <span className="admin-chip" style={{ backgroundColor: "#ECFDF5", color: "#047857" }}>
+                                <CheckCircle2 size={12} /> Paid
+                              </span>
+                            )}
+                            {p.status === "pending" && (
+                              <span className="admin-chip" style={{ backgroundColor: "#FEF3C7", color: "#B45309" }}>
+                                <Clock size={12} /> In Review
+                              </span>
+                            )}
+                            {p.status === "rejected" && (
+                              <span className="admin-chip" style={{ backgroundColor: "#FEE2E2", color: "#DC2626" }}>
+                                <AlertCircle size={12} /> Rejected
+                              </span>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               )}
             </div>
           )}

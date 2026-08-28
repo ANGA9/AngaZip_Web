@@ -252,62 +252,101 @@ export default function AdminPromotersPage() {
       {/* TAB 1: Promoters Table */}
       {activeTab === "promoters" && (
         <div className="admin-table-container">
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>Promoter</th>
-                <th>Status</th>
-                <th>Recruits</th>
-                <th>Total Earned</th>
-                <th>Available Balance</th>
-                <th>Joined</th>
-                <th style={{ textAlign: "right" }}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
+          <div className="admin-table-scroll">
+            <table className="admin-table">
+              <thead>
                 <tr>
-                  <td colSpan={7} style={{ textAlign: "center", padding: 40 }}>
-                    <Loader2 className="admin-spin" style={{ margin: "0 auto" }} />
-                  </td>
+                  <th>Promoter</th>
+                  <th>Status</th>
+                  <th>Recruits</th>
+                  <th>Total Earned</th>
+                  <th>Available Balance</th>
+                  <th>Joined</th>
+                  <th style={{ textAlign: "right" }}>Actions</th>
                 </tr>
-              ) : promoters.length === 0 ? (
-                <tr>
-                  <td colSpan={7} style={{ textAlign: "center", padding: 40, color: "#6b7280" }}>
-                    No promoters found.
-                  </td>
-                </tr>
-              ) : (
-                promoters.map((p) => (
-                  <tr key={p.id}>
-                    <td>
-                      <div style={{ fontWeight: 600, color: "#111827" }}>{p.name || "Unnamed"}</div>
-                      <div style={{ fontSize: 12, color: "#6b7280", fontFamily: "monospace" }}>{p.phone}</div>
+              </thead>
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td colSpan={7} style={{ textAlign: "center", padding: 40 }}>
+                      <Loader2 className="admin-spin" style={{ margin: "0 auto" }} />
                     </td>
-                    <td>
-                      {p.approval_status === "approved" && (
-                        <span style={{ padding: "3px 8px", borderRadius: 12, fontSize: 11, fontWeight: 600, backgroundColor: "#dcfce7", color: "#15803d" }}>
-                          Approved
-                        </span>
-                      )}
-                      {p.approval_status === "pending" && (
-                        <span style={{ padding: "3px 8px", borderRadius: 12, fontSize: 11, fontWeight: 600, backgroundColor: "#fef3c7", color: "#b45309" }}>
-                          Pending
-                        </span>
-                      )}
-                      {p.approval_status === "rejected" && (
-                        <span style={{ padding: "3px 8px", borderRadius: 12, fontSize: 11, fontWeight: 600, backgroundColor: "#fee2e2", color: "#b91c1c" }}>
-                          Rejected
-                        </span>
-                      )}
+                  </tr>
+                ) : promoters.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} style={{ textAlign: "center", padding: 40, color: "#6b7280" }}>
+                      No promoters found.
                     </td>
-                    <td style={{ fontWeight: 600 }}>{p.total_recruits || 0}</td>
-                    <td style={{ color: "#059669", fontWeight: 600 }}>₹{((p.total_earnings || 0) / 100).toFixed(2)}</td>
-                    <td style={{ fontWeight: 600 }}>₹{((p.available_balance || 0) / 100).toFixed(2)}</td>
-                    <td style={{ fontSize: 12, color: "#6b7280" }}>{new Date(p.created_at).toLocaleDateString()}</td>
-                    <td style={{ textAlign: "right" }}>
-                      {p.approval_status === "pending" && (
-                        <div style={{ display: "flex", gap: 6, justifyContent: "flex-end" }}>
+                  </tr>
+                ) : (
+                  promoters.map((p) => (
+                    <tr key={p.id}>
+                      <td>
+                        <div style={{ fontWeight: 600, color: "#111827" }}>{p.name || "Unnamed"}</div>
+                        <div style={{ fontSize: 12, color: "#6b7280", fontFamily: "monospace" }}>{p.phone}</div>
+                      </td>
+                      <td>
+                        {p.approval_status === "approved" && (
+                          <span style={{ padding: "3px 8px", borderRadius: 12, fontSize: 11, fontWeight: 600, backgroundColor: "#dcfce7", color: "#15803d" }}>
+                            Approved
+                          </span>
+                        )}
+                        {p.approval_status === "pending" && (
+                          <span style={{ padding: "3px 8px", borderRadius: 12, fontSize: 11, fontWeight: 600, backgroundColor: "#fef3c7", color: "#b45309" }}>
+                            Pending
+                          </span>
+                        )}
+                        {p.approval_status === "rejected" && (
+                          <span style={{ padding: "3px 8px", borderRadius: 12, fontSize: 11, fontWeight: 600, backgroundColor: "#fee2e2", color: "#b91c1c" }}>
+                            Rejected
+                          </span>
+                        )}
+                      </td>
+                      <td style={{ fontWeight: 600 }}>{p.total_recruits || 0}</td>
+                      <td style={{ color: "#059669", fontWeight: 600 }}>₹{((p.total_earnings || 0) / 100).toFixed(2)}</td>
+                      <td style={{ fontWeight: 600 }}>₹{((p.available_balance || 0) / 100).toFixed(2)}</td>
+                      <td style={{ fontSize: 12, color: "#6b7280" }}>{new Date(p.created_at).toLocaleDateString()}</td>
+                      <td style={{ textAlign: "right" }}>
+                        {p.approval_status === "pending" && (
+                          <div style={{ display: "flex", gap: 6, justifyContent: "flex-end" }}>
+                            <button
+                              onClick={() => handleApprovePromoter(p.id)}
+                              disabled={actionLoading}
+                              style={{
+                                padding: "4px 10px",
+                                borderRadius: 6,
+                                fontSize: 12,
+                                fontWeight: 600,
+                                backgroundColor: "#4f46e5",
+                                color: "#fff",
+                                border: "none",
+                                cursor: "pointer",
+                              }}
+                            >
+                              Approve
+                            </button>
+                            <button
+                              onClick={() => { setSelectedPromoterId(p.id); setRejectModalOpen(true); }}
+                              disabled={actionLoading}
+                              style={{
+                                padding: "4px 10px",
+                                borderRadius: 6,
+                                fontSize: 12,
+                                fontWeight: 600,
+                                backgroundColor: "#fee2e2",
+                                color: "#b91c1c",
+                                border: "none",
+                                cursor: "pointer",
+                              }}
+                            >
+                              Reject
+                            </button>
+                          </div>
+                        )}
+                        {p.approval_status === "approved" && (
+                          <span style={{ fontSize: 12, color: "#059669" }}>Active</span>
+                        )}
+                        {p.approval_status === "rejected" && (
                           <button
                             onClick={() => handleApprovePromoter(p.id)}
                             disabled={actionLoading}
@@ -316,178 +355,143 @@ export default function AdminPromotersPage() {
                               borderRadius: 6,
                               fontSize: 12,
                               fontWeight: 600,
-                              backgroundColor: "#4f46e5",
-                              color: "#fff",
-                              border: "none",
+                              backgroundColor: "#f3f4f6",
+                              color: "#374151",
+                              border: "1px solid #d1d5db",
                               cursor: "pointer",
                             }}
                           >
-                            Approve
+                            Re-approve
                           </button>
-                          <button
-                            onClick={() => { setSelectedPromoterId(p.id); setRejectModalOpen(true); }}
-                            disabled={actionLoading}
-                            style={{
-                              padding: "4px 10px",
-                              borderRadius: 6,
-                              fontSize: 12,
-                              fontWeight: 600,
-                              backgroundColor: "#fee2e2",
-                              color: "#b91c1c",
-                              border: "none",
-                              cursor: "pointer",
-                            }}
-                          >
-                            Reject
-                          </button>
-                        </div>
-                      )}
-                      {p.approval_status === "approved" && (
-                        <span style={{ fontSize: 12, color: "#059669" }}>Active</span>
-                      )}
-                      {p.approval_status === "rejected" && (
-                        <button
-                          onClick={() => handleApprovePromoter(p.id)}
-                          disabled={actionLoading}
-                          style={{
-                            padding: "4px 10px",
-                            borderRadius: 6,
-                            fontSize: 12,
-                            fontWeight: 600,
-                            backgroundColor: "#f3f4f6",
-                            color: "#374151",
-                            border: "1px solid #d1d5db",
-                            cursor: "pointer",
-                          }}
-                        >
-                          Re-approve
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
       {/* TAB 2: Payout Requests Table */}
       {activeTab === "payouts" && (
         <div className="admin-table-container">
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>Promoter</th>
-                <th>Amount</th>
-                <th>Destination</th>
-                <th>Date Requested</th>
-                <th>Status</th>
-                <th>Txn Ref</th>
-                <th style={{ textAlign: "right" }}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
+          <div className="admin-table-scroll">
+            <table className="admin-table">
+              <thead>
                 <tr>
-                  <td colSpan={7} style={{ textAlign: "center", padding: 40 }}>
-                    <Loader2 className="admin-spin" style={{ margin: "0 auto" }} />
-                  </td>
+                  <th>Promoter</th>
+                  <th>Amount</th>
+                  <th>Destination</th>
+                  <th>Date Requested</th>
+                  <th>Status</th>
+                  <th>Txn Ref</th>
+                  <th style={{ textAlign: "right" }}>Actions</th>
                 </tr>
-              ) : payouts.length === 0 ? (
-                <tr>
-                  <td colSpan={7} style={{ textAlign: "center", padding: 40, color: "#6b7280" }}>
-                    No payout requests found.
-                  </td>
-                </tr>
-              ) : (
-                payouts.map((p) => (
-                  <tr key={p.id}>
-                    <td>
-                      <div style={{ fontWeight: 600, color: "#111827" }}>{p.promoters?.name || "Promoter"}</div>
-                      <div style={{ fontSize: 12, color: "#6b7280", fontFamily: "monospace" }}>{p.promoters?.phone}</div>
-                    </td>
-                    <td style={{ fontWeight: 700, fontSize: 14 }}>₹{(p.amount / 100).toFixed(2)}</td>
-                    <td>
-                      {p.payout_method === "upi" ? (
-                        <div style={{ fontFamily: "monospace", fontSize: 12, color: "#4f46e5" }}>
-                          UPI: {p.upi_id}
-                        </div>
-                      ) : (
-                        <div style={{ fontSize: 12 }}>
-                          <div><strong>A/C:</strong> {p.bank_account_no}</div>
-                          <div><strong>IFSC:</strong> {p.bank_ifsc}</div>
-                          {p.bank_name && <div style={{ color: "#6b7280" }}>{p.bank_name}</div>}
-                        </div>
-                      )}
-                    </td>
-                    <td style={{ fontSize: 12, color: "#6b7280" }}>{new Date(p.requested_at).toLocaleDateString()}</td>
-                    <td>
-                      {p.status === "paid" && (
-                        <span style={{ padding: "3px 8px", borderRadius: 12, fontSize: 11, fontWeight: 600, backgroundColor: "#dcfce7", color: "#15803d" }}>
-                          Paid
-                        </span>
-                      )}
-                      {p.status === "pending" && (
-                        <span style={{ padding: "3px 8px", borderRadius: 12, fontSize: 11, fontWeight: 600, backgroundColor: "#fef3c7", color: "#b45309" }}>
-                          Pending
-                        </span>
-                      )}
-                      {p.status === "rejected" && (
-                        <span style={{ padding: "3px 8px", borderRadius: 12, fontSize: 11, fontWeight: 600, backgroundColor: "#fee2e2", color: "#b91c1c" }}>
-                          Rejected
-                        </span>
-                      )}
-                    </td>
-                    <td style={{ fontSize: 12, fontFamily: "monospace", color: "#6b7280" }}>
-                      {p.transaction_ref || "—"}
-                    </td>
-                    <td style={{ textAlign: "right" }}>
-                      {p.status === "pending" && (
-                        <div style={{ display: "flex", gap: 6, justifyContent: "flex-end" }}>
-                          <button
-                            onClick={() => { setSelectedPayoutId(p.id); setPayModalOpen(true); }}
-                            disabled={actionLoading}
-                            style={{
-                              padding: "4px 10px",
-                              borderRadius: 6,
-                              fontSize: 12,
-                              fontWeight: 600,
-                              backgroundColor: "#059669",
-                              color: "#fff",
-                              border: "none",
-                              cursor: "pointer",
-                            }}
-                          >
-                            Mark Paid
-                          </button>
-                          <button
-                            onClick={() => handleRejectPayout(p.id)}
-                            disabled={actionLoading}
-                            style={{
-                              padding: "4px 10px",
-                              borderRadius: 6,
-                              fontSize: 12,
-                              fontWeight: 600,
-                              backgroundColor: "#fee2e2",
-                              color: "#b91c1c",
-                              border: "none",
-                              cursor: "pointer",
-                            }}
-                          >
-                            Reject
-                          </button>
-                        </div>
-                      )}
-                      {p.status === "paid" && (
-                        <span style={{ fontSize: 12, color: "#059669" }}>Completed</span>
-                      )}
+              </thead>
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td colSpan={7} style={{ textAlign: "center", padding: 40 }}>
+                      <Loader2 className="admin-spin" style={{ margin: "0 auto" }} />
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : payouts.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} style={{ textAlign: "center", padding: 40, color: "#6b7280" }}>
+                      No payout requests found.
+                    </td>
+                  </tr>
+                ) : (
+                  payouts.map((p) => (
+                    <tr key={p.id}>
+                      <td>
+                        <div style={{ fontWeight: 600, color: "#111827" }}>{p.promoters?.name || "Promoter"}</div>
+                        <div style={{ fontSize: 12, color: "#6b7280", fontFamily: "monospace" }}>{p.promoters?.phone}</div>
+                      </td>
+                      <td style={{ fontWeight: 700, fontSize: 14 }}>₹{(p.amount / 100).toFixed(2)}</td>
+                      <td>
+                        {p.payout_method === "upi" ? (
+                          <div style={{ fontFamily: "monospace", fontSize: 12, color: "#4f46e5" }}>
+                            UPI: {p.upi_id}
+                          </div>
+                        ) : (
+                          <div style={{ fontSize: 12 }}>
+                            <div><strong>A/C:</strong> {p.bank_account_no}</div>
+                            <div><strong>IFSC:</strong> {p.bank_ifsc}</div>
+                            {p.bank_name && <div style={{ color: "#6b7280" }}>{p.bank_name}</div>}
+                          </div>
+                        )}
+                      </td>
+                      <td style={{ fontSize: 12, color: "#6b7280" }}>{new Date(p.requested_at).toLocaleDateString()}</td>
+                      <td>
+                        {p.status === "paid" && (
+                          <span style={{ padding: "3px 8px", borderRadius: 12, fontSize: 11, fontWeight: 600, backgroundColor: "#dcfce7", color: "#15803d" }}>
+                            Paid
+                          </span>
+                        )}
+                        {p.status === "pending" && (
+                          <span style={{ padding: "3px 8px", borderRadius: 12, fontSize: 11, fontWeight: 600, backgroundColor: "#fef3c7", color: "#b45309" }}>
+                            Pending
+                          </span>
+                        )}
+                        {p.status === "rejected" && (
+                          <span style={{ padding: "3px 8px", borderRadius: 12, fontSize: 11, fontWeight: 600, backgroundColor: "#fee2e2", color: "#b91c1c" }}>
+                            Rejected
+                          </span>
+                        )}
+                      </td>
+                      <td style={{ fontSize: 12, fontFamily: "monospace", color: "#6b7280" }}>
+                        {p.transaction_ref || "—"}
+                      </td>
+                      <td style={{ textAlign: "right" }}>
+                        {p.status === "pending" && (
+                          <div style={{ display: "flex", gap: 6, justifyContent: "flex-end" }}>
+                            <button
+                              onClick={() => { setSelectedPayoutId(p.id); setPayModalOpen(true); }}
+                              disabled={actionLoading}
+                              style={{
+                                padding: "4px 10px",
+                                borderRadius: 6,
+                                fontSize: 12,
+                                fontWeight: 600,
+                                backgroundColor: "#059669",
+                                color: "#fff",
+                                border: "none",
+                                cursor: "pointer",
+                              }}
+                            >
+                              Mark Paid
+                            </button>
+                            <button
+                              onClick={() => handleRejectPayout(p.id)}
+                              disabled={actionLoading}
+                              style={{
+                                padding: "4px 10px",
+                                borderRadius: 6,
+                                fontSize: 12,
+                                fontWeight: 600,
+                                backgroundColor: "#fee2e2",
+                                color: "#b91c1c",
+                                border: "none",
+                                cursor: "pointer",
+                              }}
+                            >
+                              Reject
+                            </button>
+                          </div>
+                        )}
+                        {p.status === "paid" && (
+                          <span style={{ fontSize: 12, color: "#059669" }}>Completed</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 

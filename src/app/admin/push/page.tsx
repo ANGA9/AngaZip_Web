@@ -319,7 +319,7 @@ export default function PushNotificationsPage() {
       )}
 
       {/* Main Grid: Form + History */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1.8fr", gap: "28px", alignItems: "start" }}>
+      <div className="admin-two-column-grid">
         {/* Compose Form */}
         <div className="admin-card" style={{ padding: "26px", backgroundColor: "white", borderRadius: "16px", border: "1px solid var(--admin-border)", boxShadow: "0 2px 10px rgba(0,0,0,0.03)" }}>
           <h2 style={{ fontSize: "17px", fontWeight: "700", marginBottom: "22px", display: "flex", alignItems: "center", gap: "10px", color: "var(--admin-ink)" }}>
