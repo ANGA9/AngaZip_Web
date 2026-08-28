@@ -514,93 +514,95 @@ export default function PushNotificationsPage() {
 
           {/* Table */}
           <div className="admin-table-container" style={{ minHeight: "380px" }}>
-            <table className="admin-table" style={{ width: "100%", textAlign: "left", borderCollapse: "collapse" }}>
-              <thead>
-                <tr style={{ backgroundColor: "#F9FAFB" }}>
-                  <th style={{ padding: "12px 20px", borderBottom: "1px solid var(--admin-border)", color: "var(--admin-muted-soft)", fontSize: "12px", fontWeight: "700", textTransform: "uppercase", width: "160px" }}>
-                    Date & Time
-                  </th>
-                  <th style={{ padding: "12px 20px", borderBottom: "1px solid var(--admin-border)", color: "var(--admin-muted-soft)", fontSize: "12px", fontWeight: "700", textTransform: "uppercase", width: "130px" }}>
-                    Target
-                  </th>
-                  <th style={{ padding: "12px 20px", borderBottom: "1px solid var(--admin-border)", color: "var(--admin-muted-soft)", fontSize: "12px", fontWeight: "700", textTransform: "uppercase" }}>
-                    Message Content
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {loading ? (
-                  <tr>
-                    <td colSpan={3} style={{ padding: "48px 20px", textAlign: "center", color: "var(--admin-muted)" }}>
-                      Loading broadcast history...
-                    </td>
+            <div className="admin-table-scroll">
+              <table className="admin-table" style={{ width: "100%", textAlign: "left", borderCollapse: "collapse" }}>
+                <thead>
+                  <tr style={{ backgroundColor: "#F9FAFB" }}>
+                    <th style={{ padding: "12px 20px", borderBottom: "1px solid var(--admin-border)", color: "var(--admin-muted-soft)", fontSize: "12px", fontWeight: "700", textTransform: "uppercase", width: "160px" }}>
+                      Date & Time
+                    </th>
+                    <th style={{ padding: "12px 20px", borderBottom: "1px solid var(--admin-border)", color: "var(--admin-muted-soft)", fontSize: "12px", fontWeight: "700", textTransform: "uppercase", width: "130px" }}>
+                      Target
+                    </th>
+                    <th style={{ padding: "12px 20px", borderBottom: "1px solid var(--admin-border)", color: "var(--admin-muted-soft)", fontSize: "12px", fontWeight: "700", textTransform: "uppercase" }}>
+                      Message Content
+                    </th>
                   </tr>
-                ) : history.length === 0 ? (
-                  <tr>
-                    <td colSpan={3} style={{ padding: "64px 20px", textAlign: "center", color: "var(--admin-muted)" }}>
-                      <Smartphone size={32} color="#D1D5DB" style={{ margin: "0 auto 12px" }} />
-                      <div style={{ fontWeight: "600", fontSize: "14px", color: "var(--admin-ink)", marginBottom: "4px" }}>
-                        No broadcasts yet
-                      </div>
-                      <div style={{ fontSize: "13px" }}>
-                        Compose a notification or click a quick test button to get started.
-                      </div>
-                    </td>
-                  </tr>
-                ) : (
-                  history.slice(0, ITEMS_PER_PAGE).map((item) => {
-                    const badge = getTargetBadge(item.target);
-                    return (
-                      <tr key={item.id} style={{ borderBottom: "1px solid var(--admin-border)" }}>
-                        <td style={{ padding: "14px 20px", fontSize: "13px", color: "var(--admin-muted)", verticalAlign: "top" }}>
-                          {new Date(item.sent_at).toLocaleDateString([], { month: "short", day: "numeric" })}
-                          <div style={{ fontSize: "11px", color: "var(--admin-muted-soft)", marginTop: "2px" }}>
-                            {new Date(item.sent_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                          </div>
-                        </td>
+                </thead>
+                <tbody>
+                  {loading ? (
+                    <tr>
+                      <td colSpan={3} style={{ padding: "48px 20px", textAlign: "center", color: "var(--admin-muted)" }}>
+                        Loading broadcast history...
+                      </td>
+                    </tr>
+                  ) : history.length === 0 ? (
+                    <tr>
+                      <td colSpan={3} style={{ padding: "64px 20px", textAlign: "center", color: "var(--admin-muted)" }}>
+                        <Smartphone size={32} color="#D1D5DB" style={{ margin: "0 auto 12px" }} />
+                        <div style={{ fontWeight: "600", fontSize: "14px", color: "var(--admin-ink)", marginBottom: "4px" }}>
+                          No broadcasts yet
+                        </div>
+                        <div style={{ fontSize: "13px" }}>
+                          Compose a notification or click a quick test button to get started.
+                        </div>
+                      </td>
+                    </tr>
+                  ) : (
+                    history.slice(0, ITEMS_PER_PAGE).map((item) => {
+                      const badge = getTargetBadge(item.target);
+                      return (
+                        <tr key={item.id} style={{ borderBottom: "1px solid var(--admin-border)" }}>
+                          <td style={{ padding: "14px 20px", fontSize: "13px", color: "var(--admin-muted)", verticalAlign: "top" }}>
+                            {new Date(item.sent_at).toLocaleDateString([], { month: "short", day: "numeric" })}
+                            <div style={{ fontSize: "11px", color: "var(--admin-muted-soft)", marginTop: "2px" }}>
+                              {new Date(item.sent_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                            </div>
+                          </td>
 
-                        <td style={{ padding: "14px 20px", verticalAlign: "top" }}>
-                          <span
-                            style={{
-                              backgroundColor: badge.bg,
-                              color: badge.color,
-                              border: `1px solid ${badge.border}`,
-                              padding: "4px 8px",
-                              borderRadius: "6px",
-                              fontSize: "11px",
-                              fontWeight: "700",
-                              whiteSpace: "nowrap",
-                              display: "inline-block",
-                            }}
-                          >
-                            {badge.label}
-                          </span>
-                        </td>
+                          <td style={{ padding: "14px 20px", verticalAlign: "top" }}>
+                            <span
+                              style={{
+                                backgroundColor: badge.bg,
+                                color: badge.color,
+                                border: `1px solid ${badge.border}`,
+                                padding: "4px 8px",
+                                borderRadius: "6px",
+                                fontSize: "11px",
+                                fontWeight: "700",
+                                whiteSpace: "nowrap",
+                                display: "inline-block",
+                              }}
+                            >
+                              {badge.label}
+                            </span>
+                          </td>
 
-                        <td style={{ padding: "14px 20px", verticalAlign: "top" }}>
-                          <div style={{ fontWeight: "700", color: "var(--admin-ink)", fontSize: "14px", marginBottom: "3px" }}>
-                            {item.title}
-                          </div>
-                          <div
-                            style={{
-                              color: "var(--admin-muted)",
-                              fontSize: "13px",
-                              lineHeight: "1.4",
-                              WebkitLineClamp: 2,
-                              WebkitBoxOrient: "vertical",
-                              overflow: "hidden",
-                              display: "-webkit-box",
-                            }}
-                          >
-                            {item.body}
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
+                          <td style={{ padding: "14px 20px", verticalAlign: "top" }}>
+                            <div style={{ fontWeight: "700", color: "var(--admin-ink)", fontSize: "14px", marginBottom: "3px" }}>
+                              {item.title}
+                            </div>
+                            <div
+                              style={{
+                                color: "var(--admin-muted)",
+                                fontSize: "13px",
+                                lineHeight: "1.4",
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: "vertical",
+                                overflow: "hidden",
+                                display: "-webkit-box",
+                              }}
+                            >
+                              {item.body}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
 
           {/* Pagination Footer (8 Items per Page) */}
