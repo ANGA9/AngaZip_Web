@@ -1940,6 +1940,10 @@
     display: flex;
   }
 
+  .admin-sidebar-logo {
+    display: none;
+  }
+
   /* Mobile Top Navigation Header */
   .admin-mobile-menu-btn {
     display: flex;
