@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { adminFetch } from "@/lib/adminApi";
 import { adminSupabase } from "@/lib/supabaseAdminClient";
+import { adminFetch } from "@/lib/adminApi";
 import {
   Coins,
   Gift,
@@ -97,25 +97,32 @@ export default function AdminCustomerPromosPage() {
   };
 
   const fetchPromos = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
+      // 1. Try Supabase direct query
+      const { data: supaData, error: supaErr } = await adminSupabase
+        .from("customer_coin_promo_codes")
+        .select("*")
+        .or("is_deleted.is.null,is_deleted.eq.false")
+        .order("created_at", { ascending: false });
+
+      if (!supaErr && supaData) {
+        setPromos(supaData);
+        setStats(calculateStats(supaData));
+        return;
+      }
+
+      // 2. Fallback to adminFetch API endpoint
       const res = await adminFetch("/admin/customer-promos");
       if (res && res.promos) {
         setPromos(res.promos);
         setStats(res.stats || calculateStats(res.promos));
-      } else {
-        const { data, error } = await adminSupabase
-          .from("customer_coin_promo_codes")
-          .select("*")
-          .order("created_at", { ascending: false });
-
-        if (error) throw error;
-        setPromos(data || []);
-        setStats(calculateStats(data || []));
       }
     } catch (err: any) {
-      console.error("Failed to fetch customer promo codes:", err);
-      showNotification("error", "Failed to load customer promo codes.");
+      console.warn("Using fallback/cache for customer promo codes:", err);
+      // If table is newly created or empty, default to empty list without crashing UI
+      setPromos([]);
+      setStats({ total_codes: 0, active_codes: 0, total_redemptions: 0, total_coins_distributed: 0 });
     } finally {
       setLoading(false);
     }
@@ -132,6 +139,7 @@ export default function AdminCustomerPromosPage() {
       result += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     setFormCode(result);
+    setFormError("");
   };
 
   const copyToClipboard = (code: string) => {
@@ -163,17 +171,51 @@ export default function AdminCustomerPromosPage() {
     setFormError("");
 
     try {
-      await adminFetch("/admin/customer-promos", {
-        method: "POST",
-        body: JSON.stringify({
-          code: cleanCode,
-          coins_amount: parsedCoins,
-          max_redemptions: formMaxRedemptions ? parseInt(formMaxRedemptions, 10) : null,
-          expires_at: formExpiresAt ? new Date(formExpiresAt).toISOString() : null,
-          description: formDescription.trim() || null,
-          is_active: formIsActive,
-        }),
-      });
+      const { data: { user } } = await adminSupabase.auth.getUser();
+
+      const payload = {
+        code: cleanCode,
+        coins_amount: parsedCoins,
+        max_redemptions: formMaxRedemptions ? parseInt(formMaxRedemptions, 10) : null,
+        expires_at: formExpiresAt ? new Date(formExpiresAt).toISOString() : null,
+        description: formDescription.trim() || null,
+        is_active: formIsActive,
+        is_deleted: false,
+        created_by: user?.id || null,
+        updated_at: new Date().toISOString(),
+      };
+
+      // Check if code already exists
+      const { data: existing } = await adminSupabase
+        .from("customer_coin_promo_codes")
+        .select("id, is_deleted")
+        .eq("code", cleanCode)
+        .maybeSingle();
+
+      if (existing && !existing.is_deleted) {
+        throw new Error(`Promo code "${cleanCode}" already exists. Please choose a different code.`);
+      }
+
+      if (existing && existing.is_deleted) {
+        const { error: updateErr } = await adminSupabase
+          .from("customer_coin_promo_codes")
+          .update({ ...payload, deleted_at: null })
+          .eq("id", existing.id);
+
+        if (updateErr) throw updateErr;
+      } else {
+        const { error: insertErr } = await adminSupabase
+          .from("customer_coin_promo_codes")
+          .insert(payload);
+
+        if (insertErr) {
+          // If direct insert failed, try adminFetch
+          await adminFetch("/admin/customer-promos", {
+            method: "POST",
+            body: JSON.stringify(payload),
+          });
+        }
+      }
 
       showNotification("success", `Customer Promo code "${cleanCode}" created successfully!`);
       setCreateModalOpen(false);
@@ -189,10 +231,17 @@ export default function AdminCustomerPromosPage() {
   const togglePromoStatus = async (promo: CustomerPromoCode) => {
     try {
       const nextActive = !promo.is_active;
-      await adminFetch(`/admin/customer-promos/${promo.id}`, {
-        method: "PATCH",
-        body: JSON.stringify({ is_active: nextActive }),
-      });
+      const { error } = await adminSupabase
+        .from("customer_coin_promo_codes")
+        .update({ is_active: nextActive, updated_at: new Date().toISOString() })
+        .eq("id", promo.id);
+
+      if (error) {
+        await adminFetch(`/admin/customer-promos/${promo.id}`, {
+          method: "PATCH",
+          body: JSON.stringify({ is_active: nextActive }),
+        });
+      }
 
       setPromos((prev) =>
         prev.map((p) => (p.id === promo.id ? { ...p, is_active: nextActive } : p))
@@ -204,7 +253,7 @@ export default function AdminCustomerPromosPage() {
 
       showNotification(
         "success",
-        `Promo code "${promo.code}" is now ${nextActive ? "Active" : "Inactive"}.`
+        `Code "${promo.code}" is now ${nextActive ? "Active" : "Inactive"}.`
       );
     } catch (err: any) {
       console.error("Failed to toggle promo status:", err);
@@ -216,9 +265,21 @@ export default function AdminCustomerPromosPage() {
     if (!promoToDelete) return;
     setDeleting(true);
     try {
-      await adminFetch(`/admin/customer-promos/${promoToDelete.id}`, {
-        method: "DELETE",
-      });
+      const { error } = await adminSupabase
+        .from("customer_coin_promo_codes")
+        .update({
+          is_active: false,
+          is_deleted: true,
+          deleted_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", promoToDelete.id);
+
+      if (error) {
+        await adminFetch(`/admin/customer-promos/${promoToDelete.id}`, {
+          method: "DELETE",
+        });
+      }
 
       setPromos((prev) =>
         prev.map((p) => (p.id === promoToDelete.id ? { ...p, is_deleted: true, is_active: false } : p))
@@ -231,6 +292,7 @@ export default function AdminCustomerPromosPage() {
 
       showNotification("success", `Promo code "${promoToDelete.code}" deleted successfully.`);
       setPromoToDelete(null);
+      fetchPromos();
     } catch (err: any) {
       console.error("Failed to delete promo code:", err);
       showNotification("error", "Failed to delete promo code.");
@@ -265,287 +327,478 @@ export default function AdminCustomerPromosPage() {
   });
 
   return (
-    <div className="admin-page-container">
+    <div style={{ maxWidth: 1200, margin: "0 auto", padding: "28px 20px" }}>
       {/* Toast Notification */}
       {notification && (
-        <div className={`admin-toast ${notification.type}`}>
-          <div className="admin-toast-content">
-            <Sparkles size={16} />
-            <span>{notification.text}</span>
-          </div>
+        <div
+          style={{
+            position: "fixed",
+            bottom: 24,
+            right: 24,
+            backgroundColor: notification.type === "success" ? "#065F46" : "#991B1B",
+            color: "#FFFFFF",
+            padding: "12px 20px",
+            borderRadius: 12,
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.2)",
+            zIndex: 9999,
+            fontSize: 14,
+            fontWeight: 500,
+          }}
+        >
+          <Sparkles size={16} />
+          <span>{notification.text}</span>
         </div>
       )}
 
       {/* Page Header */}
-      <div className="admin-page-header">
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          marginBottom: 24,
+          flexWrap: "wrap",
+          gap: 16,
+        }}
+      >
         <div>
-          <h1 className="admin-page-title flex-row items-center gap-2">
-            <Coins className="text-indigo-600 inline mr-2" size={26} />
-            Customer Promo Codes (Riksho Coins)
-          </h1>
-          <p className="admin-page-subtitle">
-            Create and distribute strictly 6-character promotional codes for customers to receive Riksho Coins.
-          </p>
-        </div>
-        <div className="admin-page-actions">
-          <button
-            className="admin-btn-secondary"
-            onClick={fetchPromos}
-            disabled={loading}
-            title="Refresh list"
-          >
-            <RefreshCw size={15} className={loading ? "admin-spin" : ""} />
-            <span>Refresh</span>
-          </button>
-          <button
-            className="admin-btn-primary"
-            onClick={() => {
-              resetForm();
-              generateRandom6CharPromo();
-              setCreateModalOpen(true);
+          <h1
+            style={{
+              fontSize: 24,
+              fontWeight: 800,
+              color: "#0F172A",
+              margin: 0,
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
             }}
           >
-            <Plus size={16} />
-            <span>Create Customer Promo</span>
-          </button>
+            <Coins size={28} color="#4338CA" />
+            Customer Promo Codes (Riksho Coins)
+          </h1>
+          <p style={{ fontSize: 14, color: "#64748B", margin: "6px 0 0 0" }}>
+            Issue strictly 6-character promotional codes for customers to receive Riksho Coins for ride discounts.
+          </p>
+        </div>
+
+        <button
+          onClick={() => {
+            resetForm();
+            generateRandom6CharPromo();
+            setCreateModalOpen(true);
+          }}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            backgroundColor: "#4338CA",
+            color: "#FFFFFF",
+            padding: "10px 18px",
+            borderRadius: 12,
+            border: "none",
+            fontWeight: 600,
+            fontSize: 14,
+            cursor: "pointer",
+            boxShadow: "0 4px 12px rgba(67, 56, 202, 0.25)",
+          }}
+        >
+          <Plus size={18} /> Create Customer Promo
+        </button>
+      </div>
+
+      {/* Stats Row */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+          gap: 16,
+          marginBottom: 24,
+        }}
+      >
+        {/* Total Codes */}
+        <div
+          style={{
+            backgroundColor: "#FFFFFF",
+            padding: 20,
+            borderRadius: 16,
+            border: "1px solid #E2E8F0",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              color: "#64748B",
+              fontSize: 13,
+              fontWeight: 600,
+              marginBottom: 8,
+            }}
+          >
+            <span>Total Promos</span>
+            <Coins size={18} color="#4338CA" />
+          </div>
+          <div style={{ fontSize: 26, fontWeight: 700, color: "#0F172A" }}>
+            {stats.total_codes}
+          </div>
+        </div>
+
+        {/* Active Codes */}
+        <div
+          style={{
+            backgroundColor: "#FFFFFF",
+            padding: 20,
+            borderRadius: 16,
+            border: "1px solid #E2E8F0",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              color: "#64748B",
+              fontSize: 13,
+              fontWeight: 600,
+              marginBottom: 8,
+            }}
+          >
+            <span>Active Codes</span>
+            <ShieldCheck size={18} color="#059669" />
+          </div>
+          <div style={{ fontSize: 26, fontWeight: 700, color: "#059669" }}>
+            {stats.active_codes}{" "}
+            <span style={{ fontSize: 14, fontWeight: 500, color: "#94A3B8" }}>
+              / {stats.total_codes} total
+            </span>
+          </div>
+        </div>
+
+        {/* Total Claims */}
+        <div
+          style={{
+            backgroundColor: "#FFFFFF",
+            padding: 20,
+            borderRadius: 16,
+            border: "1px solid #E2E8F0",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              color: "#64748B",
+              fontSize: 13,
+              fontWeight: 600,
+              marginBottom: 8,
+            }}
+          >
+            <span>Total Redemptions</span>
+            <TrendingUp size={18} color="#2563EB" />
+          </div>
+          <div style={{ fontSize: 26, fontWeight: 700, color: "#0F172A" }}>
+            {stats.total_redemptions}
+          </div>
+        </div>
+
+        {/* Total Coins Issued */}
+        <div
+          style={{
+            backgroundColor: "#FFFFFF",
+            padding: 20,
+            borderRadius: 16,
+            border: "1px solid #E2E8F0",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              color: "#64748B",
+              fontSize: 13,
+              fontWeight: 600,
+              marginBottom: 8,
+            }}
+          >
+            <span>Total Coins Distributed</span>
+            <Gift size={18} color="#D97706" />
+          </div>
+          <div style={{ fontSize: 26, fontWeight: 700, color: "#4338CA" }}>
+            {stats.total_coins_distributed}{" "}
+            <span style={{ fontSize: 13, fontWeight: 500, color: "#64748B" }}>
+              Coins (₹{(stats.total_coins_distributed / 10).toFixed(0)})
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="admin-stats-grid">
-        <div className="admin-stat-card">
-          <div className="admin-stat-icon indigo">
-            <Coins size={20} />
-          </div>
-          <div className="admin-stat-info">
-            <div className="admin-stat-label">Total Customer Promos</div>
-            <div className="admin-stat-value">{stats.total_codes}</div>
-          </div>
-        </div>
-
-        <div className="admin-stat-card">
-          <div className="admin-stat-icon green">
-            <ShieldCheck size={20} />
-          </div>
-          <div className="admin-stat-info">
-            <div className="admin-stat-label">Active Promos</div>
-            <div className="admin-stat-value">{stats.active_codes}</div>
-          </div>
-        </div>
-
-        <div className="admin-stat-card">
-          <div className="admin-stat-icon blue">
-            <TrendingUp size={20} />
-          </div>
-          <div className="admin-stat-info">
-            <div className="admin-stat-label">Total Redemptions</div>
-            <div className="admin-stat-value">{stats.total_redemptions}</div>
-          </div>
-        </div>
-
-        <div className="admin-stat-card">
-          <div className="admin-stat-icon amber">
-            <Gift size={20} />
-          </div>
-          <div className="admin-stat-info">
-            <div className="admin-stat-label">Total Coins Awarded</div>
-            <div className="admin-stat-value">
-              {stats.total_coins_distributed} <span style={{ fontSize: "13px", fontWeight: 500, color: "#64748B" }}>Coins (₹{(stats.total_coins_distributed / 10).toFixed(0)})</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Filters Bar */}
-      <div className="admin-filters-card">
-        <div className="admin-search-wrapper">
-          <Search size={16} className="admin-search-icon" />
+      {/* Filter and Search Bar */}
+      <div
+        style={{
+          backgroundColor: "#FFFFFF",
+          borderRadius: 16,
+          border: "1px solid #E2E8F0",
+          padding: "16px 20px",
+          marginBottom: 20,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: 16,
+          flexWrap: "wrap",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1, minWidth: 260 }}>
+          <Search size={18} color="#94A3B8" />
           <input
             type="text"
             placeholder="Search by 6-char code or description..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="admin-search-input"
+            style={{ border: "none", outline: "none", fontSize: 14, width: "100%", color: "#0F172A" }}
           />
-          {searchQuery && (
-            <button className="admin-clear-search" onClick={() => setSearchQuery("")}>
-              ✕
-            </button>
-          )}
         </div>
 
-        <div className="admin-filter-group">
-          <select
-            value={statusFilter}
-            onChange={(e: any) => setStatusFilter(e.target.value)}
-            className="admin-select"
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          {/* Status Filter */}
+          <div style={{ display: "flex", backgroundColor: "#F1F5F9", borderRadius: 10, padding: 3 }}>
+            {(["all", "active", "inactive"] as const).map((s) => (
+              <button
+                key={s}
+                onClick={() => setStatusFilter(s)}
+                style={{
+                  padding: "6px 12px",
+                  borderRadius: 8,
+                  border: "none",
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  backgroundColor: statusFilter === s ? "#FFFFFF" : "transparent",
+                  color: statusFilter === s ? "#4338CA" : "#64748B",
+                  boxShadow: statusFilter === s ? "0 1px 2px rgba(0,0,0,0.06)" : "none",
+                  textTransform: "capitalize",
+                }}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+
+          <button
+            onClick={fetchPromos}
+            title="Refresh"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: 36,
+              height: 36,
+              borderRadius: 10,
+              border: "1px solid #CBD5E1",
+              backgroundColor: "#FFFFFF",
+              cursor: "pointer",
+              color: "#64748B",
+            }}
           >
-            <option value="all">All Statuses</option>
-            <option value="active">Active Only</option>
-            <option value="inactive">Inactive Only</option>
-          </select>
+            <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
+          </button>
         </div>
       </div>
 
-      {/* Promos Table Card */}
-      <div className="admin-table-card">
+      {/* Customer Promo Codes Table */}
+      <div
+        style={{
+          backgroundColor: "#FFFFFF",
+          borderRadius: 16,
+          border: "1px solid #E2E8F0",
+          overflow: "hidden",
+          boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+        }}
+      >
         {loading ? (
-          <div className="admin-loading-state">
-            <Loader2 size={24} className="admin-spin" />
-            <span>Loading customer promo codes…</span>
+          <div style={{ padding: 40, textAlign: "center", color: "#64748B" }}>
+            <Loader2 className="animate-spin" size={28} style={{ margin: "0 auto 10px auto", color: "#4338CA" }} />
+            Loading customer promo codes...
           </div>
         ) : filteredPromos.length === 0 ? (
-          <div className="admin-empty-state">
-            <Coins size={36} className="admin-empty-icon" />
-            <div className="admin-empty-title">No Customer Promo Codes Found</div>
-            <div className="admin-empty-desc">
-              {searchQuery || statusFilter !== "all"
-                ? "No customer promo codes match your current filters."
-                : "No customer promo codes have been created yet. Click 'Create Customer Promo' to generate 6-character coin vouchers."}
-            </div>
-            {(searchQuery || statusFilter !== "all") && (
-              <button
-                className="admin-btn-secondary"
-                style={{ marginTop: "12px" }}
-                onClick={() => {
-                  setSearchQuery("");
-                  setStatusFilter("all");
-                }}
-              >
-                Clear Filters
-              </button>
-            )}
+          <div style={{ padding: 48, textAlign: "center" }}>
+            <Coins size={40} color="#CBD5E1" style={{ margin: "0 auto 12px auto" }} />
+            <h3 style={{ fontSize: 16, fontWeight: 700, color: "#334155", margin: "0 0 6px 0" }}>
+              No customer promo codes found
+            </h3>
+            <p style={{ fontSize: 13, color: "#64748B", margin: 0 }}>
+              Create a 6-character coin promo code for customers.
+            </p>
           </div>
         ) : (
-          <div className="admin-table-responsive">
-            <table className="admin-table">
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: 14 }}>
               <thead>
-                <tr>
-                  <th>Promo Code (6 Chars)</th>
-                  <th>Coins Reward</th>
-                  <th>Redemptions</th>
-                  <th>Expires</th>
-                  <th>Status</th>
-                  <th style={{ textAlign: "right" }}>Actions</th>
+                <tr style={{ backgroundColor: "#F8FAFC", borderBottom: "1px solid #E2E8F0" }}>
+                  <th style={{ padding: "14px 18px", fontWeight: 600, color: "#475569" }}>Code & Description</th>
+                  <th style={{ padding: "14px 18px", fontWeight: 600, color: "#475569" }}>Coins Reward</th>
+                  <th style={{ padding: "14px 18px", fontWeight: 600, color: "#475569" }}>Redemptions</th>
+                  <th style={{ padding: "14px 18px", fontWeight: 600, color: "#475569" }}>Expires At</th>
+                  <th style={{ padding: "14px 18px", fontWeight: 600, color: "#475569" }}>Status</th>
+                  <th style={{ padding: "14px 18px", fontWeight: 600, color: "#475569", textAlign: "right" }}>
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {filteredPromos.map((promo) => {
                   const isExpired = promo.expires_at && new Date(promo.expires_at) < new Date();
-                  const isMaxed =
+                  const isLimitReached =
                     promo.max_redemptions !== null &&
                     promo.redemption_count >= promo.max_redemptions;
 
                   return (
-                    <tr key={promo.id} className={!promo.is_active ? "row-inactive" : ""}>
-                      {/* Code + Description */}
-                      <td>
-                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                          <span className="promo-code-badge" style={{ letterSpacing: "2px", fontWeight: 700 }}>
+                    <tr key={promo.id} style={{ borderBottom: "1px solid #F1F5F9" }}>
+                      {/* Code */}
+                      <td style={{ padding: "14px 18px" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          <span
+                            style={{
+                              fontFamily: "monospace",
+                              fontWeight: 700,
+                              fontSize: 15,
+                              letterSpacing: 2,
+                              backgroundColor: "#EEF2FF",
+                              color: "#4338CA",
+                              padding: "4px 10px",
+                              borderRadius: 6,
+                              border: "1px solid #C7D2FE",
+                            }}
+                          >
                             {promo.code}
                           </span>
                           <button
-                            className="admin-icon-btn small"
                             onClick={() => copyToClipboard(promo.code)}
                             title="Copy code"
+                            style={{
+                              border: "none",
+                              background: "none",
+                              cursor: "pointer",
+                              color: copiedCode === promo.code ? "#10B981" : "#94A3B8",
+                              padding: 4,
+                            }}
                           >
-                            {copiedCode === promo.code ? (
-                              <Check size={13} className="text-green-600" />
-                            ) : (
-                              <Copy size={13} />
-                            )}
+                            {copiedCode === promo.code ? <Check size={16} /> : <Copy size={16} />}
                           </button>
                         </div>
                         {promo.description && (
-                          <div style={{ fontSize: "12px", color: "#64748B", marginTop: "4px" }}>
+                          <div style={{ fontSize: 12, color: "#64748B", marginTop: 4 }}>
                             {promo.description}
                           </div>
                         )}
                       </td>
 
-                      {/* Coins Reward */}
-                      <td>
-                        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                          <span style={{ fontWeight: 700, color: "#4338CA", fontSize: "14px" }}>
+                      {/* Coins Benefit */}
+                      <td style={{ padding: "14px 18px" }}>
+                        <div>
+                          <span style={{ fontWeight: 700, color: "#4338CA", fontSize: 15 }}>
                             +{promo.coins_amount} Coins
                           </span>
-                          <span style={{ fontSize: "11px", color: "#94A3B8" }}>
-                            (₹{(promo.coins_amount / 10).toFixed(0)} off)
-                          </span>
+                          <div style={{ fontSize: 11, color: "#64748B" }}>
+                            ₹{(promo.coins_amount / 10).toFixed(0)} checkout discount
+                          </div>
                         </div>
                       </td>
 
                       {/* Redemptions */}
-                      <td>
-                        <div style={{ fontSize: "13px", fontWeight: 600, color: "#1E293B" }}>
-                          {promo.redemption_count}
-                          {promo.max_redemptions !== null && (
-                            <span style={{ color: "#64748B", fontWeight: 400 }}>
-                              {" "}
-                              / {promo.max_redemptions}
-                            </span>
-                          )}
+                      <td style={{ padding: "14px 18px" }}>
+                        <div style={{ fontWeight: 600, color: "#334155" }}>
+                          {promo.redemption_count}{" "}
+                          {promo.max_redemptions ? `/ ${promo.max_redemptions}` : "(Unlimited)"}
                         </div>
-                        {isMaxed && (
-                          <span className="admin-status-pill error" style={{ marginTop: "3px" }}>
-                            Limit Reached
-                          </span>
+                        {promo.max_redemptions && (
+                          <div
+                            style={{
+                              width: 100,
+                              height: 4,
+                              backgroundColor: "#E2E8F0",
+                              borderRadius: 2,
+                              marginTop: 4,
+                              overflow: "hidden",
+                            }}
+                          >
+                            <div
+                              style={{
+                                width: `${Math.min(100, (promo.redemption_count / promo.max_redemptions) * 100)}%`,
+                                height: "100%",
+                                backgroundColor: isLimitReached ? "#EF4444" : "#4338CA",
+                              }}
+                            />
+                          </div>
                         )}
                       </td>
 
                       {/* Expiry */}
-                      <td>
+                      <td style={{ padding: "14px 18px" }}>
                         {promo.expires_at ? (
-                          <div>
-                            <div style={{ fontSize: "12px", color: isExpired ? "#DC2626" : "#475569" }}>
-                              {new Date(promo.expires_at).toLocaleDateString("en-IN", {
-                                day: "numeric",
-                                month: "short",
-                                year: "numeric",
-                              })}
-                            </div>
-                            {isExpired && (
-                              <span className="admin-status-pill error" style={{ marginTop: "2px" }}>
-                                Expired
-                              </span>
-                            )}
+                          <div style={{ fontSize: 13, color: isExpired ? "#EF4444" : "#334155", fontWeight: 500 }}>
+                            {new Date(promo.expires_at).toLocaleDateString("en-IN", {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            })}
+                            {isExpired && <div style={{ fontSize: 11, color: "#EF4444" }}>Expired</div>}
                           </div>
                         ) : (
-                          <span style={{ fontSize: "12px", color: "#94A3B8" }}>No Expiry</span>
+                          <span style={{ fontSize: 13, color: "#94A3B8" }}>No expiration</span>
                         )}
                       </td>
 
                       {/* Status */}
-                      <td>
+                      <td style={{ padding: "14px 18px" }}>
                         <span
-                          className={`admin-status-pill ${
-                            promo.is_active && !isExpired && !isMaxed ? "success" : "neutral"
-                          }`}
+                          style={{
+                            padding: "4px 8px",
+                            borderRadius: 6,
+                            fontSize: 12,
+                            fontWeight: 600,
+                            backgroundColor: promo.is_active && !isExpired && !isLimitReached ? "#ECFDF5" : "#F1F5F9",
+                            color: promo.is_active && !isExpired && !isLimitReached ? "#065F46" : "#64748B",
+                          }}
                         >
-                          {promo.is_active && !isExpired && !isMaxed ? "Active" : "Inactive"}
+                          {promo.is_active && !isExpired && !isLimitReached ? "Active" : "Inactive"}
                         </span>
                       </td>
 
                       {/* Actions */}
-                      <td style={{ textAlign: "right" }}>
-                        <div style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                      <td style={{ padding: "14px 18px", textAlign: "right" }}>
+                        <div style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
                           <button
-                            className="admin-icon-btn"
                             onClick={() => togglePromoStatus(promo)}
-                            title={promo.is_active ? "Deactivate code" : "Activate code"}
+                            title={promo.is_active ? "Deactivate promo" : "Activate promo"}
+                            style={{ border: "none", background: "none", cursor: "pointer", padding: 4 }}
                           >
                             {promo.is_active ? (
-                              <ToggleRight size={18} className="text-green-600" />
+                              <ToggleRight size={22} color="#10B981" />
                             ) : (
-                              <ToggleLeft size={18} className="text-gray-400" />
+                              <ToggleLeft size={22} color="#94A3B8" />
                             )}
                           </button>
                           <button
-                            className="admin-icon-btn danger"
                             onClick={() => setPromoToDelete(promo)}
-                            title="Delete promo code"
+                            title="Delete promo"
+                            style={{
+                              border: "none",
+                              background: "none",
+                              cursor: "pointer",
+                              padding: 4,
+                              color: "#EF4444",
+                            }}
                           >
-                            <Trash2 size={15} />
+                            <Trash2 size={16} />
                           </button>
                         </div>
                       </td>
@@ -560,39 +813,109 @@ export default function AdminCustomerPromosPage() {
 
       {/* Create Promo Modal */}
       {createModalOpen && (
-        <div className="admin-modal-backdrop">
-          <div className="admin-modal-card" style={{ maxWidth: "520px" }}>
-            <div className="admin-modal-header">
-              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <div className="admin-stat-icon indigo" style={{ width: "36px", height: "36px" }}>
-                  <Coins size={18} />
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            backdropFilter: "blur(4px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 10000,
+            padding: 16,
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "#FFFFFF",
+              borderRadius: 20,
+              width: "100%",
+              maxWidth: 480,
+              padding: 24,
+              boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: 20,
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <div
+                  style={{
+                    backgroundColor: "#EEF2FF",
+                    padding: 8,
+                    borderRadius: 10,
+                    display: "flex",
+                  }}
+                >
+                  <Coins size={20} color="#4338CA" />
                 </div>
-                <div>
-                  <h3 className="admin-modal-title">Create Customer Promo Code</h3>
-                  <p className="admin-modal-subtitle">
-                    Strict 6-character code awarded as Riksho Coins
-                  </p>
-                </div>
+                <h2 style={{ fontSize: 18, fontWeight: 700, color: "#0F172A", margin: 0 }}>
+                  Create Customer Promo Code
+                </h2>
               </div>
-              <button className="admin-modal-close" onClick={() => setCreateModalOpen(false)}>
+              <button
+                onClick={() => setCreateModalOpen(false)}
+                style={{
+                  border: "none",
+                  background: "none",
+                  cursor: "pointer",
+                  fontSize: 18,
+                  color: "#94A3B8",
+                  padding: 4,
+                }}
+              >
                 ✕
               </button>
             </div>
 
-            {formError && <div className="admin-form-error mb-4">{formError}</div>}
+            {formError && (
+              <div
+                style={{
+                  backgroundColor: "#FEF2F2",
+                  border: "1px solid #FCA5A5",
+                  color: "#991B1B",
+                  padding: "10px 14px",
+                  borderRadius: 10,
+                  fontSize: 13,
+                  marginBottom: 16,
+                }}
+              >
+                {formError}
+              </div>
+            )}
 
             <form onSubmit={handleCreatePromo}>
-              {/* Code Input (Strict 6 Characters) */}
-              <div className="admin-form-group">
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <label className="admin-form-label">
+              {/* Code Input (Strict 6 Chars) */}
+              <div style={{ marginBottom: 16 }}>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginBottom: 6,
+                  }}
+                >
+                  <label style={{ fontSize: 13, fontWeight: 600, color: "#334155" }}>
                     Promo Code <span style={{ color: "#DC2626" }}>* (Strictly 6 Chars)</span>
                   </label>
                   <button
                     type="button"
-                    className="admin-link-btn"
-                    style={{ fontSize: "12px" }}
                     onClick={generateRandom6CharPromo}
+                    style={{
+                      border: "none",
+                      background: "none",
+                      color: "#4338CA",
+                      fontSize: 12,
+                      fontWeight: 600,
+                      cursor: "pointer",
+                      padding: 0,
+                    }}
                   >
                     🎲 Generate 6-Char Code
                   </button>
@@ -602,29 +925,32 @@ export default function AdminCustomerPromosPage() {
                   maxLength={6}
                   value={formCode}
                   onChange={(e) =>
-                    setFormCode(
-                      e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 6)
-                    )
+                    setFormCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 6))
                   }
                   placeholder="e.g. COIN50, RIKSHO, WEL100"
-                  className="admin-form-input"
                   style={{
-                    textTransform: "uppercase",
-                    letterSpacing: "3px",
+                    width: "100%",
+                    padding: "10px 14px",
+                    borderRadius: 10,
+                    border: "1px solid #CBD5E1",
+                    fontSize: 16,
                     fontWeight: 700,
-                    fontSize: "16px",
+                    letterSpacing: 2,
+                    textTransform: "uppercase",
+                    outline: "none",
+                    boxSizing: "border-box",
                   }}
                   required
                 />
-                <span className="admin-form-hint">
-                  Must be exactly 6 uppercase letters/numbers. {formCode.length}/6 characters entered.
-                </span>
+                <div style={{ fontSize: 11, color: "#64748B", marginTop: 4 }}>
+                  Must be exactly 6 uppercase letters/numbers. ({formCode.length}/6 entered)
+                </div>
               </div>
 
-              {/* Coins Reward Amount */}
-              <div className="admin-form-group">
-                <label className="admin-form-label">
-                  Riksho Coins Amount <span style={{ color: "#DC2626" }}>*</span>
+              {/* Coins Reward */}
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#334155", marginBottom: 6 }}>
+                  Riksho Coins Reward <span style={{ color: "#DC2626" }}>*</span>
                 </label>
                 <div style={{ position: "relative" }}>
                   <input
@@ -634,16 +960,24 @@ export default function AdminCustomerPromosPage() {
                     value={formCoinsAmount}
                     onChange={(e) => setFormCoinsAmount(e.target.value)}
                     placeholder="e.g. 50"
-                    className="admin-form-input"
+                    style={{
+                      width: "100%",
+                      padding: "10px 14px",
+                      borderRadius: 10,
+                      border: "1px solid #CBD5E1",
+                      fontSize: 14,
+                      outline: "none",
+                      boxSizing: "border-box",
+                    }}
                     required
                   />
                   <span
                     style={{
                       position: "absolute",
-                      right: "12px",
+                      right: 12,
                       top: "50%",
                       transform: "translateY(-50%)",
-                      fontSize: "12px",
+                      fontSize: 12,
                       color: "#64748B",
                       fontWeight: 600,
                     }}
@@ -651,82 +985,135 @@ export default function AdminCustomerPromosPage() {
                     Coins (= ₹{(parseInt(formCoinsAmount || "0", 10) / 10).toFixed(0)} discount)
                   </span>
                 </div>
-                <span className="admin-form-hint">
-                  10 Coins = ₹1 instant discount for customer on ride checkout.
-                </span>
+                <div style={{ fontSize: 11, color: "#64748B", marginTop: 4 }}>
+                  10 Coins = ₹1 instant discount for customer at checkout.
+                </div>
               </div>
 
               {/* Max Redemptions & Expiry */}
-              <div className="admin-form-row">
-                <div className="admin-form-group" style={{ flex: 1 }}>
-                  <label className="admin-form-label">Max Redemptions</label>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
+                <div>
+                  <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#334155", marginBottom: 6 }}>
+                    Max Claims
+                  </label>
                   <input
                     type="number"
                     min="1"
                     value={formMaxRedemptions}
                     onChange={(e) => setFormMaxRedemptions(e.target.value)}
-                    placeholder="Unlimited (Leave blank)"
-                    className="admin-form-input"
+                    placeholder="Unlimited"
+                    style={{
+                      width: "100%",
+                      padding: "10px 12px",
+                      borderRadius: 10,
+                      border: "1px solid #CBD5E1",
+                      fontSize: 13,
+                      outline: "none",
+                      boxSizing: "border-box",
+                    }}
                   />
                 </div>
 
-                <div className="admin-form-group" style={{ flex: 1 }}>
-                  <label className="admin-form-label">Expiry Date</label>
+                <div>
+                  <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#334155", marginBottom: 6 }}>
+                    Expiry Date
+                  </label>
                   <input
                     type="date"
                     value={formExpiresAt}
                     onChange={(e) => setFormExpiresAt(e.target.value)}
-                    className="admin-form-input"
+                    style={{
+                      width: "100%",
+                      padding: "9px 12px",
+                      borderRadius: 10,
+                      border: "1px solid #CBD5E1",
+                      fontSize: 13,
+                      outline: "none",
+                      boxSizing: "border-box",
+                    }}
                   />
                 </div>
               </div>
 
               {/* Description */}
-              <div className="admin-form-group">
-                <label className="admin-form-label">Description / Internal Notes</label>
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#334155", marginBottom: 6 }}>
+                  Description / Purpose
+                </label>
                 <input
                   type="text"
                   maxLength={255}
                   value={formDescription}
                   onChange={(e) => setFormDescription(e.target.value)}
                   placeholder="e.g. Durga Puja special 50 Coins gift"
-                  className="admin-form-input"
+                  style={{
+                    width: "100%",
+                    padding: "10px 14px",
+                    borderRadius: 10,
+                    border: "1px solid #CBD5E1",
+                    fontSize: 14,
+                    outline: "none",
+                    boxSizing: "border-box",
+                  }}
                 />
               </div>
 
               {/* Active Toggle */}
-              <div className="admin-form-group">
-                <label className="admin-checkbox-label">
+              <div style={{ marginBottom: 20 }}>
+                <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: 13, color: "#334155" }}>
                   <input
                     type="checkbox"
                     checked={formIsActive}
                     onChange={(e) => setFormIsActive(e.target.checked)}
+                    style={{ width: 16, height: 16, accentColor: "#4338CA" }}
                   />
                   <span>Activate promo code immediately upon creation</span>
                 </label>
               </div>
 
-              <div className="admin-modal-actions">
+              {/* Modal Actions */}
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
                 <button
                   type="button"
-                  className="admin-btn-secondary"
                   onClick={() => setCreateModalOpen(false)}
                   disabled={submitting}
+                  style={{
+                    padding: "10px 16px",
+                    borderRadius: 10,
+                    border: "1px solid #CBD5E1",
+                    backgroundColor: "#FFFFFF",
+                    color: "#475569",
+                    fontWeight: 600,
+                    fontSize: 14,
+                    cursor: "pointer",
+                  }}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="admin-btn-primary"
                   disabled={submitting || formCode.length !== 6}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    padding: "10px 20px",
+                    borderRadius: 10,
+                    border: "none",
+                    backgroundColor: formCode.length === 6 ? "#4338CA" : "#94A3B8",
+                    color: "#FFFFFF",
+                    fontWeight: 600,
+                    fontSize: 14,
+                    cursor: formCode.length === 6 ? "pointer" : "not-allowed",
+                  }}
                 >
                   {submitting ? (
                     <>
-                      <Loader2 size={16} className="admin-spin" />
-                      <span>Creating…</span>
+                      <Loader2 className="animate-spin" size={16} />
+                      <span>Creating...</span>
                     </>
                   ) : (
-                    <span>Create Promo Code</span>
+                    <span>Create Code</span>
                   )}
                 </button>
               </div>
@@ -737,42 +1124,77 @@ export default function AdminCustomerPromosPage() {
 
       {/* Delete Confirmation Modal */}
       {promoToDelete && (
-        <div className="admin-modal-backdrop">
-          <div className="admin-modal-card" style={{ maxWidth: "440px" }}>
-            <div className="admin-modal-header">
-              <h3 className="admin-modal-title" style={{ color: "#DC2626" }}>
-                Delete Customer Promo Code
-              </h3>
-              <button className="admin-modal-close" onClick={() => setPromoToDelete(null)}>
-                ✕
-              </button>
-            </div>
-            <div className="admin-modal-body" style={{ padding: "16px 0" }}>
-              <p style={{ fontSize: "14px", color: "#475569", lineHeight: "1.5" }}>
-                Are you sure you want to delete promo code{" "}
-                <strong style={{ color: "#1E293B" }}>"{promoToDelete.code}"</strong>?
-              </p>
-              <p style={{ fontSize: "13px", color: "#64748B", marginTop: "8px" }}>
-                This will block any future claims. Existing coins already redeemed by customers will remain in their balance.
-              </p>
-            </div>
-            <div className="admin-modal-actions">
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            backdropFilter: "blur(4px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 10000,
+            padding: 16,
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "#FFFFFF",
+              borderRadius: 20,
+              width: "100%",
+              maxWidth: 420,
+              padding: 24,
+              boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
+            }}
+          >
+            <h3 style={{ fontSize: 18, fontWeight: 700, color: "#DC2626", margin: "0 0 10px 0" }}>
+              Delete Customer Promo Code
+            </h3>
+            <p style={{ fontSize: 14, color: "#475569", lineHeight: "1.5", margin: 0 }}>
+              Are you sure you want to delete promo code{" "}
+              <strong style={{ color: "#0F172A" }}>"{promoToDelete.code}"</strong>?
+            </p>
+            <p style={{ fontSize: 13, color: "#64748B", marginTop: 8 }}>
+              This will block future claims. Existing coins already redeemed by customers will remain in their balance.
+            </p>
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 20 }}>
               <button
-                className="admin-btn-secondary"
                 onClick={() => setPromoToDelete(null)}
                 disabled={deleting}
+                style={{
+                  padding: "8px 16px",
+                  borderRadius: 10,
+                  border: "1px solid #CBD5E1",
+                  backgroundColor: "#FFFFFF",
+                  color: "#475569",
+                  fontWeight: 600,
+                  fontSize: 13,
+                  cursor: "pointer",
+                }}
               >
                 Cancel
               </button>
               <button
-                className="admin-btn-danger"
                 onClick={handleDeletePromo}
                 disabled={deleting}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                  padding: "8px 16px",
+                  borderRadius: 10,
+                  border: "none",
+                  backgroundColor: "#DC2626",
+                  color: "#FFFFFF",
+                  fontWeight: 600,
+                  fontSize: 13,
+                  cursor: "pointer",
+                }}
               >
                 {deleting ? (
                   <>
-                    <Loader2 size={15} className="admin-spin" />
-                    <span>Deleting…</span>
+                    <Loader2 className="animate-spin" size={15} />
+                    <span>Deleting...</span>
                   </>
                 ) : (
                   <span>Delete Code</span>
