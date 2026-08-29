@@ -16,6 +16,7 @@ import {
   MessageSquareX,
   Award,
   Tag,
+  Coins,
   Menu,
   X,
 } from "lucide-react";
@@ -105,7 +106,8 @@ export default function AdminLayout({
       { href: "/admin/incomplete", label: "Possible Drivers", icon: UserMinus },
       { href: "/admin/push", label: "Push Notifications", icon: Bell },
       { href: "/admin/promoters", label: "Brand Promoters", icon: Award },
-      { href: "/admin/promos", label: "Promo Codes", icon: Tag },
+      { href: "/admin/customer-promos", label: "Customer Promo Codes", icon: Coins },
+      { href: "/admin/promos", label: "Driver Promos", icon: Tag },
     ]},
     { section: "Analytics", items: [
       { href: "/admin/cancellations", label: "Feedback Cancellation", icon: MessageSquareX },
