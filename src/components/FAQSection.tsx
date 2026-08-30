@@ -6,7 +6,7 @@ export default function FAQSection() {
 
   const faqs = [
     { question: "How are fares calculated?", answer: "We use a transparent base rate + per kilometer formula. We strictly do not use dynamic surge multipliers, so you always pay a fair price even during peak hours or rain." },
-    { question: "Are the drivers verified?", answer: "Yes. Every driver on Riksho undergoes a strict physical document verification and background check before they are allowed to accept rides." },
+    { question: "Are the drivers verified?", answer: "Yes. Every driver on Riksho undergoes document verification—including Driving License, Vehicle RC, and Government ID proofs—before being approved to accept rides." },
     { question: "Can I pay with cash or UPI?", answer: "Absolutely! You can choose to pay seamlessly via UPI directly to the driver, or pay in cash at the end of your trip." },
     { question: "What if I face an issue during the ride?", answer: "We have a 24/7 human support team and an in-app SOS button to ensure your safety and resolve any disputes within minutes." }
   ];

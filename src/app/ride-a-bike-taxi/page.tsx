@@ -309,10 +309,10 @@ export default function RideBikeTaxiPage() {
                     </div>
                     <div>
                       <h4 style={{ fontSize: "1.05rem", fontWeight: 700, color: "#0F172A", margin: "0 0 6px 0" }}>
-                        2. Fast Digital Verification
+                        2. Fast Document Verification
                       </h4>
                       <p style={{ fontSize: "0.95rem", lineHeight: 1.6, color: "#64748B", margin: 0 }}>
-                        Our automated compliance system verifies your profile within 10 minutes so you can start riding immediately.
+                        Our team verifies your submitted documents and activates your driver account promptly so you can start riding.
                       </p>
                     </div>
                   </div>

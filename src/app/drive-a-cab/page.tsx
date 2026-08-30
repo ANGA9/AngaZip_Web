@@ -72,7 +72,7 @@ export default function DriveCabPage() {
     },
     {
       question: "How quickly can I start taking rides after registering?",
-      answer: "Our automated verification system processes your documents in under 10 minutes. Once approved, you can turn on the app, complete a quick selfie verification, and start accepting ride requests immediately."
+      answer: "Our onboarding team reviews and verifies your documents promptly (typically within a few hours). Once approved, you can switch to Online mode and start accepting ride requests immediately."
     },
     {
       question: "How do I receive passenger payments?",
@@ -310,10 +310,10 @@ export default function DriveCabPage() {
                     </div>
                     <div>
                       <h4 style={{ fontSize: "1.05rem", fontWeight: 700, color: "#0F172A", margin: "0 0 6px 0" }}>
-                        2. Instant Automated Verification
+                        2. Fast Document Verification
                       </h4>
                       <p style={{ fontSize: "0.95rem", lineHeight: 1.6, color: "#64748B", margin: 0 }}>
-                        Our digital compliance engine verifies your documents and activates your driver account within 10 minutes.
+                        Our team verifies your submitted documents and activates your driver account promptly so you can start riding.
                       </p>
                     </div>
                   </div>

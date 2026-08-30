@@ -97,8 +97,8 @@ export const webPrivacyCustomerTranslations: LegalDocument = {
         "Customer / Rider: A natural person who requests, books, or receives transportation, delivery, or logistics services on the Riksho Platform.",
         "Personal Data / Information: Any information that relates to an identified or identifiable natural person, including name, phone number, GPS coordinates, email address, and payment identifiers.",
         "Device Identifier: Unique device identifiers including IMEI, UUID, IP address, MAC address, and operating system build parameters.",
-        "Third-Party Service Providers (TPSPs): Trusted third-party technology vendors, payment aggregators, cloud hosts, mapping providers, and background verification agencies contracted by Riksho.",
-        "Usage Information: Passive or automated telemetry data collected while interacting with the Riksho Platform."
+        "Third-Party Service Providers (TPSPs): Trusted technology vendors, cloud hosts, and mapping providers utilized by Riksho.",
+        "Usage Information: Telemetry data collected while interacting with the Riksho Platform."
       ]
     },
     {
@@ -106,15 +106,14 @@ export const webPrivacyCustomerTranslations: LegalDocument = {
       number: "3",
       title: "What Information Do We Collect: Information You Provide to Us",
       paragraphs: [
-        "We collect personal information directly from you when you create an account, update your profile, request rides, contact customer support, or participate in promotional surveys:",
-        "The Information you provide includes the following distinct categories:"
+        "We collect personal information directly from you when you create an account, update your profile, request rides, or contact customer support:",
+        "The Information you provide includes the following categories:"
       ],
       bullets: [
-        "Account Registration Information: Mobile telephone number (+91), full legal name, email address, gender, date of birth, profile photograph, and account login credentials.",
-        "Saved Transit & Billing Addresses: Home and work addresses, favorite saved landmarks, emergency contact numbers, and invoice preferences.",
-        "Driver Partner Statutory KYC: Commercial Driving License (DL), Permanent Account Number (PAN), Aadhaar token (via DigiLocker / offline e-KYC), Vehicle Registration Certificate (RC), Commercial Insurance Policy, Fitness Certificate, and live facial selfie images for continuous identity verification.",
-        "Background Verification Records: Police verification certificates, court record histories, and commercial driving records (collected via authorized background check TPSPs).",
-        "Customer Support Correspondence: Voice call recordings, chat transcripts, dispute tickets, uploaded accident photographs, and feedback ratings."
+        "Account Registration Information: Mobile phone number (+91), full name, email address, profile photograph, and account credentials.",
+        "Saved Transit Addresses: Saved pickup/drop-off landmarks and emergency contact numbers.",
+        "Driver Partner KYC & Vehicle Details: Driving License (DL), Vehicle Registration Certificate (RC), Vehicle Insurance, and Government Identity Proof (Aadhaar/PAN) uploaded during onboarding.",
+        "Customer Support Correspondence: Chat messages, dispute tickets, uploaded photographs, and feedback ratings."
       ]
     },
     {
@@ -122,30 +121,28 @@ export const webPrivacyCustomerTranslations: LegalDocument = {
       number: "4",
       title: "Information We Collect Automatically as You Access & Use the Riksho App",
       paragraphs: [
-        "Whenever you access or interact with the Riksho Platform, our systems automatically capture transactional, spatial, and technical telemetry:",
+        "Whenever you access or interact with the Riksho Platform, our systems capture operational and location data necessary for ride fulfillment:",
         "Detailed automated data streams include:"
       ],
       bullets: [
-        "Real-Time Location & GPS Telemetry (Customers): We collect precise GPS coordinates from your mobile device when the Riksho App is running in the foreground (open on-screen) and during active transit to determine pickup coordinates, optimize routes, compute fares, and power safety features. Even if precise location permissions are restricted, we link the assigned Captain's real-time trip GPS to your booking receipt for verification.",
-        "Real-Time Location & GPS Telemetry (Captains): For Driver Partners, high-precision GPS telemetry is captured both in the foreground and background whenever the 'On-Duty' status toggle is enabled.",
-        "Transactional & Ride Telemetry: Pickup and drop-off coordinates, route timestamps, distance traveled (km), duration (minutes), fare breakdown, tolls, and digital transaction tokens.",
-        "Device & Telemetry Identifiers: Hardware model, operating system version, screen resolution, mobile carrier network data, battery level, crash dumps, and app gesture interactions.",
-        "SMS & OTP Permissions: Device access permissions to read incoming One-Time Passwords (OTPs) sent by Riksho for seamless auto-verification during login and digital payments.",
-        "Call Masking & Voice Recordings: For safety and quality assurance, phone calls between Riders and Captains routed via our in-app proxy telephony numbers are recorded.",
-        "Cookies & Session Tracking: Essential cookies and session analytics stored in your browser to maintain authentication state."
+        "Real-Time Location & GPS Telemetry (Customers): We collect GPS coordinates from your mobile device when the Riksho App is in the foreground (open on-screen) and during active transit to determine pickup coordinates, optimize routes, and compute fares.",
+        "Real-Time Location & GPS Telemetry (Drivers): For Driver Partners, GPS telemetry is captured while the 'On-Duty' status toggle is enabled to match nearby rides and navigate routes.",
+        "Transactional & Ride Telemetry: Pickup and drop-off coordinates, route timestamps, distance traveled (km), duration (minutes), and fare breakdown.",
+        "Device Identifiers: Hardware model, operating system version, crash logs, and app interaction telemetry.",
+        "Cookies & Session Tracking: Essential cookies and session tokens stored in your browser to maintain authentication state."
       ]
     },
     {
       id: "information-from-third-parties",
       number: "5",
-      title: "Information Third Parties Provide About You",
+      title: "Information Received from Third-Party Services",
       paragraphs: [
-        "We may receive information about you from our affiliates, business partners, and Third-Party Service Providers (TPSPs):"
+        "We may receive information about you from trusted technology service providers:",
+        "Key integrations include:"
       ],
       bullets: [
-        "Payment Aggregators: Settlement status, transaction reference numbers, and UPI VPA verification from RBI-authorized payment gateways.",
-        "Government Portals & Verification TPSPs: Driving license validation via VAHAN / SARATHI databases, DigiLocker KYC verification, and criminal background checks.",
-        "Corporate Clients & Co-Branded Partners: If your account is linked to an employer corporate ride program, we receive corporate email and cost-center allocation details."
+        "Mapping Services: Geocoding coordinates and road network distances for route estimation.",
+        "Notification Gateways: Delivery receipts for transactional SMS and booking alerts."
       ]
     },
     {
