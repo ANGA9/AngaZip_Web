@@ -109,7 +109,7 @@ export default function DeleteAccountPage() {
                   border: "1px solid #E2E8F0"
                 }}>
                   <Building2 size={13} color="#64748B" />
-                  Riksho Technologies Pvt. Ltd.
+                  Riksho
                 </span>
               </div>
             </div>

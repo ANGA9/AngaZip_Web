@@ -3,7 +3,7 @@ import LegalLayout from "@/components/LegalLayout";
 
 export const metadata: Metadata = {
   title: "Terms of Service | Riksho",
-  description: "Official Terms of Service for Riders, Customers, and Driver Partners of Riksho Technologies Pvt. Ltd.",
+  description: "Official Terms of Service for Riders, Customers, and Driver Partners of Riksho.",
 };
 
 export default function TermsPage() {

@@ -45,27 +45,27 @@ export const legalUiTranslations = {
   grievanceDesc: "Pursuant to the Information Technology (Intermediary Guidelines and Digital Media Ethics Code) Rules, 2021, the Consumer Protection (E-Commerce) Rules, 2020, and the Digital Personal Data Protection (DPDP) Act, 2023, please find below the designated statutory Grievance Officer details:",
   officerName: "Sumit Shaw",
   officerRole: "Chief Nodal & Grievance Redressal Officer",
-  officerEntity: "Riksho Technologies Pvt. Ltd.",
-  officerEmail: "grievance@riksho.in",
-  officerAddress: "Corporate Office: G744+2PV, Jalkal, Maheshtala, West Bengal 700141, India",
+  officerEntity: "Riksho",
+  officerEmail: "grievance@riksho.com",
+  officerAddress: "G744+2PV, Jalkal, Maheshtala, West Bengal 700141, India",
   officerResponseTime: "Statutory SLA: Acknowledgment within 24–48 hours | Resolution within 15–30 days",
   officialNotice: "This is a legally binding electronic agreement executed under the Information Technology Act, 2000 and the rules framed thereunder."
 };
 
 // ==========================================
-// 1. PRIVACY POLICY - CUSTOMER (14 DETAILED CLAUSES)
+// 1. PRIVACY POLICY - CUSTOMER
 // ==========================================
 export const webPrivacyCustomerTranslations: LegalDocument = {
   title: "Customer Privacy Policy",
-  subtitle: "Complete Data Governance and Privacy Protocol Governing the Collection, Use, Telemetry Tracking, Storage, Disclosure, Transfer, and Protection of Your Personal Information under the Digital Personal Data Protection (DPDP) Act, 2023 and Information Technology Act, 2000.",
-  version: "Version 4.1.0 (DPDP Act Compliance)",
-  lastUpdated: "July 21, 2026",
-  effectiveDate: "August 1, 2026",
-  entityName: "Riksho Technologies Pvt. Ltd.",
+  subtitle: "Data Governance and Privacy Protocol Governing the Collection, Use, Telemetry Tracking, Storage, Disclosure, Transfer, and Protection of Your Personal Information under the Digital Personal Data Protection (DPDP) Act, 2023 and Information Technology Act, 2000.",
+  version: "Version 4.1.0",
+  lastUpdated: "August 2026",
+  effectiveDate: "August 2026",
+  entityName: "Riksho",
   intro: [
-    "Your privacy matters to Riksho Technologies Pvt. Ltd. (the \"Company\", \"we\", \"Riksho\", \"us\" or \"our\").",
+    "Your privacy matters to Riksho (\"we\", \"Riksho\", \"us\" or \"our\").",
     "This Privacy Policy (\"Policy\") describes our policies and procedures on the collection, use, processing, storage, retrieval, disclosure, transfer, and protection of your information, including personal information and sensitive personal data or information (\"Information\"), that Riksho may receive through your online access, interaction, or use of the Riksho mobile applications (\"Riksho App\"), our website located at https://riksho.com (the website and Riksho App are collectively referred to as the \"Riksho Platform\"), or through your offline interactions with us including via telephone, emails, in-person support desks, or while availing our on-demand mobility and delivery Services.",
-    "The terms \"you\" and \"your\" refer to a Customer / Rider, a Captain / Driver Partner, a Delivery Partner, or any other user accessing the Riksho Platform or availing the Services.",
+    "The terms \"you\" and \"your\" refer to a Customer / Rider, a Driver Partner / Buddy, a Delivery Partner, or any other user accessing the Riksho Platform or availing the Services.",
     "Please read this Policy carefully before using the Riksho Platform or submitting any Information to Riksho. This Policy is incorporated into and is to be read alongside the Customer Terms of Service and applicable Partner Agreements available on the Riksho Platform."
   ],
   sections: [
@@ -217,19 +217,19 @@ export const webPrivacyCustomerTranslations: LegalDocument = {
         "As a Data Principal under the DPDP Act, 2023, you possess comprehensive statutory rights regarding your personal information:"
       ],
       bullets: [
-        "Right to Access & Summary: Request a complete summary of personal data processed by Riksho, including identities of TPSPs with whom data has been shared.",
+        "Right to Access & Summary: Request a complete summary of personal data processed by Riksho, including identities of service providers with whom data has been shared for ride execution.",
         "Right to Correction & Updating: Rectify inaccurate, misleading, or out-of-date personal information directly in the Riksho App.",
-        "Right to Erasure (Account Deletion): Submit an account deletion request via the app Privacy Hub or by emailing grievance@riksho.in.",
+        "Right to Erasure (Account Deletion): Submit an account deletion request via the app Privacy Hub or by emailing grievance@riksho.com.",
         "Right to Nominate: Nominate an individual to exercise your data rights in the event of death or incapacity."
       ]
     },
     {
       id: "security-measures",
       number: "12",
-      title: "Information Security, AES-256 Encryption & Data Localization",
+      title: "Information Security & Data Storage",
       paragraphs: [
-        "All Information collected by Riksho is securely stored in ISO 27001, ISO 27018, and SOC-2 certified tier-IV data center facilities physically located within the territorial borders of the Republic of India.",
-        "We enforce industry-standard security safeguards including TLS 1.3 encryption in transit, AES-256 encryption at rest, multi-factor administrative authentication, network firewalls, and continuous vulnerability monitoring."
+        "All Information collected by Riksho is securely stored on secure cloud database servers physically located within the territorial borders of the Republic of India.",
+        "We enforce industry-standard security safeguards including TLS encryption in transit, encrypted storage at rest, strict access controls, network firewalls, and regular security monitoring."
       ]
     },
     {
@@ -246,7 +246,7 @@ export const webPrivacyCustomerTranslations: LegalDocument = {
       title: "Nodal Grievance Redressal Officer & Policy Amendments",
       paragraphs: [
         "If you have any questions, concerns, feedback, or legal grievances regarding the processing of your Information, please reach out to our designated Nodal Grievance Officer:",
-        "Name: Sumit Shaw | Designation: Chief Nodal & Grievance Redressal Officer | Email: grievance@riksho.in | Address: G744+2PV, Jalkal, Maheshtala, West Bengal 700141, India.",
+        "Name: Sumit Shaw | Designation: Chief Nodal & Grievance Redressal Officer | Email: grievance@riksho.com | Address: G744+2PV, Jalkal, Maheshtala, West Bengal 700141, India.",
         "Amendments: Riksho reserves the right to modify this Policy periodically. We will notify you of material changes via in-app banner notifications or email prior to the revised Policy taking effect."
       ]
     }
@@ -254,7 +254,7 @@ export const webPrivacyCustomerTranslations: LegalDocument = {
   faqs: [
     {
       question: "Does Riksho track my location when the app is closed?",
-      answer: "For Customers, Riksho only captures your location when the app is actively open on-screen (foreground) and during an active trip to ensure route accuracy and emergency safety. For Driver Partners, location is tracked in the background only when the 'On-Duty' toggle is turned on."
+      answer: "For Customers, Riksho only captures your location when the app is actively open on-screen (foreground) and during an active trip to ensure route accuracy and emergency safety. For Driver Partners, location is tracked only when the 'On-Duty' toggle is turned on."
     },
     {
       question: "Does Riksho sell my personal data to advertisers?",
@@ -262,11 +262,11 @@ export const webPrivacyCustomerTranslations: LegalDocument = {
     },
     {
       question: "How do I permanently delete my account and data?",
-      answer: "You can request account deletion directly inside the app by navigating to Profile > Settings > Data & Privacy > Delete Account, or by emailing our Grievance Officer at grievance@riksho.in. Your personal identifiers will be purged within 30 days."
+      answer: "You can request account deletion directly inside the app by navigating to Profile > Settings > Data & Privacy > Delete Account, or by emailing our Grievance Officer at grievance@riksho.com. Your personal identifiers will be purged within 30 days."
     },
     {
       question: "Are my phone calls with drivers private?",
-      answer: "Yes. Riksho utilizes virtual number masking technology. Drivers and riders cannot view each other's actual personal phone numbers during transit calls."
+      answer: "Yes. Riksho facilitates in-app communication and respects your privacy. Drivers and riders are encouraged to communicate for pickup coordination only."
     }
   ]
 };
@@ -276,46 +276,45 @@ export const webPrivacyCustomerTranslations: LegalDocument = {
 // ==========================================
 export const webPrivacyPartnerTranslations: LegalDocument = {
   title: "Driver & Delivery Partner Privacy Policy",
-  subtitle: "Comprehensive Partner Data Governance Protocol: Statutory KYC Verification, Continuous GPS Telemetry, Banking Payout Settlements, Background Checks, and 7-Year Regulatory Retention.",
+  subtitle: "Partner Data Governance Protocol: Driver KYC Verification, GPS Telemetry for Dispatches, Payout Settlements, and Regulatory Compliance.",
   version: "Version 4.1.0 (Partner Privacy)",
-  lastUpdated: "July 21, 2026",
-  effectiveDate: "August 1, 2026",
-  entityName: "Riksho Technologies Pvt. Ltd.",
+  lastUpdated: "August 2026",
+  effectiveDate: "August 2026",
+  entityName: "Riksho",
   intro: [
-    "This Partner Privacy Policy (\"Policy\") details the policies and procedures of Riksho Technologies Pvt. Ltd. regarding the collection, verification, storage, and processing of personal, biometric-linked, and telematics data of driver and courier partners (\"Driver Partners\" or \"you\").",
-    "Compliance with these data standards is mandatory to maintain an active commercial driving account on the Riksho Platform."
+    "This Partner Privacy Policy (\"Policy\") details the policies and procedures of Riksho (\"we\", \"our\", or \"us\") regarding the collection, verification, storage, and processing of personal, vehicle, and telematics data of driver and courier partners (\"Driver Partners\" or \"you\").",
+    "Compliance with these data standards is required to maintain an active commercial driving account on the Riksho Platform."
   ],
   sections: [
     {
       id: "partner-data-ingestion",
       number: "1",
-      title: "Statutory KYC & Personal Data Collection",
+      title: "Driver KYC & Vehicle Data Collection",
       paragraphs: [
-        "To comply with state motor vehicle directives and ensure passenger safety, we collect, verify, and store:"
+        "To comply with transport directives and ensure passenger safety, we collect, verify, and store:"
       ],
       bullets: [
-        "Commercial Driving License (DL): Verified via the Ministry of Road Transport and Highways (MoRTH) SARATHI portal.",
-        "Identity & Tax Documents: PAN Card and Aadhaar Card (via DigiLocker token).",
-        "Vehicle Documentation: Registration Certificate (RC), Commercial Insurance, Fitness Certificate, and PUC.",
-        "Live Biometric Selfies: In-app real-time facial selfie verification before activating 'On-Duty' dispatch mode.",
-        "Banking & Settlement Data: Bank account number, IFSC code, and UPI VPAs for daily automatic earnings payouts.",
-        "Background Verification Records: Police verification certificates and court record checks."
+        "Driving License (DL): Valid commercial or standard category driving license as applicable.",
+        "Identity Proofs: Government identity proof (Aadhaar Card or PAN Card) for verification and tax reporting.",
+        "Vehicle Documentation: Registration Certificate (RC), Vehicle Insurance, and Fitness / PUC Certificate.",
+        "Profile Photograph: Clear face photo for passenger identification.",
+        "Banking & Settlement Data: Bank account number, IFSC code, or UPI ID for daily earnings settlements."
       ]
     },
     {
       id: "continuous-telematics",
       number: "2",
-      title: "Continuous High-Frequency GPS Telematics & Telemetry Auditing",
+      title: "Real-Time GPS Location & Dispatching",
       paragraphs: [
-        "While logged into the Partner App in 'On-Duty' status, your real-time GPS telemetry is continuously captured in both the foreground and background to calculate ride dispatches, compute automated distance fares, and monitor safety."
+        "While logged into the Partner App in 'On-Duty' status, your GPS location is captured in the foreground and background to dispatch nearby ride requests, compute accurate trip routes, and ensure safety during active trips."
       ]
     },
     {
       id: "regulatory-retention",
       number: "3",
-      title: "Regulatory Storage & 7-Year Data Retention Schedules",
+      title: "Data Storage & Retention",
       paragraphs: [
-        "In compliance with the Motor Vehicles Act, 1988, IT Act, 2000, and tax regulations, partner KYC, trip trajectories, and payout ledger records are securely archived for seven (7) years following account deactivation."
+        "In compliance with applicable motor vehicle, tax, and IT regulations, partner KYC details, trip history, and payout records are securely retained as required by law."
       ]
     },
     {
@@ -323,7 +322,7 @@ export const webPrivacyPartnerTranslations: LegalDocument = {
       number: "4",
       title: "Partner Data Rights & Support Contact",
       paragraphs: [
-        "Partners may inspect uploaded documents, update bank details, and request tax statements via the Partner App or by writing to partnercare@riksho.in."
+        "Partners may view and update their vehicle documents, bank details, and personal profile directly in the Partner App or by contacting partner support at support@riksho.com."
       ]
     }
   ],
@@ -334,25 +333,25 @@ export const webPrivacyPartnerTranslations: LegalDocument = {
     },
     {
       question: "How long are my trip logs and earnings records kept?",
-      answer: "In compliance with Indian taxation and transport laws, earnings and KYC records are securely archived for 7 years."
+      answer: "In compliance with Indian taxation and transport record-keeping requirements, earnings and trip records are securely archived."
     }
   ]
 };
 
 // ==========================================
-// 3. TERMS OF SERVICE - CUSTOMER (12 CLAUSES)
+// 3. TERMS OF SERVICE - CUSTOMER
 // ==========================================
 export const webTermsCustomerTranslations: LegalDocument = {
   title: "Customer Terms of Service",
-  subtitle: "Comprehensive Master Terms & Conditions Governing Rider Accounts, Booking Dispatches, Dynamic Fare Calculations, Payment Settlement, Safety Protocols, and Dispute Mechanisms.",
-  version: "Version 4.1.0 (PAN-India Edition)",
-  lastUpdated: "July 21, 2026",
-  effectiveDate: "August 1, 2026",
-  entityName: "Riksho Technologies Pvt. Ltd.",
+  subtitle: "Terms & Conditions Governing Rider Accounts, Bookings, Fare Calculations, Payment Methods, Safety Protocols, and Cancellations.",
+  version: "Version 4.1.0",
+  lastUpdated: "August 2026",
+  effectiveDate: "August 2026",
+  entityName: "Riksho",
   intro: [
     "Welcome to Riksho! These Customer Terms of Service (\"Terms\" or \"Agreement\") constitute an electronic contract under the Information Technology Act, 2000 and the rules framed thereunder.",
     "This document is published in accordance with Rule 3(1) of the Information Technology (Intermediary Guidelines and Digital Media Ethics Code) Rules, 2021 and the Consumer Protection (E-Commerce) Rules, 2020.",
-    "The Platform is owned and operated by Riksho Technologies Pvt. Ltd., having its registered office at G744+2PV, Jalkal, Maheshtala, West Bengal 700141, India.",
+    "The Platform is owned and operated by Riksho, having its operating address at G744+2PV, Jalkal, Maheshtala, West Bengal 700141, India.",
     "By using the Platform, you agree to be bound by these Terms, our Privacy Policy, Cancellation & Refund Policy, and Safety Guidelines."
   ],
   sections: [
@@ -368,78 +367,79 @@ export const webTermsCustomerTranslations: LegalDocument = {
     {
       id: "eligibility",
       number: "2",
-      title: "User Eligibility, Capacity to Contract & Verification",
+      title: "User Eligibility & Verification",
       paragraphs: [
-        "The Platform is available only to individuals legally competent to contract under the Indian Contract Act, 1872."
+        "The Platform is available to individuals legally competent to contract under the Indian Contract Act, 1872."
       ],
       bullets: [
         "Age: You must be at least 18 years of age.",
         "Legal Capacity: You must possess full legal capacity to enter into binding contracts.",
         "Good Standing: You must not have been previously suspended or terminated from the Platform.",
-        "Mobile Telecommunication: You must hold an active Indian mobile number (+91) registered in your legal name."
+        "Mobile Number: You must register with an active Indian mobile phone number (+91)."
       ]
     },
     {
       id: "account",
       number: "3",
-      title: "Account Registration, Security & Responsibilities",
+      title: "Account Registration & Responsibilities",
       paragraphs: [
-        "You must register an Account via OTP verification. You are solely responsible for maintaining the confidentiality of your login credentials and all activities occurring under your Account."
+        "You must register an Account via OTP verification. You are solely responsible for maintaining the confidentiality of your account credentials and all activities occurring under your Account."
       ],
       bullets: [
-        "Single Account: Only one active account is permitted per natural person.",
-        "Non-Transferable: You cannot assign or transfer your Account to any third party.",
-        "Breach Notification: Promptly notify Riksho at support@riksho.in upon suspecting unauthorized access."
+        "Single Account: Only one active account is permitted per user.",
+        "Non-Transferable: You cannot transfer your Account to any third party.",
+        "Breach Notification: Promptly notify Riksho at support@riksho.com upon suspecting unauthorized access."
       ]
     },
     {
       id: "services",
       number: "4",
-      title: "Nature of Services & Intermediary Role",
+      title: "Nature of Services & Platform Role",
       paragraphs: [
-        "Riksho operates strictly as an electronic commerce marketplace and technology intermediary under Section 79 of the IT Act, 2000. Riksho connects Riders with independent commercial Driver Partners (Bike Taxi, Auto Rickshaw, and Cabs). Riksho does not provide transportation services directly."
+        "Riksho operates as a technology platform connecting Riders with independent third-party Driver Partners (Auto Rickshaw, Toto / E-Rickshaw, Bike Taxi, and Cargo / Parcel Delivery). Riksho does not own commercial transport vehicles and does not provide transportation services directly."
       ]
     },
     {
       id: "bookings",
       number: "5",
-      title: "Ride Bookings, Waiting Times & Navigation",
+      title: "Ride Bookings & Navigation",
       paragraphs: [
-        "When you request a ride, an upfront estimated fare is displayed. A binding trip contract is formed when an independent Driver Partner accepts your dispatch.",
-        "A complimentary waiting grace period of 5 minutes is provided at the pickup point. In-transit destination updates will automatically adjust the fare based on distance and duration."
+        "When you request a ride, an upfront estimated fare is displayed. A binding trip contract is formed when an independent Driver Partner accepts your request.",
+        "A complimentary waiting grace period of 5 minutes is provided at the pickup point. In-transit destination updates will automatically adjust the fare based on distance and route."
       ]
     },
     {
       id: "payments",
       number: "6",
-      title: "Fares, Surge Pricing, Taxes, Tolls & Payments",
+      title: "Fares, Payments & Promotions",
       paragraphs: [
-        "Fares are calculated based on base fare, distance, time, applicable tolls (FASTag), and applicable statutory taxes. Dynamic surge pricing may apply during peak demand periods.",
-        "Accepted payment modes include Direct Cash to Driver, online UPI, Debit/Credit Cards, and Riksho Wallet / Coins."
+        "Fares are calculated based on base fare, distance traveled, and trip duration metrics. Dynamic adjustments may apply during peak demand or extreme weather periods.",
+        "Accepted payment modes include Direct Cash to Driver, Direct UPI to Driver (via QR code / UPI apps), and Riksho Coins / Promotional promo codes."
       ]
     },
     {
       id: "cancellations",
       number: "7",
-      title: "Cancellation Policy & Refund Framework",
+      title: "Cancellation Policy & Refunds",
       paragraphs: [
-        "Riders may cancel rides free of charge within 2 minutes of booking acceptance. Cancellations beyond 2 minutes may incur a ₹25–₹50 fee. Driver-initiated cancellations never attract rider fees. Approved refunds are credited instantly to Riksho Wallet or within 3–5 business days to bank accounts."
+        "Riders may cancel rides free of charge within 2 minutes of booking acceptance. If a cancellation occurs after the driver has arrived or traveled significantly towards pickup, a standard cancellation fee may apply to compensate the driver.",
+        "Driver-initiated cancellations never attract rider fees. Any promotional coins or eligible refunds will be restored to your account."
       ]
     },
     {
       id: "conduct",
       number: "8",
-      title: "Rider Code of Conduct & Safety Prohibitions",
+      title: "Rider Code of Conduct",
       paragraphs: [
-        "Users must maintain civility and safety at all times. Physical violence, sexual harassment, verbal abuse, smoking, alcohol, narcotics, and damaging partner vehicles are strictly prohibited and result in immediate account termination."
+        "Users must maintain courtesy and mutual respect at all times. Physical violence, verbal abuse, smoking, alcohol consumption, illicit substances, or damaging partner vehicles is strictly prohibited and will lead to account suspension."
       ]
     },
     {
       id: "safety",
       number: "9",
-      title: "Safety Systems, Live Telemetry & Insurance",
+      title: "Safety Features & Emergency Support",
       paragraphs: [
-        "Riksho provides 24/7 automated telemetry tracking, in-app Emergency SOS connected to Police (112), driver identity validation, and third-party passenger accidental insurance on every completed trip."
+        "Riksho provides 4-digit start-trip security OTPs, real-time live ride tracking, emergency contacts sharing, and emergency helpline assistance."
       ]
     },
     {
@@ -447,7 +447,7 @@ export const webTermsCustomerTranslations: LegalDocument = {
       number: "10",
       title: "Intellectual Property Rights",
       paragraphs: [
-        "All software, algorithms, designs, logos, and trademarks remain the exclusive intellectual property of Riksho Technologies Pvt. Ltd."
+        "All software, UI designs, brand assets, logos, and trademarks remain the intellectual property of Riksho."
       ]
     },
     {
@@ -455,34 +455,34 @@ export const webTermsCustomerTranslations: LegalDocument = {
       number: "11",
       title: "Limitation of Liability & Disclaimers",
       paragraphs: [
-        "The Platform is provided on an 'as-is' basis. Riksho's aggregate liability for any direct claim arising from a trip shall not exceed the gross fare paid for that specific trip."
+        "The Platform is provided on an 'as-is' basis. As a technology marketplace, Riksho facilitates connections between riders and independent drivers, and our aggregate liability for any direct claim arising from a trip shall not exceed the gross fare paid for that specific trip."
       ]
     },
     {
       id: "disputes",
       number: "12",
-      title: "Governing Law, Arbitration & Jurisdiction",
+      title: "Governing Law & Dispute Resolution",
       paragraphs: [
-        "These Terms are governed by the laws of India. Unresolved disputes shall be referred to binding sole arbitration in Bengaluru, Karnataka under the Arbitration and Conciliation Act, 1996."
+        "These Terms are governed by the laws of India. Any disputes arising in connection with the Platform shall be subject to the exclusive jurisdiction of the competent courts in West Bengal, India."
       ]
     }
   ],
   faqs: [
     {
       question: "How are ride fares calculated?",
-      answer: "Fares are calculated using transparent base rates + distance + time + applicable tolls and taxes. During peak traffic or rain, dynamic surge multipliers may apply and are always shown upfront."
+      answer: "Fares are calculated using transparent base rates + distance + estimated duration. Fares are displayed upfront before you confirm your booking."
     },
     {
       question: "What is the cancellation policy?",
-      answer: "You can cancel free of charge within 2 minutes of driver assignment. After 2 minutes or upon driver arrival, a ₹25–₹50 fee may apply to compensate the driver for fuel."
+      answer: "You can cancel free of charge within 2 minutes of driver assignment. After 2 minutes or upon driver arrival, a small fee may apply to compensate the driver for fuel and time."
     },
     {
-      question: "How does the in-app SOS safety button work?",
-      answer: "Tapping the in-app SOS button instantly transmits your real-time GPS coordinates, driver details, and trip route to local Police Control (112) and our 24/7 Emergency Response Team."
+      question: "How does the start-trip OTP work?",
+      answer: "When a driver arrives, share the 4-digit OTP shown on your booking screen. The driver enters this into their app to verify your identity and start the ride."
     },
     {
       question: "What payment methods are supported?",
-      answer: "You can pay via Cash directly to the driver, instant UPI QR code, Net Banking, Debit/Credit Cards, or your prepaid Riksho Wallet."
+      answer: "You can pay via Direct Cash to the driver, Direct UPI payment (scanning the driver's UPI QR code), or apply Riksho Coins and promo discounts."
     }
   ]
 };
@@ -492,14 +492,14 @@ export const webTermsCustomerTranslations: LegalDocument = {
 // ==========================================
 export const webTermsPartnerTranslations: LegalDocument = {
   title: "Driver & Delivery Partner Terms of Service",
-  subtitle: "Master Partner Agreement, Onboarding Standards, Commission Structure, Vehicle Compliance & Platform Obligations",
+  subtitle: "Partner Agreement, Onboarding Standards, Zero/Low Commission Structure, Vehicle Compliance & Platform Obligations",
   version: "Version 4.1.0 (Partner Edition)",
-  lastUpdated: "July 21, 2026",
-  effectiveDate: "August 1, 2026",
-  entityName: "Riksho Technologies Pvt. Ltd.",
+  lastUpdated: "August 2026",
+  effectiveDate: "August 2026",
+  entityName: "Riksho",
   intro: [
-    "This Master Partner Agreement (\"Agreement\") is entered into between Riksho Technologies Pvt. Ltd. (\"Riksho\", \"Company\", \"we\", or \"us\") and the independent driver/delivery operator (\"Driver Partner\", \"Partner\", or \"you\").",
-    "By signing up, submitting KYC documentation, and taking online trip dispatches on the Riksho Partner App, you agree to comply with this Agreement, our Partner Privacy Policy, Vehicle Standards, and Code of Conduct."
+    "This Partner Agreement (\"Agreement\") is entered into between Riksho (\"Riksho\", \"we\", or \"us\") and the independent driver/delivery operator (\"Driver Partner\", \"Buddy\", or \"you\").",
+    "By signing up, submitting KYC documentation, and taking online trip requests on the Riksho Partner App, you agree to comply with this Agreement, our Partner Privacy Policy, and Code of Conduct."
   ],
   sections: [
     {
@@ -507,48 +507,47 @@ export const webTermsPartnerTranslations: LegalDocument = {
       number: "1",
       title: "Independent Contractor Relationship",
       paragraphs: [
-        "You expressly acknowledge and agree that your relationship with Riksho is solely that of an independent commercial contractor. Nothing in this Agreement creates any employer-employee, agency, or partnership relationship.",
+        "You expressly acknowledge and agree that your relationship with Riksho is that of an independent commercial contractor. Nothing in this Agreement creates any employer-employee, agency, or partnership relationship.",
         "You retain complete autonomy and freedom to determine when, where, and for how long you log into the Partner App and accept ride dispatches."
       ]
     },
     {
       id: "kyc-verification",
       number: "2",
-      title: "Driver Partner Onboarding & Statutory KYC",
+      title: "Driver Partner Onboarding & KYC",
       paragraphs: [
-        "To receive trip dispatches, you must upload and maintain valid government documentation:"
+        "To receive trip dispatches, you must upload and maintain valid government and vehicle documentation:"
       ],
       bullets: [
-        "Commercial Driving License (DL).",
-        "Aadhaar Card and PAN Card for tax compliance.",
-        "Vehicle Registration Certificate (RC) with valid fitness certificate.",
-        "Motor Insurance: Active third-party commercial vehicle insurance.",
-        "Pollution Under Control (PUC) certificate.",
-        "Police Verification Certificate."
+        "Valid Driving License (DL).",
+        "Aadhaar Card or PAN Card for identity verification.",
+        "Vehicle Registration Certificate (RC).",
+        "Valid third-party vehicle insurance.",
+        "Pollution Under Control (PUC) certificate (where applicable)."
       ]
     },
     {
       id: "vehicle-standards",
       number: "3",
-      title: "Vehicle Standards & EV Mandates",
+      title: "Vehicle Standards & Safety",
       paragraphs: [
-        "Vehicles must be maintained in roadworthy, clean, and mechanically sound condition at all times. Electric vehicles must maintain at least 20% battery charge before accepting long-distance trips."
+        "Vehicles must be maintained in clean, safe, and mechanically sound condition at all times. Electric vehicles (Toto / E-Rickshaws) must ensure adequate battery charge before accepting long trips."
       ]
     },
     {
       id: "earnings-commission",
       number: "4",
-      title: "Partner Earnings, Commission & Payouts",
+      title: "Partner Earnings & Transparent Pricing",
       paragraphs: [
-        "Riksho deducts a transparent platform facilitation fee (0% to 15%) from gross fares. Digital fares and bonuses are settled via automated daily bank transfers."
+        "Riksho operates on an honest, driver-first model with zero or minimal platform subscription fees. Passenger fares collected via Cash or Direct UPI are retained directly by the driver."
       ]
     },
     {
       id: "code-of-conduct",
       number: "5",
-      title: "Zero Tolerance Safety & Code of Conduct",
+      title: "Safety & Driver Code of Conduct",
       paragraphs: [
-        "No driving under the influence of alcohol, narcotics, or fatigue. Strict zero tolerance for harassment, overcharging, or refusing helmets/seatbelts."
+        "Zero tolerance for driving under the influence of alcohol or drugs. Drivers must treat all passengers with courtesy, follow traffic rules, wear helmets/seatbelts, and never demand extra unmetered charges."
       ]
     },
     {
@@ -556,18 +555,18 @@ export const webTermsPartnerTranslations: LegalDocument = {
       number: "6",
       title: "Governing Law & Dispute Resolution",
       paragraphs: [
-        "This Agreement is governed by Indian law. Disputes shall be resolved through binding sole arbitration in Bengaluru, Karnataka."
+        "This Agreement is governed by Indian law and subject to the jurisdiction of competent courts in West Bengal, India."
       ]
     }
   ],
   faqs: [
     {
-      question: "When are partner payouts settled?",
-      answer: "All digital ride fares, tips, and incentive bonuses are calculated daily and transferred directly to your verified bank account or UPI VPA every morning."
+      question: "How do I receive my earnings?",
+      answer: "Passengers pay you directly via Cash or direct UPI scan. Online wallet balances and incentives can be withdrawn directly to your bank account or UPI ID."
     },
     {
       question: "What documents do I need to register as a Driver Partner?",
-      answer: "You need a Commercial Driving License (DL), Vehicle Registration Certificate (RC), Commercial Insurance, Pollution Certificate (PUC), PAN Card, and Aadhaar."
+      answer: "You need a valid Driving License (DL), Vehicle Registration Certificate (RC), Insurance, PAN/Aadhaar Card, and vehicle photos."
     }
   ]
 };
@@ -577,120 +576,80 @@ export const webTermsPartnerTranslations: LegalDocument = {
 // ==========================================
 export const webCookiePolicyCustomerTranslations: LegalDocument = {
   title: "Cookie & Tracking Technologies Policy",
-  subtitle: "Comprehensive Disclosure Regarding the Utilization of Cookies, Local Storage, Session Identifiers, Web Beacons, and Telemetry Controls Across the Riksho Web Platform under the DPDP Act, 2023 and IT Act, 2000.",
-  version: "Version 4.1.0 (Cookie Governance)",
-  lastUpdated: "July 21, 2026",
-  effectiveDate: "August 1, 2026",
-  entityName: "Riksho Technologies Pvt. Ltd.",
+  subtitle: "Disclosure Regarding the Utilization of Cookies, Local Storage, Session Identifiers, and Analytics Across the Riksho Web Platform under the DPDP Act, 2023 and IT Act, 2000.",
+  version: "Version 4.1.0",
+  lastUpdated: "August 2026",
+  effectiveDate: "August 2026",
+  entityName: "Riksho",
   intro: [
-    "This Cookie & Tracking Technologies Policy (\"Cookie Policy\") explains how Riksho Technologies Pvt. Ltd. (\"Riksho\", \"we\", \"us\", or \"our\") uses cookies, local browser storage, pixel tags, software development kits (SDKs), and similar telemetry identifiers when you visit our website https://riksho.com or access our web portals.",
-    "This Cookie Policy is to be read in conjunction with our Customer Privacy Policy and Terms of Service. By continuing to navigate or interact with the Riksho website, you acknowledge and consent to our use of cookies and tracking technologies as described herein."
+    "This Cookie Policy explains how Riksho (\"we\", \"us\", or \"our\") uses cookies, local browser storage, and related web technologies when you visit our website https://riksho.com or access our web portals.",
+    "This Cookie Policy is to be read in conjunction with our Customer Privacy Policy and Terms of Service. By continuing to use the Riksho website, you consent to our use of cookies as described herein."
   ],
   sections: [
     {
       id: "what-are-cookies",
       number: "1",
-      title: "What Are Cookies and Tracking Technologies?",
+      title: "What Are Cookies and Web Storage?",
       paragraphs: [
-        "Cookies are small text files placed on your computer, tablet, or mobile browser by websites that you visit. They are widely used to make websites function securely and efficiently, remember user preferences, and provide analytical telemetry to site operators.",
-        "In addition to traditional HTTP cookies, Riksho may utilize modern client-side storage technologies such as HTML5 LocalStorage, SessionStorage, and security tokens to maintain encrypted authentication states and improve page rendering speeds."
+        "Cookies are small text files placed on your browser by websites you visit. They help make websites function securely and efficiently, remember user preferences, and provide analytical data to site operators.",
+        "Riksho may also utilize HTML5 LocalStorage and SessionStorage to maintain secure session states and improve website responsiveness."
       ]
     },
     {
       id: "categories-of-cookies",
       number: "2",
-      title: "Categories of Cookies We Deploy",
+      title: "Categories of Cookies We Use",
       paragraphs: [
-        "We categorize cookies and tracking technologies deployed on our website into four distinct functional tiers:"
+        "We categorize cookies and tracking technologies deployed on our website into functional categories:"
       ],
       bullets: [
-        "Strictly Necessary & Authentication Cookies: Essential for basic website operation, security, CSRF protection, and user session persistence. Without these cookies, services like booking ride estimates and account logins cannot function.",
-        "Performance & Analytical Telemetry Cookies: Gather aggregated, anonymous telemetry regarding page visit counts, bounce rates, error logs, and navigation paths to help us optimize server responsiveness and platform usability.",
-        "Functional & Preference Cookies: Remember your chosen settings such as language selection, dark/light theme preferences, and recently searched pickup locations.",
-        "Security & Anti-Fraud Tokens: Identify suspicious browser behavior, prevent automated bot attacks, detect GPS spoofing attempts, and protect digital payment transactions."
+        "Strictly Necessary Cookies: Essential for basic website operation, security, CSRF protection, and user session management.",
+        "Performance & Analytics Cookies: Gather anonymous telemetry regarding page visits, bounce rates, and navigation paths to help us improve website performance.",
+        "Functional & Preference Cookies: Remember your chosen settings such as language selection and theme preferences."
       ],
-      callout: "Essential Cookies: Strictly necessary cookies cannot be switched off in our systems as they are required for security and core platform functions."
+      callout: "Essential Cookies: Strictly necessary cookies cannot be disabled as they are required for security and core website operation."
     },
     {
       id: "third-party-cookies",
       number: "3",
-      title: "Third-Party Cookies & Integrated Technology Partners",
+      title: "Third-Party Services",
       paragraphs: [
-        "Some cookies on our web platform are set by trusted third-party technology providers contracted by Riksho to power specialized functions:",
-        "Key third-party integrations include:"
+        "Some third-party providers integrated with our web platform may set cookies to power specialized functions:",
+        "Key integrations include:"
       ],
       bullets: [
-        "Mapping & Geocoding Services (Google Maps / Mapbox): Deliver interactive route visualizers, live road congestion maps, and accurate distance calculation.",
-        "Payment Aggregators (Razorpay / Cashfree): Ensure encrypted tokenization and fraud monitoring during UPI and card checkout flows.",
-        "Content Delivery & Security (Cloudflare / AWS CloudFront): Deliver low-latency page loads and defend against Distributed Denial of Service (DDoS) attacks."
-      ]
-    },
-    {
-      id: "cookie-retention-lifespan",
-      number: "4",
-      title: "Lifespan & Data Retention of Cookies",
-      paragraphs: [
-        "Cookies deployed on the Riksho platform have varying durations depending on their specific technical purpose:"
-      ],
-      bullets: [
-        "Session Cookies: Temporary cookies that expire and are automatically deleted from your device memory when you close your web browser.",
-        "Persistent Cookies: Remain on your device storage for a specified period (ranging from 24 hours to 180 days) or until manually cleared via browser settings. These ensure you remain logged in across browser restarts."
+        "Mapping & Geocoding: Interactive map visualization and distance estimation.",
+        "Analytics: Aggregated performance and error tracking.",
+        "Content Delivery & Security: Fast page rendering and protection against DDoS attacks."
       ]
     },
     {
       id: "managing-cookie-preferences",
-      number: "5",
-      title: "How to Control, Manage & Disable Cookies",
+      number: "4",
+      title: "How to Manage Cookies",
       paragraphs: [
-        "You have complete autonomy to accept, configure, or reject non-essential cookies. You can manage your preferences through your web browser controls:",
-        "Most browsers allow you to view stored cookies, delete existing cookies individually or collectively, block third-party cookies, or configure alerts whenever a cookie is transmitted.",
-        "Please note that disabling strictly necessary cookies may prevent certain critical features (such as live booking dispatches and account login) from functioning correctly."
-      ],
-      bullets: [
-        "Google Chrome: Settings > Privacy and Security > Third-party cookies.",
-        "Apple Safari: Settings > Safari > Advanced > Block All Cookies.",
-        "Mozilla Firefox: Settings > Privacy & Security > Enhanced Tracking Protection.",
-        "Microsoft Edge: Settings > Cookies and site permissions > Manage and delete cookies."
-      ]
-    },
-    {
-      id: "do-not-track",
-      number: "6",
-      title: "Do Not Track (DNT) & Global Privacy Control Signals",
-      paragraphs: [
-        "Some web browsers transmit 'Do Not Track' (DNT) or Global Privacy Control (GPC) headers. Riksho respects user privacy choices and does not track users across unrelated third-party websites for commercial advertising purposes."
-      ]
-    },
-    {
-      id: "policy-updates",
-      number: "7",
-      title: "Updates to this Cookie Policy",
-      paragraphs: [
-        "Riksho may update this Cookie Policy periodically to reflect technological advancements, new platform features, or evolving regulatory mandates under Indian law. Any modifications will take effect immediately upon publication on this page with an updated Effective Date."
+        "You can manage your cookie preferences through your web browser settings. Most browsers allow you to view stored cookies, delete existing cookies, or block third-party cookies.",
+        "Please note that disabling strictly necessary cookies may impact website functionality."
       ]
     },
     {
       id: "contact-officer",
-      number: "8",
-      title: "Questions & Statutory Compliance Desk",
+      number: "5",
+      title: "Questions & Compliance Desk",
       paragraphs: [
-        "If you have questions regarding our cookie practices, please contact our designated Statutory Grievance & Compliance Desk:",
-        "Name: Sumit Shaw | Role: Chief Nodal & Grievance Redressal Officer | Email: grievance@riksho.in | Address: G744+2PV, Jalkal, Maheshtala, West Bengal 700141, India."
+        "If you have questions regarding our cookie practices, please contact our Grievance Desk:",
+        "Name: Sumit Shaw | Role: Chief Nodal & Grievance Redressal Officer | Email: grievance@riksho.com | Address: G744+2PV, Jalkal, Maheshtala, West Bengal 700141, India."
       ]
     }
   ],
   faqs: [
     {
       question: "What happens if I disable cookies on the Riksho website?",
-      answer: "If you disable all cookies, you can still view public information pages, but interactive features such as account login, real-time fare estimates, and saved pickup favorites will not function properly."
+      answer: "You can still view public information pages, but interactive features like saved preferences and web account login may not work properly."
     },
     {
-      question: "Does Riksho use cookies to sell my browsing data?",
-      answer: "No. Riksho never sells, trades, or rents your web browsing data or cookie identifiers to third-party data brokers or marketing networks."
-    },
-    {
-      question: "How long do authentication session tokens stay active?",
-      answer: "Web session tokens typically expire after 30 days of inactivity, requiring re-authentication via SMS OTP for security."
+      question: "Does Riksho sell browsing data to advertisers?",
+      answer: "No. Riksho never sells or rents your browsing data to third-party advertisers."
     }
   ]
 };
@@ -698,5 +657,5 @@ export const webCookiePolicyCustomerTranslations: LegalDocument = {
 export const webCookiePolicyPartnerTranslations: LegalDocument = {
   ...webCookiePolicyCustomerTranslations,
   title: "Partner Portal Cookie & Telemetry Policy",
-  subtitle: "Technical Protocol Governing Session State, Partner Dashboard Telemetry, Map Rendering Tokens, and Secure Banking Gateway Session Handshakes for Driver & Delivery Partners."
+  subtitle: "Technical Protocol Governing Session State, Partner Dashboard Analytics, and Map Rendering for Driver & Delivery Partners."
 };

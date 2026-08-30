@@ -128,7 +128,7 @@ export default function AboutUsPage() {
                   Empowering Millions of Daily Journeys
                 </h2>
                 <p style={{ fontSize: "1.05rem", lineHeight: 1.7, color: "#475569", marginBottom: "28px" }}>
-                  At Riksho Technologies Pvt. Ltd., we believe urban transit should be predictable, accessible, and dignified for every commuter and captain. We bridge daily riders with autos, bike taxis, cabs, and quick commerce delivery fleets with crystal-clear pricing.
+                  At Riksho, we believe urban transit should be predictable, accessible, and dignified for every commuter and captain. We bridge daily riders with autos, bike taxis, cabs, and quick commerce delivery fleets with crystal-clear pricing.
                 </p>
 
                 {/* 3 Core Mission Points (Spacious & Breathable) */}

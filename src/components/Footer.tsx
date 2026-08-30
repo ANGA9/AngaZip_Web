@@ -115,7 +115,7 @@ export default function Footer() {
               </svg>
             </div>
             <p>
-              © {new Date().getFullYear()} Riksho Technologies Pvt. Ltd. All rights reserved.
+              © {new Date().getFullYear()} Riksho. All rights reserved.
             </p>
           </div>
           <div className="footer-legal">

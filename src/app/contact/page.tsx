@@ -38,15 +38,15 @@ export default function ContactPage() {
     },
     {
       question: "How do I escalate an unresolved customer service ticket?",
-      answer: "If your support query has not been resolved within 48 hours, you can escalate it directly to our statutory Grievance Officer (Sumit Shaw) by emailing grievance@riksho.in with your previous ticket ID."
+      answer: "If your support query has not been resolved within 48 hours, you can escalate it directly to our statutory Grievance Officer (Sumit Shaw) by emailing grievance@riksho.com with your previous ticket ID."
     },
     {
       question: "Where should enterprise and corporate partnership inquiries be directed?",
-      answer: "Corporate account managers, enterprise ride contracts, and darkstore delivery integrations can be reached directly via business@riksho.in. Our B2B sales team responds within 1 business day."
+      answer: "Corporate account managers, enterprise ride contracts, and darkstore delivery integrations can be reached directly via support@riksho.com."
     },
     {
       question: "How do driver partners get in-person onboarding support?",
-      answer: "Driver partners can visit local partner support hubs or upload documents directly through the Riksho Partner App. For document re-verification questions, reach out to partnercare@riksho.in."
+      answer: "Driver partners can visit local partner support hubs or upload documents directly through the Riksho Partner App. For document questions, reach out to support@riksho.com."
     }
   ];
 
@@ -131,9 +131,9 @@ export default function ContactPage() {
                   </p>
                 </div>
                 <div>
-                  <a href="mailto:support@riksho.in" style={{ color: "var(--color-indigo)", fontWeight: 700, fontSize: "0.95rem", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                  <a href="mailto:support@riksho.com" style={{ color: "var(--color-indigo)", fontWeight: 700, fontSize: "0.95rem", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "6px" }}>
                     <Mail size={16} />
-                    <span>support@riksho.in</span>
+                    <span>support@riksho.com</span>
                   </a>
                 </div>
               </div>
@@ -154,21 +154,21 @@ export default function ContactPage() {
                     <Car size={22} />
                   </div>
                   <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.25rem", fontWeight: 700, color: "#0F172A", marginBottom: "8px" }}>
-                    Driver &amp; Fleet Help Desk
+                    Driver &amp; Partner Desk
                   </h3>
                   <p style={{ fontSize: "0.875rem", lineHeight: 1.6, color: "#475569", marginBottom: "16px" }}>
-                    Daily payout verification, commercial vehicle KYC approval, and partner earnings support.
+                    Partner KYC approval, earnings inquiries, and buddy account assistance.
                   </p>
                 </div>
                 <div>
-                  <a href="mailto:partnercare@riksho.in" style={{ color: "var(--color-indigo)", fontWeight: 700, fontSize: "0.95rem", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                  <a href="mailto:support@riksho.com" style={{ color: "var(--color-indigo)", fontWeight: 700, fontSize: "0.95rem", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "6px" }}>
                     <Mail size={16} />
-                    <span>partnercare@riksho.in</span>
+                    <span>support@riksho.com</span>
                   </a>
                 </div>
               </div>
 
-              {/* Business & Media */}
+              {/* Grievance & Legal */}
               <div style={{
                 backgroundColor: "#FFFFFF",
                 border: "1px solid #E2E8F0",
@@ -184,16 +184,16 @@ export default function ContactPage() {
                     <Briefcase size={22} />
                   </div>
                   <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.25rem", fontWeight: 700, color: "#0F172A", marginBottom: "8px" }}>
-                    Business &amp; Media
+                    Grievance &amp; Escalations
                   </h3>
                   <p style={{ fontSize: "0.875rem", lineHeight: 1.6, color: "#475569", marginBottom: "16px" }}>
-                    Corporate employee travel accounts, darkstore courier fulfillment API, and press queries.
+                    Official nodal escalation desk for unresolved issues and regulatory compliance.
                   </p>
                 </div>
                 <div>
-                  <a href="mailto:business@riksho.in" style={{ color: "var(--color-indigo)", fontWeight: 700, fontSize: "0.95rem", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                  <a href="mailto:grievance@riksho.com" style={{ color: "var(--color-indigo)", fontWeight: 700, fontSize: "0.95rem", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "6px" }}>
                     <Mail size={16} />
-                    <span>business@riksho.in</span>
+                    <span>grievance@riksho.com</span>
                   </a>
                 </div>
               </div>

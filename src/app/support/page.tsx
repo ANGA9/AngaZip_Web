@@ -52,7 +52,7 @@ export default function SupportPage() {
   const faqs: SupportFaq[] = [
     {
       question: "How do I report an item left behind in a Riksho cab or auto?",
-      answer: "Open the Riksho app > Activity > select your trip > tap 'Find Lost Item'. You can connect directly with your driver through our masked proxy calling within 48 hours, or email support@riksho.in with your Trip ID."
+      answer: "Open the Riksho app > Activity > select your trip > tap 'Find Lost Item'. You can connect directly with your driver within 48 hours, or email support@riksho.com with your Trip ID."
     },
     {
       question: "Why was I charged a cancellation fee?",
@@ -221,10 +221,10 @@ export default function SupportPage() {
                     <span>
                       Customer &amp; Partner Support:{" "}
                       <a 
-                        href="mailto:support@riksho.in" 
+                        href="mailto:support@riksho.com" 
                         style={{ color: "var(--color-indigo)", fontWeight: 700, textDecoration: "underline" }}
                       >
-                        support@riksho.in
+                        support@riksho.com
                       </a>
                     </span>
                   </div>
@@ -246,10 +246,10 @@ export default function SupportPage() {
                     <span>
                       Grievance &amp; Escalations:{" "}
                       <a 
-                        href="mailto:grievance@riksho.in" 
+                        href="mailto:grievance@riksho.com" 
                         style={{ color: "var(--color-indigo)", fontWeight: 700, textDecoration: "underline" }}
                       >
-                        grievance@riksho.in
+                        grievance@riksho.com
                       </a>
                     </span>
                   </div>
