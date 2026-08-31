@@ -93,7 +93,7 @@ export const webPrivacyCustomerTranslations: LegalDocument = {
         "Unless otherwise defined in this Policy, capitalized terms shall have the meaning ascribed below:"
       ],
       bullets: [
-        "Captains / Driver Partners: Independent third-party commercial vehicle operators who provide motorized bike taxi, auto rickshaw, or cab transportation to Customers via the Platform.",
+        "Driver Buddies / Driver Partners: Independent third-party commercial vehicle operators who provide motorized bike taxi, auto rickshaw, or cab transportation to Customers via the Platform.",
         "Customer / Rider: A natural person who requests, books, or receives transportation, delivery, or logistics services on the Riksho Platform.",
         "Personal Data / Information: Any information that relates to an identified or identifiable natural person, including name, phone number, GPS coordinates, email address, and payment identifiers.",
         "Device Identifier: Unique device identifiers including IMEI, UUID, IP address, MAC address, and operating system build parameters.",
@@ -155,7 +155,7 @@ export const webPrivacyCustomerTranslations: LegalDocument = {
       ],
       bullets: [
         "Platform Access & Identity Verification: Authenticating your login credentials, verifying age eligibility, and confirming commercial driving permits.",
-        "Dispatch Allocation & Route Optimization: Matching Riders with the closest available Captains based on live telemetry, road congestion, and vehicle type.",
+        "Dispatch Allocation & Route Optimization: Matching Riders with the closest available Buddies based on live telemetry, road congestion, and vehicle type.",
         "Safety Engineering & Emergency SOS: Transmitting real-time GPS coordinates, vehicle registration numbers, and live telemetry to Police Control (112) and the Riksho Emergency Response Team upon SOS trigger.",
         "Dynamic Fare Billing & Tax Invoicing: Generating accurate distance-based ride receipts, calculating wait times, deducting tolls, and issuing digital invoices.",
         "Fraud Prevention & Anti-Money Laundering: Detecting GPS spoofing, fraudulent payment chargebacks, account takeovers, and algorithmic referral abuses.",
@@ -171,7 +171,7 @@ export const webPrivacyCustomerTranslations: LegalDocument = {
         "Riksho does not sell, rent, or trade your personal information to third-party commercial advertisers. We disclose Information strictly in the following circumstances:"
       ],
       bullets: [
-        "Between Riders and Captains: When a ride is confirmed, the assigned Captain receives your first name, pickup location, and in-app masked telephone proxy. When a ride ends, your complete personal contact details are immediately hidden.",
+        "Between Riders and Buddies: When a ride is confirmed, the assigned Buddy receives your first name, pickup location, and in-app masked telephone proxy. When a ride ends, your complete personal contact details are immediately hidden.",
         "Third-Party Service Providers (TPSPs): We engage trusted TPSPs to host cloud databases (AWS / GCP in India), process digital payments (Razorpay / Cashfree), verify government KYC credentials, send SMS/WhatsApp notifications, and conduct technical analytics under strict data processing agreements.",
         "Statutory & Legal Compulsion: We disclose information to police authorities, judicial courts, and enforcement agencies in response to valid statutory summons, court orders, or emergency life-threatening situations.",
         "Corporate Restructuring: In the event of a merger, acquisition, asset sale, or corporate reorganization, customer data may be transferred to the continuing entity under equivalent privacy protections."

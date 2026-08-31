@@ -19,7 +19,7 @@ export default function SafetyHubPage() {
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
 
   const stats = [
-    { value: "100%", label: "Background Verified Captains", icon: <ShieldCheck size={20} color="#0F172A" /> },
+    { value: "100%", label: "Background Verified Buddies", icon: <ShieldCheck size={20} color="#0F172A" /> },
     { value: "24/7", label: "Active Incident Command Desk", icon: <Activity size={20} color="#0F172A" /> },
     { value: "99.98%", label: "Incident-Free Completed Trips", icon: <Lock size={20} color="#0F172A" /> },
     { value: "4-Digit", label: "Mandatory Secure Ride OTP", icon: <PhoneCall size={20} color="#0F172A" /> }
@@ -101,7 +101,7 @@ export default function SafetyHubPage() {
                 margin: 0,
                 textShadow: "0 1px 8px rgba(0, 0, 0, 0.55)"
               }}>
-                Real-time safety telemetry, verified captains, and proactive trip monitoring designed to keep every rider and driver secure across India.
+                Real-time safety telemetry, verified driver buddies, and proactive trip monitoring designed to keep every rider and driver secure across India.
               </p>
             </div>
           </div>
@@ -167,7 +167,7 @@ export default function SafetyHubPage() {
                         Live Route Telemetry &amp; Share Trip
                       </h4>
                       <p style={{ fontSize: "0.95rem", lineHeight: 1.6, color: "#64748B", margin: 0 }}>
-                        Share your real-time vehicle route, captain profile, and estimated arrival time with emergency contacts in one tap.
+                        Share your real-time vehicle route, buddy profile, and estimated arrival time with emergency contacts in one tap.
                       </p>
                     </div>
                   </div>
@@ -181,18 +181,15 @@ export default function SafetyHubPage() {
                   width: "100%",
                   maxWidth: "440px",
                   aspectRatio: "1/1",
-                  backgroundColor: "#FFFFFF",
-                  borderRadius: "20px",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center"
                 }}>
                   <Image
-                    src="/images/ill_safety_rider.png"
-                    alt="Riksho Passenger Safety Illustration"
+                    src="/images/ill_passenger_safety.png"
+                    alt="Multi-layered passenger protection and safety telemetry"
                     fill
                     style={{ objectFit: "contain" }}
-                    priority
                   />
                 </div>
               </div>
@@ -248,8 +245,8 @@ export default function SafetyHubPage() {
           </div>
         </section>
 
-        {/* Section 3: Driver & Partner Protection (With Cyan Blob Illustration #00C2FF) */}
-        <section style={{ padding: "64px 0", backgroundColor: "#FFFFFF" }}>
+        {/* Section 3: Driver & Delivery Partner Welfare (With Cyan Blob Illustration #00C2FF) */}
+        <section style={{ padding: "64px 0", backgroundColor: "#F8FAFC" }}>
           <div className="container">
             <div style={{
               display: "grid",
@@ -257,25 +254,22 @@ export default function SafetyHubPage() {
               gap: "48px",
               alignItems: "center"
             }}>
-              {/* Left Column (Desktop): Custom Cyan Blob Illustration (#00C2FF) */}
+              {/* Left Column: Custom Cyan Blob Illustration (#00C2FF) */}
               <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                 <div style={{
                   position: "relative",
                   width: "100%",
                   maxWidth: "440px",
                   aspectRatio: "1/1",
-                  backgroundColor: "#FFFFFF",
-                  borderRadius: "20px",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center"
                 }}>
                   <Image
-                    src="/images/ill_safety_partner.png"
-                    alt="Riksho Driver and Partner Safety Illustration"
+                    src="/images/ill_driver_safety.png"
+                    alt="Driver partner dignity, telemetry, and welfare support"
                     fill
                     style={{ objectFit: "contain" }}
-                    priority
                   />
                 </div>
               </div>
@@ -283,10 +277,10 @@ export default function SafetyHubPage() {
               {/* Right Column: Driver Safety Narrative */}
               <div>
                 <span style={{ color: "#0284C7", fontWeight: 700, textTransform: "uppercase", fontSize: "0.8125rem", letterSpacing: "0.05em", display: "block", marginBottom: "10px" }}>
-                  Captain &amp; Partner Welfare
+                  Buddy &amp; Partner Welfare
                 </span>
                 <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(26px, 3.8vw, 38px)", fontWeight: 800, color: "#0F172A", lineHeight: 1.25, marginBottom: "16px" }}>
-                  Protecting the Captains Who Move India
+                  Protecting the Buddies Who Move India
                 </h2>
                 <p style={{ fontSize: "1.05rem", lineHeight: 1.7, color: "#475569", marginBottom: "24px" }}>
                   Safety is a two-way commitment. We actively safeguard our driver and courier partners with automated telematics, collision checks, and 24/7 dedicated partner assistance.
@@ -303,7 +297,7 @@ export default function SafetyHubPage() {
                         Comprehensive In-Transit Cover
                       </h4>
                       <p style={{ fontSize: "0.95rem", lineHeight: 1.6, color: "#64748B", margin: 0 }}>
-                        24/7 emergency medical protection and financial security for every active captain and rider on duty.
+                        24/7 emergency medical protection and financial security for every active buddy and rider on duty.
                       </p>
                     </div>
                   </div>
@@ -331,7 +325,7 @@ export default function SafetyHubPage() {
                         Dedicated Partner Helpline
                       </h4>
                       <p style={{ fontSize: "0.95rem", lineHeight: 1.6, color: "#64748B", margin: 0 }}>
-                        Direct line for captains facing late-night mechanical breakdowns, route disputes, or passenger misbehavior.
+                        Direct line for buddies facing late-night mechanical breakdowns, route disputes, or passenger misbehavior.
                       </p>
                     </div>
                   </div>

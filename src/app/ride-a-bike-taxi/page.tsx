@@ -66,16 +66,16 @@ export default function RideBikeTaxiPage() {
 
   const bikeFaqs = [
     {
-      question: "Can I use any motorcycle or scooter (EV / Petrol) to join as a Bike Captain?",
+      question: "Can I use any motorcycle or scooter (EV / Petrol) to join as a Bike Buddy?",
       answer: "Yes! Any two-wheeler (geared motorcycle, gearless scooter, or electric scooter) with valid registration and commercial or private two-wheeler insurance is eligible. Electric bikes enjoy zero fuel expenses and higher profit margins."
     },
     {
       question: "What safety equipment is required for bike taxi rides?",
-      answer: "Safety is strictly enforced. Every bike captain must carry ISI-certified helmets for both the captain and passenger in accordance with state transport guidelines."
+      answer: "Safety is strictly enforced. Every bike buddy must carry ISI-certified helmets for both the driver and passenger in accordance with state transport guidelines."
     },
     {
       question: "Can I work flexible hours as a part-time student or freelancer?",
-      answer: "Yes! There are zero forced shifts or minimum daily hours. Many captains ride for 2 to 3 hours during peak morning or evening office hours to earn supplemental income."
+      answer: "Yes! There are zero forced shifts or minimum daily hours. Many buddies ride for 2 to 3 hours during peak morning or evening office hours to earn supplemental income."
     },
     {
       question: "How do I withdraw my earnings to my bank account?",
@@ -162,7 +162,7 @@ export default function RideBikeTaxiPage() {
                     transition: "transform 0.15s ease"
                   }}
                 >
-                  <span>Join as a Bike Captain</span>
+                  <span>Join as a Bike Buddy</span>
                   <ArrowRight size={18} strokeWidth={2.5} />
                 </a>
               </div>
@@ -170,12 +170,12 @@ export default function RideBikeTaxiPage() {
           </div>
         </section>
 
-        {/* Section: Bike Captain Pillars Grid (3 Cards) */}
+        {/* Section: Bike Buddy Pillars Grid (3 Cards) */}
         <section style={{ padding: "64px 0 32px 0", backgroundColor: "#FFFFFF" }}>
           <div className="container">
             <div style={{ textAlign: "center", marginBottom: "40px" }}>
               <span style={{ color: "var(--color-indigo)", fontWeight: 700, textTransform: "uppercase", fontSize: "0.8125rem", letterSpacing: "0.05em", display: "block", marginBottom: "8px" }}>
-                Captain Advantage
+                Buddy Advantage
               </span>
               <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(26px, 3.8vw, 36px)", fontWeight: 800, color: "#0F172A", margin: "0 0 10px 0" }}>
                 Built to Maximize Two-Wheeler Income
@@ -267,7 +267,7 @@ export default function RideBikeTaxiPage() {
                 }}>
                   <Image
                     src="/images/ill_bike_onboarding.png"
-                    alt="Fast bike captain digital onboarding"
+                    alt="Fast bike buddy digital onboarding"
                     fill
                     style={{ objectFit: "contain" }}
                     priority
@@ -284,7 +284,7 @@ export default function RideBikeTaxiPage() {
                   Start Taking Rides Today
                 </h2>
                 <p style={{ fontSize: "1.05rem", lineHeight: 1.7, color: "#475569", marginBottom: "28px" }}>
-                  Activate your captain profile in 3 simple steps from your smartphone and start receiving ride requests in your local neighborhood.
+                  Activate your buddy profile in 3 simple steps from your smartphone and start receiving ride requests in your local neighborhood.
                 </p>
 
                 {/* 3 Spacious Feature Points */}
@@ -336,7 +336,7 @@ export default function RideBikeTaxiPage() {
           </div>
         </section>
 
-        {/* Section 2: Captain Safety & Welfare (With Cyan Blob Artwork #00C2FF) */}
+        {/* Section 2: Buddy Safety & Welfare (With Cyan Blob Artwork #00C2FF) */}
         <section style={{ padding: "64px 0", backgroundColor: "#FFFFFF" }}>
           <div className="container">
             <div style={{
@@ -348,7 +348,7 @@ export default function RideBikeTaxiPage() {
               {/* Left Column: Welfare Narrative */}
               <div>
                 <span style={{ color: "#0284C7", fontWeight: 700, textTransform: "uppercase", fontSize: "0.8125rem", letterSpacing: "0.05em", display: "block", marginBottom: "10px" }}>
-                  Captain Protection
+                  Buddy Protection
                 </span>
                 <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(26px, 3.8vw, 38px)", fontWeight: 800, color: "#0F172A", lineHeight: 1.25, marginBottom: "16px" }}>
                   Protected on Every Single Ride
@@ -382,7 +382,7 @@ export default function RideBikeTaxiPage() {
                         In-App 24/7 Police 112 SOS Button
                       </h4>
                       <p style={{ fontSize: "0.95rem", lineHeight: 1.6, color: "#64748B", margin: 0 }}>
-                        Instant direct telemetry link to local emergency response units and our 24/7 captain safety desk.
+                        Instant direct telemetry link to local emergency response units and our 24/7 buddy safety desk.
                       </p>
                     </div>
                   </div>
@@ -393,7 +393,7 @@ export default function RideBikeTaxiPage() {
                     </div>
                     <div>
                       <h4 style={{ fontSize: "1.05rem", fontWeight: 700, color: "#0F172A", margin: "0 0 6px 0" }}>
-                        High-Rating Captain Bonuses
+                        High-Rating Buddy Bonuses
                       </h4>
                       <p style={{ fontSize: "0.95rem", lineHeight: 1.6, color: "#64748B", margin: 0 }}>
                         Maintain a 4.8+ rating and earn extra monthly safety rewards, free servicing vouchers, and priority booking dispatch.
@@ -418,7 +418,7 @@ export default function RideBikeTaxiPage() {
                 }}>
                   <Image
                     src="/images/ill_bike_safety.png"
-                    alt="Bike captain safety and welfare protection"
+                    alt="Bike buddy safety and welfare protection"
                     fill
                     style={{ objectFit: "contain" }}
                     priority
@@ -482,7 +482,7 @@ export default function RideBikeTaxiPage() {
           <div className="container" style={{ maxWidth: "800px" }}>
             <div style={{ textAlign: "center", marginBottom: "28px" }}>
               <span style={{ color: "var(--color-indigo)", fontWeight: 700, textTransform: "uppercase", fontSize: "0.8125rem", letterSpacing: "0.05em", display: "block", marginBottom: "6px" }}>
-                Bike Captain Helpdesk
+                Bike Buddy Helpdesk
               </span>
               <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(24px, 3.5vw, 32px)", fontWeight: 800, color: "#0F172A", margin: 0 }}>
                 Frequently Asked Questions

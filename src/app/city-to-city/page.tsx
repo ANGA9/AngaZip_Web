@@ -134,11 +134,11 @@ export default function CityToCityPage() {
     },
     {
       question: "What qualifications and background checks do outstation drivers undergo?",
-      answer: "All Riksho Intercity captains have a minimum of 5 years of verified highway driving experience, valid commercial passenger transport badges, and verified criminal background checks. Our telemetry monitors speed compliance and rest breaks throughout the trip."
+      answer: "All Riksho Intercity driver buddies have a minimum of 5 years of verified highway driving experience, valid commercial passenger transport badges, and verified criminal background checks. Our telemetry monitors speed compliance and rest breaks throughout the trip."
     },
     {
       question: "Can I schedule an outstation cab in advance for early morning or late night departures?",
-      answer: "Yes, you can schedule your outstation ride up to 7 days in advance in the Riksho app. Your assigned captain details and vehicle registration will be dispatched 2 hours prior to your scheduled pickup time."
+      answer: "Yes, you can schedule your outstation ride up to 7 days in advance in the Riksho app. Your assigned buddy details and vehicle registration will be dispatched 2 hours prior to your scheduled pickup time."
     }
   ];
 
@@ -433,7 +433,7 @@ export default function CityToCityPage() {
                         Door-to-Door Outstation Pickups
                       </h4>
                       <p style={{ fontSize: "0.95rem", lineHeight: 1.6, color: "#64748B", margin: 0 }}>
-                        Your captain arrives directly at your home or hotel and drops you precisely at your destination address.
+                        Your buddy arrives directly at your home or hotel and drops you precisely at your destination address.
                       </p>
                     </div>
                   </div>
@@ -472,7 +472,7 @@ export default function CityToCityPage() {
                     </div>
                     <div>
                       <h4 style={{ fontSize: "1.05rem", fontWeight: 700, color: "#0F172A", margin: "0 0 6px 0" }}>
-                        Highway-Vetted Commercial Captains
+                        Highway-Vetted Commercial Buddies
                       </h4>
                       <p style={{ fontSize: "0.95rem", lineHeight: 1.6, color: "#64748B", margin: 0 }}>
                         Drivers must possess at least 5 years of long-distance driving history, valid commercial badges, and clean background records.

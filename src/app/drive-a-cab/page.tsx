@@ -179,7 +179,7 @@ export default function DriveCabPage() {
                 Driver Advantage
               </span>
               <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(26px, 3.8vw, 36px)", fontWeight: 800, color: "#0F172A", margin: "0 0 10px 0" }}>
-                Why Thousands of Captains Choose Riksho
+                Why Thousands of Driver Buddies Choose Riksho
               </h2>
               <p style={{ fontSize: "1rem", color: "#64748B", maxWidth: "560px", margin: "0 auto" }}>
                 Built from the ground up to guarantee driver dignity, financial transparency, and maximum daily take-home earnings.
