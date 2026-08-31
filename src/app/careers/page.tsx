@@ -126,7 +126,7 @@ export default function CareersPage() {
       responsibilities: [
         "Establish local driver onboarding hubs and manage field operations teams.",
         "Work directly with auto-rickshaw and taxi unions to drive platform adoption.",
-        "Monitor city supply-demand balance and optimize captain daily earnings."
+        "Monitor city supply-demand balance and optimize driver buddy daily earnings."
       ],
       requirements: [
         "Prior operations or city launch experience in mobility, logistics, or food tech.",
@@ -160,7 +160,7 @@ export default function CareersPage() {
       location: "Kolkata / Hybrid",
       type: "Full-Time",
       experience: "3–5 Years",
-      description: "Scale organic and performance acquisition loops for riders and captains across Tier-1 and Tier-2 Indian urban markets.",
+      description: "Scale organic and performance acquisition loops for riders and driver buddies across Tier-1 and Tier-2 Indian urban markets.",
       responsibilities: [
         "Design hyper-localized rider acquisition campaigns and referral mechanisms.",
         "Analyze cohort retention, CAC, and LTV across cab and bike taxi tiers.",
@@ -327,7 +327,7 @@ export default function CareersPage() {
                         Full-Stack Ownership &amp; Autonomy
                       </h4>
                       <p style={{ fontSize: "0.95rem", lineHeight: 1.6, color: "#64748B", margin: 0 }}>
-                        Own your architecture from database schemas and mobile telemetry pipelines to live on-road captain validation.
+                        Own your architecture from database schemas and mobile telemetry pipelines to live on-road driver buddy validation.
                       </p>
                     </div>
                   </div>
@@ -341,7 +341,7 @@ export default function CareersPage() {
                         Rapid 2-Week Deployment Sprints
                       </h4>
                       <p style={{ fontSize: "0.95rem", lineHeight: 1.6, color: "#64748B", margin: 0 }}>
-                        Move from prototype to production with automated CI/CD and direct user feedback from passengers and captains.
+                        Move from prototype to production with automated CI/CD and direct user feedback from passengers and driver buddies.
                       </p>
                     </div>
                   </div>

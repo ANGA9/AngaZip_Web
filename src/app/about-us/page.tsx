@@ -128,7 +128,7 @@ export default function AboutUsPage() {
                   Empowering Millions of Daily Journeys
                 </h2>
                 <p style={{ fontSize: "1.05rem", lineHeight: 1.7, color: "#475569", marginBottom: "28px" }}>
-                  At Riksho, we believe urban transit should be predictable, accessible, and dignified for every commuter and captain. We bridge daily riders with autos, bike taxis, cabs, and quick commerce delivery fleets with crystal-clear pricing.
+                  At Riksho, we believe urban transit should be predictable, accessible, and dignified for every commuter and driver partner. We bridge daily riders with autos, bike taxis, cabs, and quick commerce delivery fleets with crystal-clear pricing.
                 </p>
 
                 {/* 3 Core Mission Points (Spacious & Breathable) */}
@@ -306,7 +306,7 @@ export default function AboutUsPage() {
                         DPDP Privacy Architecture
                       </h4>
                       <p style={{ fontSize: "0.95rem", lineHeight: 1.6, color: "#64748B", margin: 0 }}>
-                        Masked phone proxies and zero personal data leakage between rider and captain.
+                        Masked phone proxies and zero personal data leakage between rider and buddy.
                       </p>
                     </div>
                   </div>

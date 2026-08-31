@@ -29,7 +29,7 @@ This document tracks the end-to-end design, responsiveness, typography, and UX p
 | [x] | `/` | **Home / Landing** | Hero booking widget, vehicle tiers, live reviews, app CTA, light modern branding. |
 | [x] | `/city-rides` | **City Rides** | Minimalist photo hero banner, interactive 4-tier vehicle showcase (Auto, Bike Taxi, Mini & Prime Sedan) with upfront rates, custom purple/cyan blob artwork, 4 impact metrics, clean FAQ accordion, AppDownloadCTA, Footer. |
 | [x] | `/city-to-city` | **City-to-City** | Minimalist photo hero banner, interactive route showcase with One-Way vs Roundtrip pricing, custom purple/cyan blob artwork, 4 impact metrics, clean FAQ accordion, AppDownloadCTA, Footer. |
-| [x] | `/ride-a-bike-taxi` | **Ride a Bike Taxi** | Minimalist photo hero banner, 3 captain advantage pillars, rush hour multipliers, purple/cyan blob artwork, 4 metrics, FAQ, AppDownloadCTA, Footer. |
+| [x] | `/ride-a-bike-taxi` | **Ride a Bike Taxi** | Minimalist photo hero banner, 3 buddy advantage pillars, rush hour multipliers, purple/cyan blob artwork, 4 metrics, FAQ, AppDownloadCTA, Footer. |
 | [x] | `/* (404)` | **404 Route Not Found** | Minimalist 404 detour layout, cursive quote, 5 popular quick destination pills, Back to Home and Help Center CTA buttons, Navbar, Footer. |
 
 ---

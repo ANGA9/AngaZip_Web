@@ -64,12 +64,12 @@ export default function CityRidesPage() {
     {
       id: "sedan",
       name: "Prime Sedan",
-      tagline: "Extra legroom & top captains",
+      tagline: "Extra legroom & top buddies",
       capacity: "4 Seats",
       eta: "4-6 mins",
       baseFare: "₹70",
       perKm: "₹18/km",
-      features: ["Extra legroom", "Top-rated captains", "Trunk luggage space"],
+      features: ["Extra legroom", "Top-rated buddies", "Trunk luggage space"],
       image: "/images/ill_tier_sedan.png",
       badge: "Executive"
     }
@@ -97,7 +97,7 @@ export default function CityRidesPage() {
     },
     {
       question: "How does the mandatory 4-Digit Ride OTP protect passengers?",
-      answer: "Every ride generates a unique 4-digit security OTP in your Riksho app. Your captain must enter this OTP into their driver app before the meter and navigation activate, ensuring you never board the wrong vehicle."
+      answer: "Every ride generates a unique 4-digit security OTP in your Riksho app. Your buddy must enter this OTP into their driver app before the meter and navigation activate, ensuring you never board the wrong vehicle."
     }
   ];
 
@@ -158,7 +158,7 @@ export default function CityRidesPage() {
                 margin: 0,
                 textShadow: "0 1px 8px rgba(0, 0, 0, 0.55)"
               }}>
-                From electric autos and bike taxis to comfortable AC sedans—navigate everyday city traffic with verified captains and transparent upfront pricing.
+                From electric autos and bike taxis to comfortable AC sedans—navigate everyday city traffic with verified buddies and transparent upfront pricing.
               </p>
             </div>
           </div>
@@ -386,7 +386,7 @@ export default function CityRidesPage() {
                         Sub-Second Proximity Dispatch
                       </h4>
                       <p style={{ fontSize: "0.95rem", lineHeight: 1.6, color: "#64748B", margin: 0 }}>
-                        Intelligent spatial clustering matches you with the nearest captain heading your way to cut pickup waiting times to under 4 minutes.
+                        Intelligent spatial clustering matches you with the nearest buddy heading your way to cut pickup waiting times to under 4 minutes.
                       </p>
                     </div>
                   </div>
@@ -492,7 +492,7 @@ export default function CityRidesPage() {
                 }}>
                   <Image
                     src="/images/ill_city_safety_otp.png"
-                    alt="Safety shields and verified transit captains"
+                    alt="Safety shields and verified transit buddies"
                     fill
                     style={{ objectFit: "contain" }}
                     priority

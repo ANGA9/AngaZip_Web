@@ -90,7 +90,7 @@ export default function BlogPage() {
         text: "Mobile network handoffs in underground passages and dense concrete alleys frequently drop persistent TCP connections. We engineered an offline-first state-sync pipeline using binary Protocol Buffers over fallback MQTT channels. If a driver drops cellular connectivity for up to 45 seconds, the vehicle's dead-reckoning trajectory is calculated on-device and synchronized instantly upon packet restoration."
       },
       {
-        heading: "Impact on Passenger ETA & Captain Earnings",
+        heading: "Impact on Passenger ETA & Driver Buddy Earnings",
         text: "During our 90-day pilot across 50,000 active daily trips, this dispatch overhaul reduced median passenger pickup wait time from 6.8 minutes down to 4.2 minutes (a 38.2% drop) while cutting driver unpaid deadhead travel by 22%."
       }
     ]
@@ -109,7 +109,7 @@ export default function BlogPage() {
       paragraphs: [
         {
           heading: "Mapping Beyond Standard Turn-by-Turn",
-          text: "Standard global map providers often lack granular detail regarding dynamic local barricades, market hours, and narrow gullies. Riksho's internal road network graph integrates real-time telemetry from thousands of active auto and bike captains who traverse local neighborhood lanes daily."
+          text: "Standard global map providers often lack granular detail regarding dynamic local barricades, market hours, and narrow gullies. Riksho's internal road network graph integrates real-time telemetry from thousands of active auto and bike buddies who traverse local neighborhood lanes daily."
         },
         {
           heading: "Graph Partitioning & Live Routing",
@@ -120,7 +120,7 @@ export default function BlogPage() {
     },
     {
       id: "driver-morning-payouts",
-      title: "Why Next-Morning Settlements Matter for 100,000+ Captains",
+      title: "Why Next-Morning Settlements Matter for 100,000+ Driver Buddies",
       excerpt: "The economics of driver dignity: eliminating high platform cuts and automating 8:00 AM bank transfers.",
       category: "Driver Stories",
       readTime: "3 min read",
@@ -130,11 +130,11 @@ export default function BlogPage() {
       paragraphs: [
         {
           heading: "Ending the Weekly Payout Cycle",
-          text: "Most ride-hailing aggregators hold driver earnings for 7 to 14 days, forcing captains to borrow at high interest rates just to afford fuel, daily CNG refills, and household expenses. At Riksho, we fundamentally redesigned platform economics around driver cash-flow dignity."
+          text: "Most ride-hailing aggregators hold driver earnings for 7 to 14 days, forcing drivers to borrow at high interest rates just to afford fuel, daily CNG refills, and household expenses. At Riksho, we fundamentally redesigned platform economics around driver cash-flow dignity."
         },
         {
           heading: "Automated 8:00 AM Direct Bank Deposits",
-          text: "Every morning at 8:00 AM IST, our automated banking integration deposits 100% of the previous day's digital fare earnings directly into the captain's verified bank account via IMPS/NEFT, with transparent commission breakdowns and zero withholding fees.",
+          text: "Every morning at 8:00 AM IST, our automated banking integration deposits 100% of the previous day's digital fare earnings directly into the driver buddy's verified bank account via IMPS/NEFT, with transparent commission breakdowns and zero withholding fees.",
           quote: "When a driver wakes up knowing their money is already in their bank, they drive with peace of mind and genuine pride."
         }
       ]
@@ -193,7 +193,7 @@ export default function BlogPage() {
       paragraphs: [
         {
           heading: "Partnering Directly with Local Transport Unions",
-          text: "Unlike aggregators that enter new cities aggressively, Riksho partners directly with regional auto-rickshaw unions and municipal transport boards. We set fair base fares that reflect local living costs and ensure captains retain their dignity."
+          text: "Unlike aggregators that enter new cities aggressively, Riksho partners directly with regional auto-rickshaw unions and municipal transport boards. We set fair base fares that reflect local living costs and ensure buddies retain their dignity."
         },
         {
           heading: "Building Trust Across Tier-2 & Tier-3 India",
@@ -236,7 +236,7 @@ export default function BlogPage() {
     },
     {
       question: "Can driver partners and passengers contribute their own stories?",
-      answer: "Yes! We regularly feature captain milestone journeys, passenger transit stories, and fleet operator spotlights. Reach out to stories@riksho.in to submit your journey."
+      answer: "Yes! We regularly feature driver buddy milestone journeys, passenger transit stories, and fleet operator spotlights. Reach out to stories@riksho.in to submit your journey."
     },
     {
       question: "Where can media outlets find official press kits and branding assets?",
