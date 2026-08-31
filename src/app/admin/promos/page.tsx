@@ -35,6 +35,7 @@ interface PromoCode {
   max_redemptions: number | null;
   redemption_count: number;
   expires_at: string | null;
+  usage_validity_hours?: number | null;
   is_active: boolean;
   is_deleted?: boolean;
   deleted_at?: string | null;
@@ -77,6 +78,8 @@ export default function AdminPromosPage() {
   const [formPlanName, setFormPlanName] = useState("");
   const [formMaxRedemptions, setFormMaxRedemptions] = useState("");
   const [formExpiresAt, setFormExpiresAt] = useState("");
+  const [formUsageTimerEnabled, setFormUsageTimerEnabled] = useState(false);
+  const [formUsageHours, setFormUsageHours] = useState("24");
   const [formDescription, setFormDescription] = useState("");
   const [formIsActive, setFormIsActive] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -201,6 +204,8 @@ export default function AdminPromosPage() {
         throw new Error(`Promo code "${cleanCode}" already exists. Please choose a different code.`);
       }
 
+      const payloadUsageHours = formUsageTimerEnabled && parseInt(formUsageHours) > 0 ? parseInt(formUsageHours) : null;
+
       if (existing && existing.is_deleted) {
         const { error: updateErr } = await adminSupabase
           .from("driver_promo_codes")
@@ -211,6 +216,7 @@ export default function AdminPromosPage() {
             plan_name: payloadPlanName,
             max_redemptions: formMaxRedemptions ? parseInt(formMaxRedemptions) : null,
             expires_at: formExpiresAt ? new Date(formExpiresAt).toISOString() : null,
+            usage_validity_hours: payloadUsageHours,
             description: formDescription.trim() || null,
             is_active: formIsActive,
             is_deleted: false,
@@ -232,6 +238,7 @@ export default function AdminPromosPage() {
             plan_name: payloadPlanName,
             max_redemptions: formMaxRedemptions ? parseInt(formMaxRedemptions) : null,
             expires_at: formExpiresAt ? new Date(formExpiresAt).toISOString() : null,
+            usage_validity_hours: payloadUsageHours,
             description: formDescription.trim() || null,
             is_active: formIsActive,
             is_deleted: false,
@@ -260,6 +267,8 @@ export default function AdminPromosPage() {
     setFormPlanName("");
     setFormMaxRedemptions("");
     setFormExpiresAt("");
+    setFormUsageTimerEnabled(false);
+    setFormUsageHours("24");
     setFormDescription("");
     setFormIsActive(true);
     setFormError("");
@@ -617,6 +626,11 @@ export default function AdminPromosPage() {
                         ) : (
                           <span style={{ color: "#94A3B8" }}>Never expires</span>
                         )}
+                        {promo.usage_validity_hours && (
+                          <div style={{ display: "inline-flex", alignItems: "center", gap: 4, backgroundColor: "#FEF3C7", color: "#B45309", border: "1px solid #FDE68A", padding: "2px 7px", borderRadius: 6, fontSize: 11, fontWeight: 700, marginTop: 4 }}>
+                            <Clock size={11} /> {promo.usage_validity_hours}h timer after claim
+                          </div>
+                        )}
                       </td>
 
                       {/* Status */}
@@ -966,6 +980,89 @@ export default function AdminPromosPage() {
                     }}
                   />
                 </div>
+              </div>
+
+              {/* Post-Claim Usage Timer Option */}
+              <div style={{ backgroundColor: "#F8FAFC", border: "1px solid #E2E8F0", borderRadius: 14, padding: "14px 16px", marginBottom: 16 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: formUsageTimerEnabled ? 12 : 0 }}>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "#0F172A", display: "flex", alignItems: "center", gap: 6 }}>
+                      <Clock size={16} color="#4338CA" /> Set Usage Expiration Timer
+                    </div>
+                    <div style={{ fontSize: 12, color: "#64748B", marginTop: 2 }}>
+                      Once claimed, the user must use the reward within this time limit before it expires.
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setFormUsageTimerEnabled(!formUsageTimerEnabled)}
+                    style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", padding: 0 }}
+                  >
+                    {formUsageTimerEnabled ? (
+                      <ToggleRight size={30} color="#4338CA" />
+                    ) : (
+                      <ToggleLeft size={30} color="#94A3B8" />
+                    )}
+                  </button>
+                </div>
+
+                {formUsageTimerEnabled && (
+                  <div>
+                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
+                      {[
+                        { label: "12 Hours", value: "12" },
+                        { label: "24 Hours (1 Day)", value: "24" },
+                        { label: "48 Hours (2 Days)", value: "48" },
+                        { label: "3 Days (72h)", value: "72" },
+                        { label: "7 Days (168h)", value: "168" },
+                      ].map((preset) => (
+                        <button
+                          key={preset.value}
+                          type="button"
+                          onClick={() => setFormUsageHours(preset.value)}
+                          style={{
+                            padding: "6px 12px",
+                            borderRadius: 8,
+                            fontSize: 12,
+                            fontWeight: 600,
+                            border: formUsageHours === preset.value ? "1.5px solid #4338CA" : "1px solid #CBD5E1",
+                            backgroundColor: formUsageHours === preset.value ? "#EEF2FF" : "#FFFFFF",
+                            color: formUsageHours === preset.value ? "#4338CA" : "#475569",
+                            cursor: "pointer",
+                          }}
+                        >
+                          {preset.label}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <label style={{ fontSize: 12, fontWeight: 600, color: "#334155" }}>
+                        Custom Hours:
+                      </label>
+                      <input
+                        type="number"
+                        min="1"
+                        value={formUsageHours}
+                        onChange={(e) => setFormUsageHours(e.target.value)}
+                        placeholder="e.g. 24"
+                        style={{
+                          width: 90,
+                          padding: "6px 10px",
+                          borderRadius: 8,
+                          border: "1px solid #CBD5E1",
+                          fontSize: 13,
+                          fontWeight: 600,
+                          color: "#0F172A",
+                          outline: "none",
+                        }}
+                      />
+                      <span style={{ fontSize: 12, color: "#64748B" }}>
+                        hours to use after claiming
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Description */}
