@@ -128,18 +128,20 @@ function DriversListContent() {
                     </td>
                     <td className="admin-cell-mono">{driver.phone}</td>
                     <td>
-                      {driver.vehicles ? (
-                        <div>
-                          <span style={{ textTransform: "capitalize", fontWeight: 500 }}>
-                            {(Array.isArray(driver.vehicles) ? driver.vehicles[0] : driver.vehicles).type}
-                          </span>
-                          <div className="admin-cell-sub">
-                            {(Array.isArray(driver.vehicles) ? driver.vehicles[0] : driver.vehicles).plate}
+                      {(() => {
+                        const v = Array.isArray(driver.vehicles) ? driver.vehicles[0] : (driver.vehicle || driver.vehicles);
+                        if (!v) return "—";
+                        return (
+                          <div>
+                            <span style={{ textTransform: "capitalize", fontWeight: 600 }}>
+                              {v.model ? `${v.model} (${v.type})` : v.type}
+                            </span>
+                            <div className="admin-cell-sub">
+                              {v.plate || "No plate"}
+                            </div>
                           </div>
-                        </div>
-                      ) : (
-                        "—"
-                      )}
+                        );
+                      })()}
                     </td>
                     <td>
                       <span className={`admin-badge badge-${driver.verification_status}`}>
