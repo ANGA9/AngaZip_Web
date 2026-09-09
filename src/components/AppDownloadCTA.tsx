@@ -52,13 +52,14 @@ export default function AppDownloadCTA() {
             {/* Phone Mockup */}
             <div style={{ position: "relative", zIndex: 1, width: "100%", height: "100%" }}>
               <Image
-                src="/images/phone_mockup_transparent_v2.png"
-                alt="Riksho App Mockup"
+                src="/images/home_phone_mockup.png"
+                alt="Riksho App Home Mockup"
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 quality={100}
                 className="phone-mockup-img"
                 style={{ objectFit: "contain" }}
+                priority
               />
             </div>
           </div>
