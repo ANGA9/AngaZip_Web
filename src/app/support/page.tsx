@@ -186,8 +186,10 @@ export default function SupportPage() {
                 {/* 3 Minimalist Direct Channel Points (No boxes, no descriptions, no buttons) */}
                 <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                   {/* In-App Live Support */}
-                  <Link 
-                    href="#download" 
+                  <a 
+                    href="https://play.google.com/store/apps/details?id=com.riksho.customer&pcampaignid=web_share" 
+                    target="_blank"
+                    rel="noopener noreferrer"
                     style={{ 
                       display: "flex", 
                       alignItems: "center", 
@@ -202,7 +204,7 @@ export default function SupportPage() {
                       <Smartphone size={18} />
                     </div>
                     <span>In-App Live Ride Assistance</span>
-                  </Link>
+                  </a>
 
                   {/* Email Support */}
                   <div 
