@@ -121,8 +121,10 @@ export default function Navbar() {
 
             {/* Desktop Right Actions */}
             <div className="navbar-actions">
-              <Link 
-                href="#download" 
+              <a 
+                href="https://play.google.com/store/apps/details?id=com.riksho.customer&pcampaignid=web_share" 
+                target="_blank"
+                rel="noopener noreferrer"
                 className={`btn-primary btn-nav-cta hidden-mobile ${(scrolled || mobileMenuOpen) ? 'visible' : 'hidden'}`}
                 style={{ 
                   backgroundColor: "var(--color-white)", 
@@ -132,7 +134,7 @@ export default function Navbar() {
                 }}
               >
                 Get the App
-              </Link>
+              </a>
 
               {/* Language Pill & Dropdown */}
               <div style={{ position: 'relative' }}>
@@ -274,14 +276,16 @@ export default function Navbar() {
               </div>
 
               {/* Mobile CTA */}
-              <Link
-                href="#download"
+              <a
+                href="https://play.google.com/store/apps/details?id=com.riksho.customer&pcampaignid=web_share"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="btn-primary mobile-only-cta"
-                style={{ width: "100%", marginTop: "24px" }}
+                style={{ width: "100%", marginTop: "24px", textAlign: "center", display: "block" }}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Get the App
-              </Link>
+              </a>
             </div>
           )}
         </div>

@@ -74,7 +74,12 @@ export default function HeroSection() {
 
           {/* CTA */}
           <div className="hero-actions animate-fade-in-up stagger-3">
-            <a href="#download" className="btn-primary hero-main-cta">
+            <a 
+              href="https://play.google.com/store/apps/details?id=com.riksho.customer&pcampaignid=web_share" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-primary hero-main-cta"
+            >
               Get the App
               <svg style={{ marginLeft: "8px", width: "16px", height: "16px" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
